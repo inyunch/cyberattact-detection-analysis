@@ -17,6 +17,12 @@ Cybersecurity is not just a technical challenge—it's a strategic risk. Organiz
 2. **Global Cybersecurity Threats Dataset (2015–2024)** (https://www.kaggle.com/datasets/atharvasoundankar/global-cybersecurity-threats-2015-2024)
     - Incident-level global records: attack types, targeted sectors/countries, financial losses, vulnerabilities, resolutions.
     - Used for trend analysis and mapping technical detections to broader impacts.
+3. **Cybersecurity Intrusion Detection Dataset** (https://www.kaggle.com/datasets/dnkumars/cybersecurity-intrusion-detection-dataset)
+    - Network traffic and user behavior-based features for intrusion detection.
+    - Network features: packet size (64-1500 bytes), protocol type (TCP, UDP, ICMP), encryption type (AES, DES, None).
+    - User behavior features: login attempts, session duration, failed login counts, unusual time access, IP reputation score, browser type.
+    - Binary classification: attack detected (1) vs. normal activity (0).
+    - Used for machine learning-based intrusion detection and user behavior analysis.
 
 ## Project Narrative
 
@@ -25,6 +31,10 @@ Before diving into analysis or visualization, this project establishes a clear m
 - **What is the story?**
     - Technical detection helps organizations prevent major incidents. Insights at the network level may provide early warning for broader impacts.
     - Understanding connections between attack behavior and global incident patterns drives better mitigation strategies.
+    - My goal is to tell a story about how digital threats have changed over time and across industries and regions, leading to actionable insights:
+        - Which countries and sectors need the most improvement?
+        - What types of attacks are most frequent and damaging?
+        - How effective have different defenses been over time?
 - **What are we trying to prove?**
     - Can specific packet behaviors provide leading indicators for global attack trends?
     - Do certain network violation types (confidentiality, integrity, authenticity) correlate with high-impact incidents globally?
@@ -57,6 +67,17 @@ All visualizations will start by specifying the point or insight being communica
 - Visualizations: Time-series, interactive dashboards, heatmaps, bar/treemaps, model performance charts
 - Tables: Summary statistics, top attacks/impacts, feature importances
 - Documentation: Embedded user help, project purpose, instructions, definitions
+
+### Planned Visualizations & Features
+
+Based on the narrative goals, the app will include:
+
+- **Interactive time-series charts** for attack frequency and losses by year
+- **Heatmaps** showing affected regions/countries
+- **Treemaps or bar charts** for attack types and targeted industries
+- **Filters** to drill down by industry, year, or country
+- **Network graphs** for attack sources and defense mechanisms
+- **Summary dashboard with KPIs**: total losses per year, top 5 attack types
 
 ## Risk Mitigation
 
