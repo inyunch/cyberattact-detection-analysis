@@ -1,5 +1,9 @@
 # Cyberattack Detection and Global Impact Analysis
 
+## Live Demo
+
+**[View the deployed app here](https://cyberattact-detection-analysis.streamlit.app/)**
+
 ## Project Overview
 
 The goal of this project is to investigate cyberattacks from both granular technical (network/packet-level) and broader global perspectives. The narrative centers around understanding how attack behaviors observed in IoT network packet captures align with real-world cybersecurity incidents, trends, and organizational impacts. By bridging these layers, the project aims to deliver actionable insights into detection, risk management, and mitigation strategies.
