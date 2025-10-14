@@ -3,6 +3,14 @@ import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
+from modules.theme import COLORS, apply_plotly_theme
+from modules.filters import (
+    apply_global_filters,
+    page_filter_panel_global_threats,
+    apply_page_filters_global_threats,
+    filter_summary_chips,
+    show_filter_stats
+)
 
 def show(global_threats):
     """Display global threat landscape analysis"""
@@ -15,129 +23,24 @@ def show(global_threats):
         st.error("Unable to load global threats data.")
         return
 
-    # Year range filter card
-    with st.sidebar.container():
-        st.markdown("""
-        <div style="
-            background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
-            padding: 15px 16px 12px 16px;
-            border-radius: 10px;
-            margin-bottom: 18px;
-            border: 1px solid rgba(0,120,212,0.2);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        ">
-            <p style="color: #ffffff; font-weight: 600; font-size: 13px; margin: 0 0 12px 0; letter-spacing: 0.5px;">
-                📅 YEAR RANGE
-            </p>
-        """, unsafe_allow_html=True)
+    # Apply global filters first
+    original_count = len(global_threats)
+    global_filters = st.session_state.get('global_filters', {})
+    global_threats = apply_global_filters(global_threats, global_filters)
 
-        min_year, max_year = int(global_threats['Year'].min()), int(global_threats['Year'].max())
-        year_range = st.slider(
-            "Year Range",
-            min_value=min_year,
-            max_value=max_year,
-            value=(min_year, max_year),
-            label_visibility="collapsed"
-        )
+    # Page-specific filters
+    page_filters = page_filter_panel_global_threats(global_threats)
+    global_threats = apply_page_filters_global_threats(global_threats, page_filters)
+    filtered_count = len(global_threats)
 
-        st.markdown("</div>", unsafe_allow_html=True)
+    # Show filter summary
+    filter_summary_chips(global_filters, page_filters)
 
-    # Country filter card
-    with st.sidebar.container():
-        st.markdown("""
-        <div style="
-            background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
-            padding: 15px 16px 12px 16px;
-            border-radius: 10px;
-            margin: 20px 0 18px 0;
-            border: 1px solid rgba(0,120,212,0.2);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        ">
-            <p style="color: #ffffff; font-weight: 600; font-size: 13px; margin: 0 0 12px 0; letter-spacing: 0.5px;">
-                🌍 COUNTRIES
-            </p>
-        """, unsafe_allow_html=True)
+    # Show filter stats
+    show_filter_stats(original_count, filtered_count)
 
-        countries = ['All'] + sorted(global_threats['Country'].unique().tolist())
-        selected_countries = st.multiselect(
-            "Countries",
-            options=countries,
-            default=['All'],
-            label_visibility="collapsed"
-        )
-
-        st.markdown("</div>", unsafe_allow_html=True)
-
-    # Sector filter card
-    with st.sidebar.container():
-        st.markdown("""
-        <div style="
-            background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
-            padding: 15px 16px 12px 16px;
-            border-radius: 10px;
-            margin: 20px 0 18px 0;
-            border: 1px solid rgba(0,120,212,0.2);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        ">
-            <p style="color: #ffffff; font-weight: 600; font-size: 13px; margin: 0 0 12px 0; letter-spacing: 0.5px;">
-                🏢 INDUSTRIES
-            </p>
-        """, unsafe_allow_html=True)
-
-        sectors = ['All'] + sorted(global_threats['Target Industry'].unique().tolist())
-        selected_sectors = st.multiselect(
-            "Industries",
-            options=sectors,
-            default=['All'],
-            label_visibility="collapsed"
-        )
-
-        st.markdown("</div>", unsafe_allow_html=True)
-
-    # Attack type filter card
-    with st.sidebar.container():
-        st.markdown("""
-        <div style="
-            background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
-            padding: 15px 16px 12px 16px;
-            border-radius: 10px;
-            margin: 20px 0 18px 0;
-            border: 1px solid rgba(0,120,212,0.2);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        ">
-            <p style="color: #ffffff; font-weight: 600; font-size: 13px; margin: 0 0 12px 0; letter-spacing: 0.5px;">
-                🎯 ATTACK TYPES
-            </p>
-        """, unsafe_allow_html=True)
-
-        attack_types = ['All'] + sorted(global_threats['Attack Type'].unique().tolist())
-        selected_attack_types = st.multiselect(
-            "Attack Types",
-            options=attack_types,
-            default=['All'],
-            label_visibility="collapsed"
-        )
-
-        st.markdown("</div>", unsafe_allow_html=True)
-
-    # Apply filters
-    filtered_data = global_threats.copy()
-    filtered_data = filtered_data[
-        (filtered_data['Year'] >= year_range[0]) &
-        (filtered_data['Year'] <= year_range[1])
-    ]
-
-    if 'All' not in selected_countries:
-        filtered_data = filtered_data[filtered_data['Country'].isin(selected_countries)]
-
-    if 'All' not in selected_sectors:
-        filtered_data = filtered_data[filtered_data['Target Industry'].isin(selected_sectors)]
-
-    if 'All' not in selected_attack_types:
-        filtered_data = filtered_data[filtered_data['Attack Type'].isin(selected_attack_types)]
-
-    # Display filter results
-    st.info(f"📊 Showing **{len(filtered_data):,}** incidents (filtered from {len(global_threats):,} total)")
+    # Store filtered data for charts
+    filtered_data = global_threats
 
     # Create tabs for different analyses
     tab1, tab2, tab3 = st.tabs([

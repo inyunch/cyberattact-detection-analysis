@@ -1,0 +1,362 @@
+# Claude Code Design Assistant Configuration
+
+## Project Context
+This is the CyberGuard Threat Intelligence Dashboard - a modern cybersecurity analytics platform with a dark theme and neon accents.
+
+## Design System Enforcement
+All UI/UX work MUST strictly follow the rules defined in `DESIGN_RULES.md`.
+
+When asked to create, modify, or review UI components:
+1. Always reference DESIGN_RULES.md first
+2. Use only the defined CSS variables from the color palette
+3. Follow the typography scale (Inter + JetBrains Mono)
+4. Implement proper accessibility (WCAG 2.1 AA)
+5. Ensure responsive design (mobile-first approach)
+6. Apply consistent spacing (8px base unit)
+7. Use defined transitions and animations
+8. No hard-coded colors or arbitrary values
+
+## Key Design Principles
+- **Dark Theme**: Primary background #141B2D
+- **Neon Accents**: Blue (#00D9FF) and Green (#00FFB3)
+- **Rounded Corners**: 12-16px for cards, 10-12px for buttons
+- **Glowing Effects**: Active states with subtle neon glow
+- **Modular Components**: Reusable, accessible, semantic
+
+## Code Quality Requirements
+- CSS variables only (no hard-coded values)
+- Semantic HTML with ARIA attributes
+- Mobile-first responsive design
+- Meaningful labels (no placeholder text)
+- No unnecessary libraries or frameworks
+
+## Filter System Architecture
+
+### Global Filters (All Pages)
+Located in sidebar, always visible. These filters affect all pages.
+
+**Design**: Clean, unified container with minimal branding
+- Simple "Time Period" header with calendar icon (📅)
+- NO "Global Filters" branding or redundant headers
+- NO active count badge next to section title
+- Three visually connected sections using negative margins:
+  1. Header section: Time Period label
+  2. Middle section: Slider + selected range + preset label
+  3. Footer section: Preset buttons + Clear All button
+
+**Components**:
+- **Year Range Slider**: Filter data by time period
+- **Selected Range Display**: Large gradient box showing current selection
+- **Quick Presets**: 3Y, 5Y, All (blue gradient buttons)
+- **Clear All Button**: Red button (destructive action)
+
+**Implementation**:
+- Store in `st.session_state['global_filters']`
+- Apply automatically in data loading functions
+- Persist across page navigation
+- All sections share same gradient background, border, border-radius
+- Use margin-top: -12px to overlap sections seamlessly
+
+### Page-Specific Filters
+Contextual filters that appear only on relevant pages:
+
+**Dashboard Page**:
+- No additional filters (uses global only)
+
+**Global Threat Landscape**:
+- Attack Type (multiselect)
+- Target Industry (multiselect)
+- Country (multiselect)
+- Financial Loss Range (slider)
+
+**Intrusion Detection**:
+- Protocol Type (multiselect)
+- Attack Detected (toggle: Yes/No/Both)
+- Port Range (slider)
+- Source/Destination IP search
+
+**IDA/EDA Analysis**:
+- Feature Selection (multiselect for columns)
+- Statistical Method (dropdown)
+- Chart Type (radio buttons)
+
+**Comparative Insights**:
+- Comparison Mode (dropdown: YoY, Dataset A vs B, Industry comparison)
+- Metric Selection (multiselect)
+
+### Filter Component Guidelines
+
+**CRITICAL COLOR RULE**:
+❌ RED (#FF5370) is ONLY for destructive/critical actions (Clear All Filters button)
+❌ NEVER use red for regular buttons, presets, or normal UI elements
+✅ Use BLUE (#00D9FF) and GREEN (#00FFB3) gradients for all regular buttons
+✅ Sidebar preset buttons (3Y, 5Y, All) MUST be blue, never red!
+
+**Color Specifications**:
+```css
+/* Core Colors (hex values for inline styles) */
+--bg-primary: #141B2D          /* Main background */
+--bg-secondary: #1F2A40        /* Cards, panels */
+--bg-tertiary: #0F1520         /* Darker elements */
+--bg-hover: #2A3650            /* Hover states */
+
+--text-primary: #E8EAF0        /* Main text */
+--text-secondary: #A0A7B8      /* Secondary text */
+--text-muted: #6C7489          /* Labels, muted text */
+
+--accent-blue: #00D9FF         /* Primary accent */
+--accent-green: #00FFB3        /* Secondary accent */
+--accent-purple: #7B61FF       /* Tertiary accent */
+--accent-orange: #FF9F43       /* Warning/attention */
+--accent-red: #FF5370          /* Error/remove */
+
+--border-color: #2E3A52        /* Standard borders */
+```
+
+**Filter Component Colors**:
+```css
+/* Time Period Container (All Sections) */
+background: linear-gradient(135deg,
+    rgba(0, 217, 255, 0.08) 0%,
+    rgba(0, 255, 179, 0.08) 100%);
+border: 1px solid rgba(0, 217, 255, 0.3);
+border-radius: 12px;
+padding: 16px;
+margin-bottom: 12px;
+box-shadow: 0 4px 16px rgba(0, 217, 255, 0.1);
+
+/* Section Overlap Technique */
+margin-top: -12px;  /* Use on middle/footer sections to visually connect */
+
+/* Time Period Header */
+icon: 📅 (calendar, 18px)
+title: "Time Period" (0.95rem, 700 weight, #E8EAF0)
+no-badge: DO NOT show active count badge
+
+/* Active Filter Chips Container */
+background: linear-gradient(135deg,
+    rgba(0, 217, 255, 0.05) 0%,
+    rgba(0, 255, 179, 0.05) 50%,
+    rgba(123, 97, 255, 0.05) 100%);
+border: 1px solid rgba(0, 217, 255, 0.2);
+top-border: linear-gradient(90deg, #00D9FF 0%, #00FFB3 50%, #7B61FF 100%);
+
+/* Filter Chip - Blue (Global) */
+background: linear-gradient(135deg,
+    rgba(0, 217, 255, 0.2) 0%,
+    rgba(0, 217, 255, 0.1) 100%);
+border: 1.5px solid rgba(0, 217, 255, 0.5);
+
+/* Filter Chip - Green (Page) */
+background: linear-gradient(135deg,
+    rgba(0, 255, 179, 0.2) 0%,
+    rgba(0, 255, 179, 0.1) 100%);
+border: 1.5px solid rgba(0, 255, 179, 0.5);
+
+/* Filter Chip - Purple (Ranges) */
+background: linear-gradient(135deg,
+    rgba(123, 97, 255, 0.2) 0%,
+    rgba(123, 97, 255, 0.1) 100%);
+border: 1.5px solid rgba(123, 97, 255, 0.5);
+
+/* Filter Chip - Orange (Other) */
+background: linear-gradient(135deg,
+    rgba(255, 159, 67, 0.2) 0%,
+    rgba(255, 159, 67, 0.1) 100%);
+border: 1.5px solid rgba(255, 159, 67, 0.5);
+
+/* Selected Year Range Display */
+background: linear-gradient(135deg,
+    rgba(0, 217, 255, 0.15) 0%,
+    rgba(0, 255, 179, 0.15) 100%);
+border-radius: 8px;
+padding: 10px;
+text-align: center;
+start-year-color: #00D9FF (1.1rem, 700 weight, JetBrains Mono);
+arrow: → (#6C7489, 600 weight);
+end-year-color: #00FFB3 (1.1rem, 700 weight, JetBrains Mono);
+
+/* Sidebar Preset Buttons (3Y, 5Y, All) - MUST BE BLUE, NOT RED! */
+background: transparent;
+background-image: linear-gradient(135deg, rgba(0, 217, 255, 0.12) 0%, rgba(0, 255, 179, 0.12) 100%);
+color: #00D9FF;
+border: 1.5px solid rgba(0, 217, 255, 0.5);
+hover-background: linear-gradient(135deg, rgba(0, 217, 255, 0.25) 0%, rgba(0, 255, 179, 0.25) 100%);
+hover-color: #00FFB3;
+
+/* Clear All Button - RED IS OK HERE (destructive action) */
+background: transparent;
+border: 1px solid rgba(255, 83, 112, 0.5);
+color: #FF5370;
+hover-background: rgba(255, 83, 112, 0.1);
+
+/* Filter Stats - Intensity Colors */
+< 25% filtered: #00FFB3 (green - light filtering, broad view)
+25-50% filtered: #00D9FF (blue - moderate filtering, balanced)
+50-75% filtered: #FF9F43 (orange - heavy filtering, focused)
+> 75% filtered: #7B61FF (purple - very focused, precision filtering)
+
+/* Progress Bar */
+track: rgba(255, 255, 255, 0.05);
+fill: linear-gradient(90deg, #00D9FF 0%, #00FFB3 100%);
+glow: dynamic based on intensity color
+```
+
+**Visual Design Standards**:
+```css
+/* Filter container */
+background: #1F2A40;
+border: 1px solid #2E3A52;
+border-radius: 12px;
+padding: 16px;
+box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+
+/* Filter section headers */
+color: #6C7489;
+font-size: 0.75rem;
+font-weight: 600;
+text-transform: uppercase;
+letter-spacing: 0.05em;
+
+/* Prominent cards (Time Period, Page Filter Info) */
+background: linear-gradient(135deg,
+    rgba(0, 217, 255, 0.05) 0%,
+    rgba(0, 255, 179, 0.05) 100%);
+border: 1px solid rgba(0, 217, 255, 0.3);
+box-shadow: 0 4px 12px rgba(0, 217, 255, 0.15);
+```
+
+**Interaction Design**:
+- Smooth animations (--transition-base)
+- Hover states with accent colors
+- Active filter chips with close buttons
+- Filter count badge on collapse button
+- "Applied Filters" summary bar
+
+**Accessibility**:
+- Clear labels with aria-label
+- Keyboard navigation support
+- Screen reader announcements for filter changes
+- Focus indicators on all interactive elements
+
+### Filter State Management
+
+**Session State Structure**:
+```python
+st.session_state['global_filters'] = {
+    'year_range': (2015, 2024),
+    'quick_preset': None
+}
+
+st.session_state['page_filters'] = {
+    'global_threats': {
+        'attack_types': [],
+        'industries': [],
+        'countries': [],
+        'loss_range': (0, 1000)
+    },
+    'intrusion_detection': {
+        'protocols': [],
+        'attack_detected': 'both',
+        'port_range': (0, 65535)
+    }
+}
+```
+
+**Filter Application Order**:
+1. Global filters applied first (year range)
+2. Page-specific filters applied second
+3. Cache results with `@st.cache_data`
+4. Display filtered row count
+
+### Filter Component Reusability
+
+**Create in `modules/filters.py`**:
+```python
+def global_filter_sidebar()
+def page_filter_panel(page_name, available_filters)
+def filter_summary_chips(active_filters)
+def apply_filters(df, filters)
+```
+
+**Standard Filter Types**:
+- `year_range_filter()` - Slider with quick presets
+- `multiselect_filter()` - Searchable multiselect
+- `numeric_range_filter()` - Min/max slider
+- `toggle_filter()` - Binary yes/no
+- `search_filter()` - Text input with suggestions
+
+### Filter UX Best Practices
+
+**DO**:
+✅ Display active filters as removable chips on main content area
+✅ Provide "Clear All" option at bottom of filter panel
+✅ Show data count before/after filtering
+✅ Persist filters in session state
+✅ Use icons for filter types (📅 for time, ⚠️ for attacks, etc.)
+✅ Use visual overlapping (negative margins) to connect sections
+✅ Keep section headers simple and minimal
+
+**DON'T**:
+❌ Show active count badges next to section titles (clutters header)
+❌ Use "Global Filters" redundant branding (context is obvious)
+❌ Auto-apply filters on every keystroke (use Apply button)
+❌ Hide active filters
+❌ Lose filters on page change
+❌ Use complex nested filters
+❌ Forget loading states
+❌ Use HTML comments in markdown (they render as text)
+
+## Before Implementing Any UI Change
+1. Check DESIGN_RULES.md for existing patterns
+2. Verify color contrast meets WCAG standards
+3. Ensure keyboard navigation support
+4. Test responsive behavior at all breakpoints
+5. Validate against the code review checklist
+
+## File References
+- Design Rules: `DESIGN_RULES.md`
+- Theme System: `modules/theme.py`
+- Main App: `app.py` (Streamlit)
+- React Components: `components/` directory
+- Color Palette: See CSS Variables section in DESIGN_RULES.md
+
+## Sidebar Button Styling - IMPORTANT!
+
+**Problem**: Streamlit's default button styling uses red for primary buttons.
+**Solution**: Nuclear CSS override in `app.py` (lines 265-342) that forces ALL sidebar buttons to use blue gradient.
+
+**Implementation**:
+```css
+/* In app.py - Global CSS that loads before any buttons */
+div[data-testid="stSidebar"] button {
+    background: transparent !important;
+    background-image: linear-gradient(135deg, rgba(0, 217, 255, 0.12) 0%, rgba(0, 255, 179, 0.12) 100%) !important;
+    color: #00D9FF !important;
+    border: 1.5px solid rgba(0, 217, 255, 0.5) !important;
+}
+```
+
+**NEVER**:
+- Add inline CSS to override button colors (won't work, too late in render cycle)
+- Use `type="primary"` without CSS override (will show red)
+- Add button styling CSS in component files (must be in app.py)
+
+**ALWAYS**:
+- Let the global CSS in app.py handle all sidebar button styling
+- Use blue/cyan theme colors for all non-destructive buttons
+- Reserve red ONLY for "Clear All Filters" button
+
+## Filter Implementation Checklist
+
+When adding filters to any page:
+- [ ] Import filter components from `modules/filters.py`
+- [ ] Add filter UI to appropriate section (sidebar or page)
+- [ ] Store filter state in session_state
+- [ ] Apply filters to data before visualization
+- [ ] Display active filter summary
+- [ ] Show filtered data count
+- [ ] Ensure filters persist on page change
+- [ ] Test with edge cases (empty results, all selected)
+- [ ] Verify accessibility (keyboard, screen reader)
+- [ ] Match design system styling

@@ -2,45 +2,22 @@ import streamlit as st
 import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
-
-# Color palette inspired by the target design
-COLORS = {
-    "primary": "#4A90E2",
-    "secondary": "#7ED321",
-    "background": "#F0F2F6",
-    "text": "#2A3F54",
-    "light_text": "#5E6C79",
-    "grid": "#EAEAEA",
-    "accent": "#F5A623",
-    "danger": "#D0021B",
-    "blue_palette": ["#4A90E2", "#50E3C2", "#BD10E0", "#F5A623", "#F8E71C"]
-}
-
-def kpi_card(icon, title, value, delta, delta_color="normal"):
-    """Custom KPI card styled like the target image."""
-    st.markdown(f"""
-    <div class="stMetric" style="border-left-color: {COLORS['primary']};">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div style="font-size: 1.1rem; font-weight: 600; color: {COLORS['light_text']};">{title}</div>
-            <div style="font-size: 2rem; color: {COLORS['primary']};">{icon}</div>
-        </div>
-        <div style="font-size: 2.5rem; font-weight: 700; color: {COLORS['text']}; margin-top: 8px;">{value}</div>
-        <div style="font-size: 0.9rem; color: {'#D0021B' if delta_color == 'inverse' else '#2E8B57'}; margin-top: 8px;">{delta}</div>
-    </div>
-    """, unsafe_allow_html=True)
+from modules.theme import COLORS, apply_plotly_theme
+from modules.filters import apply_global_filters, filter_summary_chips, show_filter_stats, global_filter_inline
 
 def show(global_threats, intrusion_data):
     """Display the main dashboard page."""
-
-    st.title("🛡️ Cybersecurity Command Center")
-    st.markdown("An overview of the global threat landscape and network security posture.")
 
     if global_threats is None or intrusion_data is None:
         st.error("Data not loaded. Please check the data sources.")
         return
 
-    # --- KPI Row ---
-    st.markdown("##") # Vertical space
+    # Apply global filters
+    global_filters = st.session_state.get('global_filters', {})
+    global_threats = apply_global_filters(global_threats, global_filters)
+
+    st.markdown("<div style='margin-top: 1rem;'></div>", unsafe_allow_html=True)
+
     total_incidents = len(global_threats)
     total_loss = global_threats['Financial Loss (in Million $)'].sum()
     avg_resolution_time = global_threats['Incident Resolution Time (in Hours)'].mean()
@@ -57,15 +34,15 @@ def show(global_threats, intrusion_data):
 
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        kpi_card("🚨", "Total Incidents", f"{total_incidents:,}", incident_delta_str)
+        st.metric("Total Incidents", f"{total_incidents:,}", incident_delta_str)
     with col2:
-        kpi_card("💰", "Total Financial Loss", f"${total_loss/1000:.2f}B", "Over 10 years")
+        st.metric("Total Financial Loss", f"${total_loss/1000:.2f}B", "Over 10 years")
     with col3:
-        kpi_card("⏱️", "Avg. Resolution Time", f"{avg_resolution_time:.1f} hrs", "Lower is better", delta_color="inverse")
+        st.metric("Avg. Resolution Time", f"{avg_resolution_time:.1f} hrs", "Lower is better")
     with col4:
-        kpi_card("📡", "Network Attack Rate", f"{network_attack_rate:.2f}%", "From intrusion dataset")
+        st.metric("Network Attack Rate", f"{network_attack_rate:.2f}%", "From intrusion dataset")
 
-    st.markdown("##") # Vertical space
+    st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
 
     # --- Main Dashboard Grid ---
     col1, col2 = st.columns([2, 3])
@@ -78,17 +55,12 @@ def show(global_threats, intrusion_data):
             labels=attack_types.index,
             values=attack_types.values,
             hole=.6,
-            marker_colors=COLORS["blue_palette"],
+            marker_colors=COLORS["chart_palette"],
             textinfo='label+percent',
             insidetextorientation='radial'
         )])
-        fig.update_layout(
-            showlegend=False,
-            height=350,
-            margin=dict(t=20, b=20, l=20, r=20),
-            paper_bgcolor="#FFFFFF",
-            plot_bgcolor="#FFFFFF"
-        )
+        fig = apply_plotly_theme(fig)
+        fig.update_layout(showlegend=False, height=300)
         st.plotly_chart(fig, use_container_width=True)
 
         # --- Top Targeted Industries (Bar Chart) ---
@@ -98,17 +70,14 @@ def show(global_threats, intrusion_data):
             x=target_industry.values,
             y=target_industry.index,
             orientation='h',
-            marker_color=COLORS["primary"]
+            marker_color=COLORS["accent_blue"]
         ))
+        fig2 = apply_plotly_theme(fig2)
         fig2.update_layout(
-            title_text="",
             xaxis_title="Number of Incidents",
             yaxis_title="",
             yaxis=dict(autorange="reversed"),
-            height=350,
-            paper_bgcolor="#FFFFFF",
-            plot_bgcolor="#FFFFFF",
-            margin=dict(t=20, b=20, l=20, r=20)
+            height=300
         )
         st.plotly_chart(fig2, use_container_width=True)
 
@@ -122,18 +91,15 @@ def show(global_threats, intrusion_data):
             y=attacks_by_year['Count'],
             mode='lines+markers',
             fill='tozeroy',
-            line=dict(color=COLORS["primary"], width=3),
-            marker=dict(size=8)
+            line=dict(color=COLORS["accent_blue"], width=3),
+            marker=dict(size=8, color=COLORS["accent_green"]),
+            fillcolor=f'rgba(0, 217, 255, 0.1)'
         ))
+        fig3 = apply_plotly_theme(fig3)
         fig3.update_layout(
             xaxis_title="Year",
             yaxis_title="Number of Incidents",
-            height=350,
-            paper_bgcolor="#FFFFFF",
-            plot_bgcolor="#FFFFFF",
-            margin=dict(t=20, b=20, l=20, r=20),
-            xaxis=dict(gridcolor=COLORS["grid"]),
-            yaxis=dict(gridcolor=COLORS["grid"])
+            height=300
         )
         st.plotly_chart(fig3, use_container_width=True)
 
@@ -146,31 +112,17 @@ def show(global_threats, intrusion_data):
             locationmode="country names",
             color="Financial Loss (in Million $)",
             hover_name="Country",
-            color_continuous_scale=px.colors.sequential.Blues,
+            color_continuous_scale=[[0, COLORS["bg_secondary"]], [0.5, COLORS["accent_blue"]], [1, COLORS["accent_green"]]],
             projection="natural earth"
         )
+        fig4 = apply_plotly_theme(fig4)
         fig4.update_layout(
-            height=350,
+            height=300,
             geo=dict(
-                bgcolor="rgba(0,0,0,0)",
-                lakecolor=COLORS["background"],
-                landcolor="#EAEAEA",
-                subunitcolor="#FFFFFF"
-            ),
-            paper_bgcolor="#FFFFFF",
-            plot_bgcolor="#FFFFFF",
-            margin=dict(t=20, b=20, l=20, r=20)
+                bgcolor=COLORS["bg_secondary"],
+                lakecolor=COLORS["bg_primary"],
+                landcolor=COLORS["bg_hover"],
+                subunitcolor=COLORS["border_color"]
+            )
         )
         st.plotly_chart(fig4, use_container_width=True)
-
-    # --- Project Summary ---
-    st.markdown("##")
-    st.subheader("About This Platform")
-    st.markdown("""
-    This interactive dashboard provides a dual perspective on cybersecurity:
-
-    - **🌍 Macro View:** Analyzing over 10 years of global cyber attack data to identify strategic trends, financial impacts, and high-risk sectors.
-    - **🔍 Micro View:** Inspecting network-level data to uncover tactical intrusion patterns and behavioral signatures.
-
-    Use the navigation panel on the left to dive deeper into specific analyses, explore the raw data, and understand the project's methodology.
-    """)
