@@ -109,11 +109,27 @@ def show(global_threats, intrusion_data):
         # Attack growth over time
         attacks_by_year = global_threats.groupby('Year').size().reset_index(name='Count')
 
-        fig1 = px.area(attacks_by_year, x='Year', y='Count',
-                      title='Global Attack Frequency Trend (2015-2024)',
-                      labels={'Count': 'Number of Attacks'})
-        fig1.update_traces(fill='tozeroy', line_color='#ff7f0e')
-        fig1.update_layout(height=400)
+        # Convert to lists for better Plotly compatibility
+        comp_years = [int(y) for y in attacks_by_year['Year']]
+        comp_counts = [int(c) for c in attacks_by_year['Count']]
+
+        fig1 = go.Figure()
+        fig1.add_trace(go.Scatter(
+            x=comp_years,
+            y=comp_counts,
+            mode='lines',
+            fill='tozeroy',
+            line=dict(color='#ff7f0e', width=2),
+            name='Attacks'
+        ))
+
+        fig1.update_layout(
+            title='Global Attack Frequency Trend (2015-2024)',
+            xaxis_title='Year',
+            yaxis_title='Number of Attacks',
+            height=400,
+            xaxis=dict(range=[2014.5, 2024.5], dtick=1)
+        )
         st.plotly_chart(fig1, use_container_width=True)
 
         st.markdown("""

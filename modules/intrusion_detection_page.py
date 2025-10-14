@@ -15,39 +15,108 @@ def show(intrusion_data):
         st.error("Unable to load intrusion detection data.")
         return
 
-    # Sidebar filters
-    st.sidebar.markdown("## 🔍 Filters")
+    # Classification filter card
+    with st.sidebar.container():
+        st.markdown("""
+        <div style="
+            background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+            padding: 15px 16px 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 18px;
+            border: 1px solid rgba(0,120,212,0.2);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        ">
+            <p style="color: #ffffff; font-weight: 600; font-size: 13px; margin: 0 0 12px 0; letter-spacing: 0.5px;">
+                🎯 CLASSIFICATION
+            </p>
+        """, unsafe_allow_html=True)
 
-    # Classification filter
-    classification_options = ['All', 'Attack', 'Normal']
-    selected_classification = st.sidebar.selectbox(
-        "🎯 Classification",
-        options=classification_options
-    )
+        classification_options = ['All', 'Attack', 'Normal']
+        selected_classification = st.selectbox(
+            "Classification",
+            options=classification_options,
+            label_visibility="collapsed"
+        )
 
-    # Protocol filter
-    protocols = ['All'] + sorted(intrusion_data['protocol_type'].unique().tolist())
-    selected_protocols = st.sidebar.multiselect(
-        "📡 Protocol Type",
-        options=protocols,
-        default=['All']
-    )
+        st.markdown("</div>", unsafe_allow_html=True)
 
-    # Encryption filter
-    encryption_types = ['All'] + sorted(intrusion_data['encryption_used'].unique().tolist())
-    selected_encryption = st.sidebar.multiselect(
-        "🔐 Encryption Type",
-        options=encryption_types,
-        default=['All']
-    )
+    # Protocol filter card
+    with st.sidebar.container():
+        st.markdown("""
+        <div style="
+            background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+            padding: 15px 16px 12px 16px;
+            border-radius: 10px;
+            margin: 20px 0 18px 0;
+            border: 1px solid rgba(0,120,212,0.2);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        ">
+            <p style="color: #ffffff; font-weight: 600; font-size: 13px; margin: 0 0 12px 0; letter-spacing: 0.5px;">
+            📡 PROTOCOL TYPE
+            </p>
+        """, unsafe_allow_html=True)
 
-    # Browser filter
-    browsers = ['All'] + sorted(intrusion_data['browser_type'].unique().tolist())
-    selected_browsers = st.sidebar.multiselect(
-        "🌐 Browser Type",
-        options=browsers,
-        default=['All']
-    )
+        protocols = ['All'] + sorted(intrusion_data['protocol_type'].unique().tolist())
+        selected_protocols = st.multiselect(
+            "Protocol Type",
+            options=protocols,
+            default=['All'],
+            label_visibility="collapsed"
+        )
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    # Encryption filter card
+    with st.sidebar.container():
+        st.markdown("""
+        <div style="
+            background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+            padding: 15px 16px 12px 16px;
+            border-radius: 10px;
+            margin: 20px 0 18px 0;
+            border: 1px solid rgba(0,120,212,0.2);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        ">
+            <p style="color: #ffffff; font-weight: 600; font-size: 13px; margin: 0 0 12px 0; letter-spacing: 0.5px;">
+            🔐 ENCRYPTION TYPE
+            </p>
+        """, unsafe_allow_html=True)
+
+        encryption_types = ['All'] + sorted(intrusion_data['encryption_used'].unique().tolist())
+        selected_encryption = st.multiselect(
+            "Encryption Type",
+            options=encryption_types,
+            default=['All'],
+            label_visibility="collapsed"
+        )
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    # Browser filter card
+    with st.sidebar.container():
+        st.markdown("""
+        <div style="
+            background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+            padding: 15px 16px 12px 16px;
+            border-radius: 10px;
+            margin: 20px 0 18px 0;
+            border: 1px solid rgba(0,120,212,0.2);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        ">
+            <p style="color: #ffffff; font-weight: 600; font-size: 13px; margin: 0 0 12px 0; letter-spacing: 0.5px;">
+            🌐 BROWSER TYPE
+            </p>
+        """, unsafe_allow_html=True)
+
+        browsers = ['All'] + sorted(intrusion_data['browser_type'].unique().tolist())
+        selected_browsers = st.multiselect(
+            "Browser Type",
+            options=browsers,
+            default=['All'],
+            label_visibility="collapsed"
+        )
+
+        st.markdown("</div>", unsafe_allow_html=True)
 
     # Apply filters
     filtered_data = intrusion_data.copy()

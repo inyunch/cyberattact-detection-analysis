@@ -1,116 +1,378 @@
-# Cyberattack Detection and Global Impact Analysis
+# 🛡️ Cybersecurity Threat Analysis Dashboard
 
-## Live Demo
+<div align="center">
 
-**[View the deployed app here](https://cyberattact-detection-analysis.streamlit.app/)**
+![Dashboard](https://img.shields.io/badge/Dashboard-Streamlit-FF4B4B?style=for-the-badge&logo=streamlit)
+![Python](https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Plotly](https://img.shields.io/badge/Plotly-239120?style=for-the-badge&logo=plotly&logoColor=white)
+![ML](https://img.shields.io/badge/Machine_Learning-Scikit_Learn-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white)
 
-## Project Overview
+**[🚀 Live Demo](https://cyberattact-detection-analysis.streamlit.app/)** | **[📊 View Documentation](./docs/)** | **[🐛 Report Issues](https://github.com/yourusername/cyberattack-detection-analysis/issues)**
 
-The goal of this project is to investigate cyberattacks from both granular technical (network/packet-level) and broader global perspectives. The narrative centers around understanding how attack behaviors observed in IoT network packet captures align with real-world cybersecurity incidents, trends, and organizational impacts. By bridging these layers, the project aims to deliver actionable insights into detection, risk management, and mitigation strategies.
+*An enterprise-grade analytics platform for cybersecurity threat intelligence and detection*
 
-## Why this matters
-
-Cybersecurity is not just a technical challenge—it's a strategic risk. Organizations must understand both how attacks manifest on their networks and what large-scale impacts these incidents create across regions, industries, and timescales. By connecting the technical evidence with global trends, this project helps answer: Can early detection and behavior analysis prevent or contextualize serious breaches and losses?
-
-## Datasets Used
-
-1. **Kitsune Network Attack Dataset** (https://archive.ics.uci.edu/dataset/516/kitsune+network+attack+dataset)
-    - Packet-level records for key IoT network attacks (e.g., OS scan, man-in-the-middle, DoS, botnet malware).
-    - 115 engineered features per packet, with categorical labels (malicious/benign).
-    - Used for behavioral analysis, anomaly detection, and attack classification.
-2. **Global Cybersecurity Threats Dataset (2015–2024)** (https://www.kaggle.com/datasets/atharvasoundankar/global-cybersecurity-threats-2015-2024)
-    - Incident-level global records: attack types, targeted sectors/countries, financial losses, vulnerabilities, resolutions.
-    - Used for trend analysis and mapping technical detections to broader impacts.
-3. **Cybersecurity Intrusion Detection Dataset** (https://www.kaggle.com/datasets/dnkumars/cybersecurity-intrusion-detection-dataset)
-    - Network traffic and user behavior-based features for intrusion detection.
-    - Network features: packet size (64-1500 bytes), protocol type (TCP, UDP, ICMP), encryption type (AES, DES, None).
-    - User behavior features: login attempts, session duration, failed login counts, unusual time access, IP reputation score, browser type.
-    - Binary classification: attack detected (1) vs. normal activity (0).
-    - Used for machine learning-based intrusion detection and user behavior analysis.
-
-## Project Narrative
-
-Before diving into analysis or visualization, this project establishes a clear message:
-
-- **What is the story?**
-    - Technical detection helps organizations prevent major incidents. Insights at the network level may provide early warning for broader impacts.
-    - Understanding connections between attack behavior and global incident patterns drives better mitigation strategies.
-    - My goal is to tell a story about how digital threats have changed over time and across industries and regions, leading to actionable insights:
-        - Which countries and sectors need the most improvement?
-        - What types of attacks are most frequent and damaging?
-        - How effective have different defenses been over time?
-- **What are we trying to prove?**
-    - Can specific packet behaviors provide leading indicators for global attack trends?
-    - Do certain network violation types (confidentiality, integrity, authenticity) correlate with high-impact incidents globally?
-    - What risk management recommendations emerge from linking fine-grained data to global impacts?
-
-All visualizations will start by specifying the point or insight being communicated. Random or unhelpful charts will be avoided; every visual must relate to the core narrative.
-
-## Features and Deliverables
-
-- **Basic Requirements**
-    - At least two distinct data sources, basic cleaning/imputation
-    - Three or more visualization types driven by narrative/story
-    - Exploratory analysis and statistical summaries of key variables
-    - Handling missing data, encoding features appropriately
-    - Streamlit app with at least two interactive elements (sidebars, tabs, dropdowns, filterable tables, etc.)
-    - Basic documentation and usage instructions within the app
-    - GitHub repository with README and setup instructions
-- **Advanced Features**
-    - Advanced cleaning, feature engineering (e.g., feature selection for ML models)
-    - Enhanced interactive visualizations (e.g., confusion matrices, ROC/AUC, sector/region heatmaps)
-    - Multiple machine learning models (attack detection/classification, trend prediction, clustering)
-    - In-depth model comparison and evaluation
-    - Model outputs for risk forecasting or real-time detection
-    - Polished user interface and documentation in Streamlit
-
-## App Structure
-
-- Tabs/pages: "Packet-level Detection," "Global Incident Analysis," "Comparative Insights"
-- Sidebars/dropdowns: Data source selection, variable selection, time filters
-- Visualizations: Time-series, interactive dashboards, heatmaps, bar/treemaps, model performance charts
-- Tables: Summary statistics, top attacks/impacts, feature importances
-- Documentation: Embedded user help, project purpose, instructions, definitions
-
-### Planned Visualizations & Features
-
-Based on the narrative goals, the app will include:
-
-- **Interactive time-series charts** for attack frequency and losses by year
-- **Heatmaps** showing affected regions/countries
-- **Treemaps or bar charts** for attack types and targeted industries
-- **Filters** to drill down by industry, year, or country
-- **Network graphs** for attack sources and defense mechanisms
-- **Summary dashboard with KPIs**: total losses per year, top 5 attack types
-
-## Risk Mitigation
-
-- If dataset integration proves too complex, results will be analyzed in parallel but contextualized through narrative links.
-- Any data limitations or modeling constraints will be clearly documented in both the README and app.
-
-## Getting Started
-
-1. Clone this repository
-2. Install requirements using `pip install -r requirements.txt`
-3. Run the Streamlit app: `streamlit run app.py`
-4. Explore source code and documentation for variable definitions and modeling walkthroughs
-
-## Repository Structure
-
-```
-├── app.py                   # Main Streamlit app
-├── data/                    # Data files and sources
-├── notebooks/               # Exploratory analysis and prototyping
-├── models/                  # ML scripts and serialized models
-├── docs/                    # Documentation and data dictionary
-├── README.md                # This file
-└── requirements.txt         # Project dependencies
-```
-
-## Contact
-
-Questions? Reach out via Teams or email as instructed in the syllabus.
+</div>
 
 ---
 
-Feel free to update as your workflow and insights develop!
+## 📋 Table of Contents
+
+- [Overview](#-overview)
+- [Key Features](#-key-features)
+- [Dashboard Sections](#-dashboard-sections)
+- [Technology Stack](#-technology-stack)
+- [Installation](#-installation)
+- [Usage](#-usage)
+- [Data Sources](#-data-sources)
+- [Project Structure](#-project-structure)
+- [Screenshots](#-screenshots)
+- [Contributing](#-contributing)
+
+---
+
+## 🎯 Overview
+
+The **Cybersecurity Threat Analysis Dashboard** is a comprehensive, Power BI-style analytics platform that bridges technical network-level threat detection with global cybersecurity incident analysis. This professional-grade solution provides actionable intelligence for security professionals, data scientists, and decision-makers.
+
+### 🔍 What Makes This Different?
+
+- **Multi-Layer Analysis**: Combines packet-level intrusion detection with macro-level global threat trends
+- **Power BI Design**: Professional, corporate-grade interface optimized for 1920×1080 displays
+- **Storytelling Approach**: Every visualization tells a story with contextual insights and interpretations
+- **Real-Time Intelligence**: Interactive filters and dynamic visualizations for exploratory analysis
+- **ML-Powered**: Advanced analytics using machine learning for pattern recognition and prediction
+
+### 💼 Business Value
+
+Organizations using this dashboard can:
+- ✅ **Identify emerging threats** through temporal trend analysis
+- ✅ **Allocate security budgets** based on geographic and industry risk profiles
+- ✅ **Benchmark performance** against global threat landscapes
+- ✅ **Make data-driven decisions** with statistical validation
+- ✅ **Detect anomalies** using machine learning models
+
+---
+
+## ✨ Key Features
+
+### 🎨 Professional Design
+- **Power BI-Style Interface**: Microsoft blue color palette, gradient accents, professional typography
+- **Optimized Layout**: 1920×1080 display optimization with responsive design
+- **Top Navigation Tabs**: 6 main sections for easy navigation
+- **Clean Sidebar**: Minimal branding, no clutter
+
+### 📊 Advanced Analytics
+- **Initial Data Analysis (IDA)**: Comprehensive data quality assessment
+- **Exploratory Data Analysis (EDA)**: 5 analysis chapters with narrative storytelling
+- **Statistical Validation**: Correlation analysis, trend testing, significance metrics
+- **Machine Learning**: PCA, clustering, classification models
+- **Behavioral Analysis**: Attack pattern recognition and anomaly detection
+
+### 🎯 Interactive Features
+- **Dynamic Filters**: Multi-select, date ranges, sliders with active filter badges
+- **Professional KPI Cards**: Gradient backgrounds, color-coded metrics, hover effects
+- **Multiple Visualizations**:
+  - Temporal trends with area fills
+  - Geographic distributions (bubble charts, funnels, heatmaps)
+  - Correlation matrices
+  - Box plots and violin plots
+  - Waterfall charts
+  - Parallel coordinates
+  - Sunburst diagrams
+  - And more...
+
+### 📈 Smart Insights
+- **Automated Interpretations**: AI-generated insights based on data patterns
+- **Color-Coded Alerts**: Info, warning, success messages with actionable recommendations
+- **Statistical Context**: R², p-values, confidence intervals explained
+- **Comparative Analysis**: YoY growth, concentration metrics, efficiency ratios
+
+---
+
+## 🗂️ Dashboard Sections
+
+### 1️⃣ 🏠 Home
+- Executive summary and dashboard overview
+- Quick access to key metrics
+- Navigation guide
+
+### 2️⃣ 📊 IDA/EDA Analysis
+**Sub-sections:**
+- **Data Understanding (IDA)**
+  - Data quality assessment
+  - Missing value analysis
+  - Data types and structure
+  - Statistical summaries
+
+- **Exploratory Analysis (EDA)**
+  - Temporal Trend Analysis
+  - Geographic Distribution Analysis
+  - Correlation Analysis
+  - Behavior Analysis
+  - Advanced Analytics (PCA, Clustering)
+
+- **Key Findings & Insights**
+  - Executive summary of discoveries
+  - Statistical evidence
+  - Actionable recommendations
+
+### 3️⃣ 🌍 Global Threat Landscape
+- Macro-level threat analysis (2015-2024)
+- Attack frequency trends
+- Financial impact analysis
+- Geographic hotspots
+- Industry targeting patterns
+
+### 4️⃣ 🔍 Intrusion Detection
+- Network-level threat detection
+- Packet analysis
+- User behavior analytics
+- Attack classification
+- Real-time monitoring insights
+
+### 5️⃣ 📈 Comparative Insights
+- Cross-dataset analysis
+- Technical vs. global threat correlation
+- Risk assessment frameworks
+- Mitigation strategy recommendations
+
+### 6️⃣ 📖 Methodology
+- Data science approach
+- Statistical methods
+- ML model descriptions
+- Validation techniques
+- Limitations and assumptions
+
+---
+
+## 🛠️ Technology Stack
+
+### Core Technologies
+```
+Python 3.8+          │ Primary programming language
+Streamlit 1.28+      │ Dashboard framework
+Plotly 5.17+         │ Interactive visualizations
+Pandas 2.0+          │ Data manipulation
+NumPy 1.24+          │ Numerical computing
+```
+
+### Machine Learning
+```
+Scikit-learn 1.3+    │ ML algorithms and preprocessing
+SciPy 1.11+          │ Statistical analysis
+```
+
+### Styling & Design
+```
+Custom CSS           │ Power BI-style design system
+Plotly Themes        │ Professional color palettes
+Responsive Layout    │ 1920×1080 optimization
+```
+
+---
+
+## 🚀 Installation
+
+### Prerequisites
+- Python 3.8 or higher
+- pip package manager
+- 4GB+ RAM recommended
+- 1920×1080 display for optimal experience
+
+### Quick Start
+
+1. **Clone the repository**
+```bash
+git clone https://github.com/yourusername/cyberattack-detection-analysis.git
+cd cyberattack-detection-analysis
+```
+
+2. **Create virtual environment (recommended)**
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+3. **Install dependencies**
+```bash
+pip install -r requirements.txt
+```
+
+4. **Run the dashboard**
+```bash
+streamlit run app.py
+```
+
+5. **Access the dashboard**
+```
+Open your browser to: http://localhost:8501
+```
+
+### Docker Installation (Alternative)
+```bash
+docker build -t cyber-dashboard .
+docker run -p 8501:8501 cyber-dashboard
+```
+
+---
+
+## 📖 Usage
+
+### Basic Navigation
+1. **Top Tabs**: Click any tab to switch between main sections
+2. **Filters**: Use filters within each section to refine analysis
+3. **Interactive Charts**: Hover for details, click legends to toggle data
+4. **Export**: Download filtered data as CSV
+
+### Tips for Best Experience
+- 🖥️ Use a **1920×1080 or higher resolution** display
+- 🌐 Use **modern browsers** (Chrome, Firefox, Edge recommended)
+- 🔄 **Refresh** the page if visualizations don't load
+- 📱 **Mobile responsive**, but desktop recommended for full experience
+
+### Common Workflows
+
+**Security Analyst**
+```
+Home → Global Threat Landscape → Filter by region/industry → Analyze trends
+```
+
+**Data Scientist**
+```
+Home → IDA/EDA Analysis → Explore correlations → Review ML models
+```
+
+**Executive**
+```
+Home → Key Findings & Insights → Export summary reports
+```
+
+---
+
+## 📊 Data Sources
+
+### 1. Global Cybersecurity Threats Dataset (2015-2024)
+- **Source**: [Kaggle](https://www.kaggle.com/datasets/atharvasoundankar/global-cybersecurity-threats-2015-2024)
+- **Records**: 3,000+ global incidents
+- **Features**: Country, attack type, financial loss, affected users, industry, resolution time
+- **Time Span**: 10 years (2015-2024)
+- **Coverage**: 10 countries, multiple industries
+
+### 2. Cybersecurity Intrusion Detection Dataset
+- **Source**: [Kaggle](https://www.kaggle.com/datasets/dnkumars/cybersecurity-intrusion-detection-dataset)
+- **Records**: Network traffic and user behavior data
+- **Features**:
+  - Network: Packet size, protocol (TCP/UDP/ICMP), encryption type
+  - User Behavior: Login attempts, session duration, IP reputation
+- **Labels**: Binary (attack detected / normal activity)
+
+### 3. Kitsune Network Attack Dataset
+- **Source**: [UCI ML Repository](https://archive.ics.uci.edu/dataset/516/kitsune+network+attack+dataset)
+- **Records**: Packet-level IoT network attacks
+- **Features**: 115 engineered packet features
+- **Attack Types**: OS scan, MITM, DoS, botnet malware
+- **Use Case**: Behavioral analysis and anomaly detection
+
+---
+
+## 📁 Project Structure
+
+```
+cyberattack-detection-analysis/
+├── 📄 app.py                          # Main Streamlit application
+├── 📂 modules/                        # Page modules
+│   ├── home.py                        # Home page
+│   ├── data_analysis.py               # IDA/EDA section
+│   ├── global_threats_page.py         # Global threat landscape
+│   ├── intrusion_detection_page.py    # Intrusion detection
+│   ├── comparative_insights.py        # Comparative analysis
+│   └── methodology.py                 # Methodology documentation
+├── 📂 data/                           # Data files
+│   ├── Global_Cybersecurity_Threats_2015-2024.csv
+│   └── cybersecurity_intrusion_data.csv
+├── 📂 docs/                           # Documentation
+│   ├── data_dictionary.md
+│   └── methodology.md
+├── 📂 .claude/                        # Claude Code configuration
+├── 📄 requirements.txt                # Python dependencies
+├── 📄 README.md                       # This file
+├── 📄 .gitignore                      # Git ignore rules
+└── 📄 LICENSE                         # Project license
+```
+
+---
+
+## 📸 Screenshots
+
+### Dashboard Overview
+![Dashboard Home](docs/screenshots/home.png)
+*Power BI-style home page with top navigation*
+
+### Temporal Analysis
+![Temporal Trends](docs/screenshots/temporal.png)
+*Interactive time series with trend lines and insights*
+
+### Geographic Distribution
+![Geographic Analysis](docs/screenshots/geographic.png)
+*Multiple visualization types for threat distribution*
+
+### Correlation Analysis
+![Correlation Matrix](docs/screenshots/correlation.png)
+*Heatmap with statistical interpretations*
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+### Development Guidelines
+- Follow PEP 8 style guide
+- Add docstrings to functions
+- Test thoroughly before submitting
+- Update documentation as needed
+
+---
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 👥 Authors
+
+- **Your Name** - *Initial work* - [GitHub Profile](https://github.com/yourusername)
+
+---
+
+## 🙏 Acknowledgments
+
+- Data sources: Kaggle and UCI ML Repository
+- Design inspiration: Microsoft Power BI, Tableau
+- Framework: Streamlit community
+- Visualization library: Plotly team
+
+---
+
+## 📞 Contact & Support
+
+- 📧 Email: your.email@example.com
+- 💬 Issues: [GitHub Issues](https://github.com/yourusername/cyberattack-detection-analysis/issues)
+- 📚 Documentation: [Wiki](https://github.com/yourusername/cyberattack-detection-analysis/wiki)
+
+---
+
+<div align="center">
+
+**⭐ Star this repository if you find it helpful!**
+
+Made with ❤️ for the cybersecurity community
+
+</div>
