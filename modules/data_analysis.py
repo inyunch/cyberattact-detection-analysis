@@ -77,16 +77,6 @@ def show(global_threats, intrusion_data):
     # ==================== DATA UNDERSTANDING (IDA) TAB ====================
     with tab1:
         st.header("Initial Data Analysis (IDA)")
-        st.markdown("""
-        > *"Before we can analyze data, we must understand it. What are its strengths? Its weaknesses?
-        > What can we trust, and what requires caution?"*
-        """)
-        st.info("""
-        **🎓 Data Science Best Practice:** IDA is not just about checking for nulls.
-        It's about understanding the story behind the data collection, identifying potential biases,
-        and recognizing what questions we can (and cannot) answer with this dataset.
-        """)
-        st.markdown("---")
 
         # Nested tabs for dataset selection
         ida_tab1, ida_tab2, ida_tab3 = st.tabs([

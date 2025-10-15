@@ -14,7 +14,8 @@ def init_filter_state():
     if 'global_filters' not in st.session_state:
         st.session_state['global_filters'] = {
             'year_range': None,
-            'quick_preset': None
+            'quick_preset': None,
+            'attack_type': 'All'
         }
 
     if 'page_filters' not in st.session_state:
@@ -315,6 +316,10 @@ def apply_global_filters(df: pd.DataFrame, filters: Dict[str, Any]) -> pd.DataFr
             (filtered_df['Year'] >= year_range[0]) &
             (filtered_df['Year'] <= year_range[1])
         ]
+
+    # Apply attack type filter
+    if filters.get('attack_type') and filters['attack_type'] != 'All' and 'Attack Type' in filtered_df.columns:
+        filtered_df = filtered_df[filtered_df['Attack Type'] == filters['attack_type']]
 
     return filtered_df
 

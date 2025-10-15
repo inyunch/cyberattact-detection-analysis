@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-from streamlit_option_menu import option_menu
 
 # Page configuration
 st.set_page_config(
@@ -53,7 +52,7 @@ st.markdown("""
     }
 
     .block-container {
-        padding: 1rem 2rem;
+        padding: 3rem 2rem;
         max-width: 100%;
     }
 
@@ -65,25 +64,126 @@ st.markdown("""
 
     [data-testid="stSidebar"] > div:first-child {
         background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-tertiary) 100%);
+        padding-top: 0rem;
     }
 
-    /* Sidebar collapse icon (top right) */
+    section[data-testid="stSidebar"] > div {
+        padding-top: 0rem;
+    }
+
+    /* Remove white background from navigation component containers */
+    [data-testid="stSidebar"] .stElementContainer {
+        background: transparent !important;
+        background-color: transparent !important;
+    }
+
+    [data-testid="stSidebar"] .element-container {
+        background: transparent !important;
+        background-color: transparent !important;
+    }
+
+    [data-testid="stSidebar"] iframe {
+        background: transparent !important;
+        background-color: transparent !important;
+    }
+
+    [data-testid="stSidebar"] .stCustomComponentV1 {
+        background: transparent !important;
+        background-color: transparent !important;
+    }
+
+    /* Target all possible containers around the option menu */
+    [data-testid="stSidebar"] [class*="st-emotion-cache"] {
+        background: transparent !important;
+        background-color: transparent !important;
+    }
+
+    [data-testid="stSidebar"] div[class*="e1mlolmg"] {
+        background: transparent !important;
+        background-color: transparent !important;
+    }
+
+    [data-testid="stSidebar"] div[class*="e196pkbe"] {
+        background: transparent !important;
+        background-color: transparent !important;
+    }
+
+    /* Streamlit's vertical block in sidebar */
+    [data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
+        background: transparent !important;
+        background-color: transparent !important;
+    }
+
+    [data-testid="stSidebar"] [data-testid="stVerticalBlock"] > div {
+        background: transparent !important;
+        background-color: transparent !important;
+    }
+
+    /* Nuclear option - target ALL divs in sidebar */
+    [data-testid="stSidebar"] > div > div > div {
+        background: transparent !important;
+        background-color: transparent !important;
+    }
+
+    /* Target the specific classes from your HTML */
+    .st-emotion-cache-1vo6xi6 {
+        background: transparent !important;
+        background-color: transparent !important;
+    }
+
+    .st-emotion-cache-8atqhb {
+        background: transparent !important;
+        background-color: transparent !important;
+    }
+
+    .st-emotion-cache-1tvzk6f {
+        background: transparent !important;
+        background-color: transparent !important;
+    }
+
+    [data-testid="stSidebar"] .e1mlolmg0 {
+        background: transparent !important;
+        background-color: transparent !important;
+    }
+
+    [data-testid="stSidebar"] .e196pkbe0 {
+        background: transparent !important;
+        background-color: transparent !important;
+    }
+
+    [data-testid="stSidebar"] .e1begtbc0 {
+        background: transparent !important;
+        background-color: transparent !important;
+    }
+
+    /* Hide entire sidebar header section */
+    [data-testid="stSidebarHeader"] {
+        display: none !important;
+    }
+
+    [data-testid="stLogoSpacer"] {
+        display: none !important;
+    }
+
+    [data-testid="stSidebarCollapseButton"] {
+        display: none !important;
+    }
+
+    [data-testid="stBaseButton-headerNoPadding"] {
+        display: none !important;
+    }
+
     [data-testid="stSidebar"] button[kind="header"] {
-        color: #E8EAF0 !important;
+        display: none !important;
     }
 
-    [data-testid="stSidebar"] button[kind="header"] svg {
-        fill: #E8EAF0 !important;
-        color: #E8EAF0 !important;
+    [data-testid="stSidebar"] button[kind="headerNoPadding"] {
+        display: none !important;
     }
 
-    /* Sidebar header button */
-    [data-testid="collapsedControl"] button {
-        color: #E8EAF0 !important;
-    }
-
-    [data-testid="collapsedControl"] svg {
-        fill: #E8EAF0 !important;
+    /* Sidebar header button when collapsed */
+    [data-testid="collapsedControl"] {
+        display: none !important;
     }
 
     /* Typography */
@@ -135,6 +235,11 @@ st.markdown("""
         padding: 12px 14px;
         box-shadow: var(--shadow-md);
         transition: all var(--transition-base);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 140px;
+        text-align: center;
     }
 
     [data-testid="stMetric"]:hover {
@@ -144,7 +249,7 @@ st.markdown("""
     }
 
     [data-testid="stMetric"] label {
-        font-size: 0.75rem;
+        font-size: 1.1rem;
         font-weight: 600;
         color: var(--text-muted) !important;
         text-transform: uppercase;
@@ -160,12 +265,11 @@ st.markdown("""
     [data-testid="stMetric"] > div > div:last-child {
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        gap: 12px;
+        justify-content: center;
     }
 
     [data-testid="stMetric"] [data-testid="stMetricValue"] {
-        font-size: 1.6rem;
+        font-size: 2.0rem;
         font-weight: 800;
         color: var(--text-primary);
         font-family: 'JetBrains Mono', monospace;
@@ -174,11 +278,8 @@ st.markdown("""
     }
 
     [data-testid="stMetric"] [data-testid="stMetricDelta"] {
-        font-size: 0.7rem;
+        font-size: 0.95rem;
         font-weight: 600;
-        white-space: nowrap;
-        text-align: right;
-        margin-left: auto;
     }
 
     /* Charts & DataFrames */
@@ -365,14 +466,16 @@ st.markdown("""
         background-image: linear-gradient(135deg, rgba(0, 217, 255, 0.12) 0%, rgba(0, 255, 179, 0.12) 100%) !important;
         color: #00D9FF !important;
         border: 1.5px solid rgba(0, 217, 255, 0.5) !important;
-        border-radius: 8px !important;
+        border-radius: 12px !important;
         font-weight: 600 !important;
         font-size: 0.85rem !important;
         padding: 10px 16px !important;
         box-shadow: none !important;
         transition: all 0.2s ease !important;
         width: 100% !important;
-        margin: 0 !important;
+        margin: 0 0 4px 0 !important;
+        text-align: left !important;
+        justify-content: flex-start !important;
     }
 
     /* Hover states for all sidebar buttons */
@@ -484,13 +587,13 @@ init_filter_state()
 with st.sidebar:
     # Logo Header
     st.markdown("""
-        <div style="padding: 14px 16px; border-bottom: 1px solid var(--border-color);">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <span style="font-size: 28px; filter: drop-shadow(0 0 12px rgba(0, 217, 255, 0.5));">🛡️</span>
+        <div style="padding: 8px 16px 12px 16px; border-bottom: 1px solid var(--border-color); margin-bottom: 8px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 40px; filter: drop-shadow(0 0 12px rgba(0, 217, 255, 0.5));">🛡️</span>
                 <div>
                     <h1 style="
                         margin: 0;
-                        font-size: 18px;
+                        font-size: 22px;
                         font-weight: 800;
                         background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-green) 100%);
                         -webkit-background-clip: text;
@@ -499,70 +602,67 @@ with st.sidebar:
                         letter-spacing: -0.02em;
                         border: none;
                         padding: 0;
+                        line-height: 1.2;
                     ">CyberGuard</h1>
                     <p style="
-                        margin: 2px 0 0 0;
-                        font-size: 10px;
+                        margin: 3px 0 0 0;
+                        font-size: 11px;
                         color: var(--text-muted);
                         text-transform: uppercase;
                         letter-spacing: 0.08em;
                         font-weight: 600;
+                        line-height: 1.2;
                     ">Threat Intelligence</p>
                 </div>
             </div>
         </div>
     """, unsafe_allow_html=True)
 
-    # Navigation Menu
-    selected = option_menu(
-        menu_title=None,
-        options=[
-            "Dashboard",
-            "IDA/EDA Analysis",
-            "Global Threat Landscape",
-            "Intrusion Detection",
-            "Comparative Insights",
-            "Methodology"
-        ],
-        icons=[
-            "house-door-fill",
-            "bar-chart-line-fill",
-            "globe-americas",
-            "shield-shaded",
-            "lightbulb-fill",
-            "book-half"
-        ],
-        menu_icon="cast",
-        default_index=0,
-        styles={
-            "container": {
-                "padding": "10px 10px !important",
-                "background-color": "transparent"
-            },
-            "icon": {
-                "color": "var(--accent-blue)",
-                "font-size": "18px"
-            },
-            "nav-link": {
-                "font-size": "14px",
-                "font-weight": "500",
-                "text-align": "left",
-                "margin": "0 0 4px 0",
-                "padding": "11px 14px",
-                "border-radius": "10px",
-                "color": "var(--text-secondary)",
-                "transition": "all 0.15s cubic-bezier(0.4, 0, 0.2, 1)",
-                "--hover-color": "var(--bg-hover)"
-            },
-            "nav-link-selected": {
-                "background": "linear-gradient(135deg, rgba(0, 217, 255, 0.12) 0%, rgba(0, 255, 179, 0.12) 100%)",
-                "color": "var(--text-primary)",
-                "font-weight": "600",
-                "box-shadow": "inset 0 0 20px rgba(0, 217, 255, 0.1)",
-                "border-left": "4px solid var(--accent-blue)"
-            }
-        }
-    )
+    # Initialize selected page in session state
+    if 'selected_page' not in st.session_state:
+        st.session_state.selected_page = "Dashboard"
+
+    # Navigation Menu - Custom implementation
+    nav_options = [
+        {"name": "Dashboard", "icon": "🏠"},
+        {"name": "IDA/EDA Analysis", "icon": "📊"},
+        {"name": "Global Threat Landscape", "icon": "🌍"},
+        {"name": "Intrusion Detection", "icon": "🛡️"},
+        {"name": "Comparative Insights", "icon": "💡"},
+        {"name": "Methodology", "icon": "📖"}
+    ]
+
+    for option in nav_options:
+        is_selected = st.session_state.selected_page == option["name"]
+
+        # Style for selected vs unselected
+        if is_selected:
+            button_style = """
+                background: linear-gradient(135deg, rgba(0, 217, 255, 0.12) 0%, rgba(0, 255, 179, 0.12) 100%);
+                color: #E8EAF0;
+                font-weight: 600;
+                box-shadow: inset 0 0 20px rgba(0, 217, 255, 0.1);
+                border-left: 4px solid #00D9FF;
+            """
+        else:
+            button_style = """
+                background: transparent;
+                color: #A0A7B8;
+                font-weight: 500;
+                border-left: 4px solid transparent;
+            """
+
+        # Create button using columns for better control
+        if st.button(
+            f"{option['icon']}  {option['name']}",
+            key=f"nav_{option['name']}",
+            use_container_width=True,
+            type="secondary" if not is_selected else "primary"
+        ):
+            st.session_state.selected_page = option["name"]
+            st.rerun()
+
+    selected = st.session_state.selected_page
 
     # Filters, Time Period, and Data Stats
     if global_threats is not None:
@@ -627,6 +727,17 @@ with st.sidebar:
             start_year, end_year = end_year, start_year
 
         st.session_state['global_filters']['year_range'] = (start_year, end_year)
+
+        # Attack Type Filter
+        st.markdown("<div style='margin-bottom: 12px;'></div>", unsafe_allow_html=True)
+        attack_types = ["All"] + sorted(global_threats['Attack Type'].dropna().unique())
+        selected_attack_type = st.selectbox(
+            "Filter by Attack Type",
+            options=attack_types,
+            index=attack_types.index(st.session_state['global_filters']['attack_type']),
+            key='global_attack_type_filter'
+        )
+        st.session_state['global_filters']['attack_type'] = selected_attack_type
 
         st.markdown("<div style='margin-bottom: 12px;'></div>", unsafe_allow_html=True)
 

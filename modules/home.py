@@ -16,7 +16,8 @@ def show(global_threats, intrusion_data):
     global_filters = st.session_state.get('global_filters', {})
     global_threats = apply_global_filters(global_threats, global_filters)
 
-    st.markdown("<div style='margin-top: 1rem;'></div>", unsafe_allow_html=True)
+    # Add top margin to align with navigation
+    st.markdown("<div style='margin-top: 30px;'></div>", unsafe_allow_html=True)
 
     total_incidents = len(global_threats)
     total_loss = global_threats['Financial Loss (in Million $)'].sum()
@@ -48,29 +49,32 @@ def show(global_threats, intrusion_data):
     col1, col2 = st.columns([2, 3])
 
     with col1:
-        # --- Top Attack Types (Donut Chart) ---
-        st.subheader("Top 5 Attack Types")
-        attack_types = global_threats['Attack Type'].value_counts().nlargest(5)
-        fig = go.Figure(data=[go.Pie(
-            labels=attack_types.index,
-            values=attack_types.values,
-            hole=.6,
-            marker_colors=COLORS["chart_palette"],
-            textinfo='label+percent',
-            insidetextorientation='radial'
-        )])
-        fig = apply_plotly_theme(fig)
-        fig.update_layout(showlegend=False, height=300)
-        st.plotly_chart(fig, use_container_width=True)
-
         # --- Top Targeted Industries (Bar Chart) ---
         st.subheader("Top 5 Targeted Industries")
         target_industry = global_threats['Target Industry'].value_counts().nlargest(5)
-        fig2 = go.Figure(go.Bar(
+        fig1 = go.Figure(go.Bar(
             x=target_industry.values,
             y=target_industry.index,
             orientation='h',
             marker_color=COLORS["accent_blue"]
+        ))
+        fig1 = apply_plotly_theme(fig1)
+        fig1.update_layout(
+            xaxis_title="Number of Incidents",
+            yaxis_title="",
+            yaxis=dict(autorange="reversed"),
+            height=300
+        )
+        st.plotly_chart(fig1, use_container_width=True)
+
+        # --- Top Countries by Attack Frequency (Bar Chart) ---
+        st.subheader("Top 5 Countries by Attack Frequency")
+        top_countries = global_threats['Country'].value_counts().nlargest(5)
+        fig2 = go.Figure(go.Bar(
+            x=top_countries.values,
+            y=top_countries.index,
+            orientation='h',
+            marker_color=COLORS["accent_green"]
         ))
         fig2 = apply_plotly_theme(fig2)
         fig2.update_layout(
@@ -83,7 +87,12 @@ def show(global_threats, intrusion_data):
 
     with col2:
         # --- Attack Frequency Over Time (Line Chart) ---
-        st.subheader("Attack Frequency Over Time")
+        attack_type_filter = st.session_state.get('global_filters', {}).get('attack_type', 'All')
+        if attack_type_filter == 'All':
+            st.subheader("Attack Frequency Over Time")
+        else:
+            st.subheader(f"Attack Frequency Over Time: {attack_type_filter}")
+
         attacks_by_year = global_threats.groupby('Year').size().reset_index(name='Count')
         fig3 = go.Figure()
         fig3.add_trace(go.Scatter(
