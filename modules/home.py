@@ -54,7 +54,6 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
         r1_col1, r1_col2, r1_col3, r1_col4 = st.columns(4)
 
         with r1_col1:
-            st.subheader("Top 5 Targeted Industries")
             target_industry = global_threats['Target Industry'].value_counts().nlargest(5)
             fig1 = go.Figure(go.Bar(
                 x=target_industry.values,
@@ -62,7 +61,7 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
                 orientation='h',
                 marker_color=COLORS["accent_blue"]
             ))
-            fig1 = apply_plotly_theme(fig1)
+            fig1 = apply_plotly_theme(fig1, title='Top 5 Targeted Industries')
             fig1.update_layout(
                 xaxis_title="Incidents",
                 yaxis_title="",
@@ -73,7 +72,6 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
             st.plotly_chart(fig1, use_container_width=True)
 
         with r1_col2:
-            st.subheader("Top 5 Countries by Attack")
             top_countries = global_threats['Country'].value_counts().nlargest(5)
             fig2 = go.Figure(go.Bar(
                 x=top_countries.values,
@@ -81,7 +79,7 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
                 orientation='h',
                 marker_color=COLORS["accent_green"]
             ))
-            fig2 = apply_plotly_theme(fig2)
+            fig2 = apply_plotly_theme(fig2, title='Top 5 Countries by Attack')
             fig2.update_layout(
                 xaxis_title="Incidents",
                 yaxis_title="",
@@ -92,7 +90,6 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
             st.plotly_chart(fig2, use_container_width=True)
 
         with r1_col3:
-            st.subheader("Top 5 Attack Types")
             attack_types = global_threats['Attack Type'].value_counts().nlargest(5)
             fig3 = go.Figure(go.Bar(
                 x=attack_types.values,
@@ -100,7 +97,7 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
                 orientation='h',
                 marker_color=COLORS["accent_orange"]
             ))
-            fig3 = apply_plotly_theme(fig3)
+            fig3 = apply_plotly_theme(fig3, title='Top 5 Attack Types')
             fig3.update_layout(
                 xaxis_title="Incidents",
                 yaxis_title="",
@@ -111,12 +108,11 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
             st.plotly_chart(fig3, use_container_width=True)
 
         with r1_col4:
-            st.subheader("Intrusion Overview")
             class_dist = intrusion_data['attack_detected'].value_counts().reset_index()
             class_dist.columns = ['Classification', 'Count']
             class_dist['Classification'] = class_dist['Classification'].map({0: 'Normal', 1: 'Attack'})
             fig4 = px.pie(class_dist, values='Count', names='Classification',
-                            title='',
+                            title='Intrusion Overview',
                             color='Classification',
                             color_discrete_map={'Attack': COLORS["accent_red"], 'Normal': COLORS["accent_blue"]})
             fig4 = apply_plotly_theme(fig4)
@@ -133,7 +129,6 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
         r2_col1, r2_col2 = st.columns(2)
 
         with r2_col1:
-            st.subheader("Attack Frequency Over Time")
             attacks_by_year = global_threats.groupby('Year').size().reset_index(name='Count')
             fig5 = go.Figure()
             fig5.add_trace(go.Scatter(
@@ -145,7 +140,7 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
                 marker=dict(size=8, color=COLORS["accent_green"]),
                 fillcolor=f'rgba(0, 217, 255, 0.1)'
             ))
-            fig5 = apply_plotly_theme(fig5)
+            fig5 = apply_plotly_theme(fig5, title='Attack Frequency Over Time')
             fig5.update_layout(
                 xaxis_title="Year",
                 yaxis_title="Number of Incidents",
@@ -154,7 +149,6 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
             st.plotly_chart(fig5, use_container_width=True)
 
         with r2_col2:
-            st.subheader("Financial Loss by Country")
             country_loss = global_threats.groupby('Country')['Financial Loss (in Million $)'].sum().reset_index()
             fig6 = px.choropleth(
                 country_loss,
@@ -163,7 +157,8 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
                 color="Financial Loss (in Million $)",
                 hover_name="Country",
                 color_continuous_scale=[[0, COLORS["bg_secondary"]], [0.5, COLORS["accent_blue"]], [1, COLORS["accent_green"]]],
-                projection="natural earth"
+                projection="natural earth",
+                title='Financial Loss by Country'
             )
             fig6 = apply_plotly_theme(fig6)
             fig6.update_layout(
@@ -180,134 +175,161 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
     elif page == "Global Threat Landscape":
         global_threats_tab2 = st.session_state.filtered_data.get('global_threats', global_threats_original)
 
-        st.markdown("### Macro-level cybersecurity trends from 2015-2024")
+        st.markdown("### The evolving story of cyber threats: From emergence to impact")
         st.markdown("---")
 
-        # Row 1: High-Level Trends
-        st.markdown("## High-Level Trends")
+        # Section 1: Temporal Evolution - How threats have evolved over time
         col1, col2 = st.columns(2)
         with col1:
-            st.markdown("#### Attack Frequency Over Time by Type")
             attacks_by_year_type = global_threats_tab2.groupby(['Year', 'Attack Type']).size().reset_index(name='Count')
             attacks_by_year_type['Year'] = attacks_by_year_type['Year'].astype(int)
             fig1 = go.Figure()
             for attack_type in attacks_by_year_type['Attack Type'].unique():
                 type_data = attacks_by_year_type[attacks_by_year_type['Attack Type'] == attack_type]
                 fig1.add_trace(go.Scatter(x=[int(y) for y in type_data['Year']], y=[int(c) for c in type_data['Count']], mode='lines+markers', name=attack_type, marker=dict(size=6)))
-            fig1 = apply_plotly_theme(fig1)
-            fig1.update_layout(height=400, hovermode='x unified')
+            fig1 = apply_plotly_theme(fig1, title='Attack Frequency Over Time by Type')
+            fig1.update_layout(
+                height=400,
+                hovermode='x unified',
+                margin=dict(l=60, r=150, t=60, b=50),
+                legend=dict(
+                    orientation="v",
+                    yanchor="top",
+                    y=1.0,
+                    xanchor="left",
+                    x=1.02,
+                    bgcolor="rgba(31, 42, 64, 0.8)",
+                    bordercolor=COLORS["border_color"],
+                    borderwidth=1
+                )
+            )
             st.plotly_chart(fig1, use_container_width=True)
         with col2:
-            st.markdown("#### Attack Distribution by Industry and Type")
-            bar_data = global_threats_tab2.groupby(['Target Industry', 'Attack Type']).size().reset_index(name='Count')
-            fig2 = px.bar(bar_data, x='Target Industry', y='Count', color='Attack Type', barmode='group')
-            fig2 = apply_plotly_theme(fig2)
-            fig2.update_layout(height=400)
-            st.plotly_chart(fig2, use_container_width=True)
-
-        # Row 2: Financial Impact
-        st.markdown("## Financial Impact")
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.markdown("##### Total Financial Losses by Year")
             losses_by_year = global_threats_tab2.groupby('Year')['Financial Loss (in Million $)'].sum().reset_index()
             loss_years = [int(y) for y in losses_by_year['Year']]
             total_losses = [float(l) for l in losses_by_year['Financial Loss (in Million $)']]
-            fig3 = go.Figure()
-            fig3.add_trace(go.Bar(x=loss_years, y=total_losses, marker=dict(color=COLORS["accent_red"])))
+            fig2 = go.Figure()
+            fig2.add_trace(go.Bar(x=loss_years, y=total_losses, marker=dict(color=COLORS["accent_red"])))
+            fig2 = apply_plotly_theme(fig2, title='Total Financial Losses by Year')
+            fig2.update_layout(height=400)
+            st.plotly_chart(fig2, use_container_width=True)
+
+        st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
+
+        # Section 2: Attack Anatomy - Understanding what attackers do
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            attack_type_counts = global_threats_tab2['Attack Type'].value_counts().reset_index()
+            attack_type_counts.columns = ['Attack Type', 'Count']
+            fig3 = px.bar(attack_type_counts, x='Count', y='Attack Type', orientation='h', title='Attack Type Frequency')
             fig3 = apply_plotly_theme(fig3)
-            fig3.update_layout(height=300)
+            fig3.update_layout(
+                height=350,
+                yaxis={'categoryorder': 'total ascending'},
+                margin=dict(l=150, r=50, t=60, b=50),
+                yaxis_tickfont=dict(size=10)
+            )
             st.plotly_chart(fig3, use_container_width=True)
         with col2:
-            st.markdown("##### Average Loss Per Incident")
+            vuln_counts = global_threats_tab2['Security Vulnerability Type'].value_counts().head(10).reset_index()
+            vuln_counts.columns = ['Vulnerability', 'Count']
+            fig4 = px.bar(vuln_counts, x='Count', y='Vulnerability', orientation='h', title='Top 10 Security Vulnerabilities')
+            fig4 = apply_plotly_theme(fig4)
+            fig4.update_layout(
+                height=350,
+                yaxis={'categoryorder': 'total ascending'},
+                margin=dict(l=180, r=50, t=60, b=50),
+                yaxis_tickfont=dict(size=9)
+            )
+            st.plotly_chart(fig4, use_container_width=True)
+        with col3:
+            source_counts = global_threats_tab2['Attack Source'].value_counts().reset_index()
+            source_counts.columns = ['Source', 'Count']
+            fig5 = px.pie(source_counts, values='Count', names='Source', title='Attack Sources Distribution')
+            fig5 = apply_plotly_theme(fig5)
+            fig5.update_layout(
+                height=350,
+                margin=dict(l=50, r=50, t=60, b=50)
+            )
+            st.plotly_chart(fig5, use_container_width=True)
+
+        st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
+
+        # Section 3: Financial Impact Analysis - The cost of cyber attacks
+        col1, col2 = st.columns(2)
+        with col1:
             avg_losses_by_year = global_threats_tab2.groupby('Year')['Financial Loss (in Million $)'].mean().reset_index()
             avg_years = [int(y) for y in avg_losses_by_year['Year']]
             avg_losses = [float(l) for l in avg_losses_by_year['Financial Loss (in Million $)']]
-            fig4 = go.Figure()
-            fig4.add_trace(go.Scatter(x=avg_years, y=avg_losses, mode='lines+markers', line=dict(color=COLORS["accent_green"], width=3), marker=dict(size=8)))
-            fig4 = apply_plotly_theme(fig4)
-            fig4.update_layout(height=300)
-            st.plotly_chart(fig4, use_container_width=True)
-        with col3:
-            st.markdown("##### Loss Distribution by Attack Type")
-            fig5 = px.box(global_threats_tab2, x='Attack Type', y='Financial Loss (in Million $)')
-            fig5 = apply_plotly_theme(fig5)
-            fig5.update_layout(height=300, xaxis_tickangle=-45)
-            st.plotly_chart(fig5, use_container_width=True)
-
-        # Row 3: Top Targets
-        st.markdown("## Top Targets")
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.markdown("##### Top 15 Most Targeted Countries")
-            country_counts = global_threats_tab2['Country'].value_counts().head(15).reset_index()
-            country_counts.columns = ['Country', 'Count']
-            fig6 = px.bar(country_counts, x='Count', y='Country', orientation='h')
-            fig6 = apply_plotly_theme(fig6)
-            fig6.update_layout(height=300, yaxis={'categoryorder': 'total ascending'})
+            fig6 = go.Figure()
+            fig6.add_trace(go.Scatter(x=avg_years, y=avg_losses, mode='lines+markers', line=dict(color=COLORS["accent_green"], width=3), marker=dict(size=8)))
+            fig6 = apply_plotly_theme(fig6, title='Average Loss Per Incident Over Time')
+            fig6.update_layout(
+                height=350,
+                margin=dict(l=60, r=50, t=60, b=50)
+            )
             st.plotly_chart(fig6, use_container_width=True)
         with col2:
-            st.markdown("##### Top 10 Targeted Industries")
-            sector_counts = global_threats_tab2['Target Industry'].value_counts().head(10).reset_index()
-            sector_counts.columns = ['Industry', 'Count']
-            fig7 = px.bar(sector_counts, x='Count', y='Industry', orientation='h')
+            fig7 = px.box(global_threats_tab2, x='Attack Type', y='Financial Loss (in Million $)', title='Loss Distribution by Attack Type')
             fig7 = apply_plotly_theme(fig7)
-            fig7.update_layout(height=300, yaxis={'categoryorder': 'total ascending'})
+            fig7.update_layout(
+                height=350,
+                xaxis_tickangle=-45,
+                margin=dict(l=60, r=50, t=60, b=100),
+                xaxis_tickfont=dict(size=9)
+            )
             st.plotly_chart(fig7, use_container_width=True)
-        with col3:
-            st.markdown("##### Loss Distribution (Top 10 Countries)")
-            country_losses = global_threats_tab2.groupby('Country')['Financial Loss (in Million $)'].sum().sort_values(ascending=False).head(10).reset_index()
-            fig8 = px.pie(country_losses, values='Financial Loss (in Million $)', names='Country')
-            fig8 = apply_plotly_theme(fig8)
-            fig8.update_layout(height=300)
-            st.plotly_chart(fig8, use_container_width=True)
 
-        # Row 4: Attack & Vulnerability Analysis
-        st.markdown("## Attack & Vulnerability Analysis")
+        st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
+
+        # Section 4: Industry Impact Analysis - Cross-dimensional relationships
         col1, col2 = st.columns(2)
         with col1:
-            st.markdown("#### Attack Type × Industry Heatmap")
             heatmap_data = pd.crosstab(global_threats_tab2['Attack Type'], global_threats_tab2['Target Industry'])
-            fig9 = px.imshow(heatmap_data, labels=dict(x="Industry", y="Attack Type", color="Frequency"), aspect='auto', color_continuous_scale='Blues')
-            fig9 = apply_plotly_theme(fig9)
-            fig9.update_layout(height=400)
-            st.plotly_chart(fig9, use_container_width=True)
+            fig8 = px.imshow(heatmap_data, labels=dict(x="Industry", y="Attack Type", color="Frequency"), aspect='auto', color_continuous_scale='Blues', title='Attack Type × Industry Heatmap')
+            fig8 = apply_plotly_theme(fig8)
+            fig8.update_layout(
+                height=450,
+                margin=dict(l=120, r=50, t=60, b=120),
+                xaxis_tickangle=-45,
+                xaxis_tickfont=dict(size=9),
+                yaxis_tickfont=dict(size=9)
+            )
+            st.plotly_chart(fig8, use_container_width=True)
         with col2:
-            st.markdown("#### Financial Losses by Industry and Attack Type")
             treemap_data = global_threats_tab2.groupby(['Target Industry', 'Attack Type'])['Financial Loss (in Million $)'].sum().reset_index()
             treemap_data = treemap_data.sort_values('Financial Loss (in Million $)', ascending=False).head(50)
-            fig10 = px.treemap(treemap_data, path=['Target Industry', 'Attack Type'], values='Financial Loss (in Million $)', color='Financial Loss (in Million $)', color_continuous_scale='RdYlGn_r')
-            fig10 = apply_plotly_theme(fig10)
-            fig10.update_layout(height=400)
-            st.plotly_chart(fig10, use_container_width=True)
+            fig9 = px.treemap(treemap_data, path=['Target Industry', 'Attack Type'], values='Financial Loss (in Million $)', color='Financial Loss (in Million $)', color_continuous_scale='RdYlGn_r', title='Financial Losses by Industry and Attack Type')
+            fig9 = apply_plotly_theme(fig9)
+            fig9.update_layout(
+                height=450,
+                margin=dict(l=50, r=50, t=60, b=50)
+            )
+            st.plotly_chart(fig9, use_container_width=True)
 
-        # Row 5: Attack & Vulnerability Details
-        st.markdown("## Attack & Vulnerability Details")
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.markdown("##### Attack Type Frequency")
-            attack_type_counts = global_threats_tab2['Attack Type'].value_counts().reset_index()
-            attack_type_counts.columns = ['Attack Type', 'Count']
-            fig11 = px.bar(attack_type_counts, x='Count', y='Attack Type', orientation='h')
-            fig11 = apply_plotly_theme(fig11)
-            fig11.update_layout(height=300, yaxis={'categoryorder': 'total ascending'})
-            st.plotly_chart(fig11, use_container_width=True)
-        with col2:
-            st.markdown("##### Top 10 Security Vulnerabilities")
-            vuln_counts = global_threats_tab2['Security Vulnerability Type'].value_counts().head(10).reset_index()
-            vuln_counts.columns = ['Vulnerability', 'Count']
-            fig12 = px.bar(vuln_counts, x='Count', y='Vulnerability', orientation='h')
-            fig12 = apply_plotly_theme(fig12)
-            fig12.update_layout(height=300, yaxis={'categoryorder': 'total ascending'})
-            st.plotly_chart(fig12, use_container_width=True)
-        with col3:
-            st.markdown("##### Attack Sources Distribution")
-            source_counts = global_threats_tab2['Attack Source'].value_counts().reset_index()
-            source_counts.columns = ['Source', 'Count']
-            fig13 = px.pie(source_counts, values='Count', names='Source')
-            fig13 = apply_plotly_theme(fig13)
-            fig13.update_layout(height=300)
-            st.plotly_chart(fig13, use_container_width=True)
+        st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
+
+        # Section 5: Industry Distribution - How attacks vary across industries
+        bar_data = global_threats_tab2.groupby(['Target Industry', 'Attack Type']).size().reset_index(name='Count')
+        fig10 = px.bar(bar_data, x='Target Industry', y='Count', color='Attack Type', barmode='group', title='Attack Distribution by Industry and Type')
+        fig10 = apply_plotly_theme(fig10)
+        fig10.update_layout(
+            height=400,
+            xaxis_tickangle=-45,
+            margin=dict(l=60, r=150, t=60, b=120),
+            xaxis_tickfont=dict(size=10),
+            legend=dict(
+                orientation="v",
+                yanchor="top",
+                y=1.0,
+                xanchor="left",
+                x=1.02,
+                bgcolor="rgba(31, 42, 64, 0.8)",
+                bordercolor=COLORS["border_color"],
+                borderwidth=1
+            )
+        )
+        st.plotly_chart(fig10, use_container_width=True)
 
     elif page == "Intrusion Detection":
         intrusion_data = st.session_state.filtered_data.get('intrusion_detection', intrusion_data_original)
@@ -327,8 +349,6 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
         ])
 
         with subtab1:
-            st.markdown("## 📊 Classification Overview")
-
             col1, col2, col3, col4 = st.columns(4)
 
             with col1:
@@ -366,7 +386,22 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
                              color_discrete_map={'Attack': COLORS["accent_red"], 'Normal': COLORS["accent_blue"]},
                              labels={'protocol_type': 'Protocol', 'Count': 'Number of Records'})
                 fig = apply_plotly_theme(fig)
-                fig.update_layout(height=400)
+                fig.update_layout(
+                    height=400,
+                    xaxis_tickangle=-30,
+                    margin=dict(l=60, r=150, t=60, b=80),
+                    xaxis_tickfont=dict(size=10),
+                    legend=dict(
+                        orientation="v",
+                        yanchor="top",
+                        y=1.0,
+                        xanchor="left",
+                        x=1.02,
+                        bgcolor="rgba(31, 42, 64, 0.8)",
+                        bordercolor=COLORS["border_color"],
+                        borderwidth=1
+                    )
+                )
                 st.plotly_chart(fig, use_container_width=True)
 
             protocol_pct = intrusion_data.groupby(['protocol_type', 'attack_detected']).size().unstack(fill_value=0)
@@ -378,13 +413,25 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
             fig.add_trace(go.Bar(name='Attack', x=protocol_pct.index, y=protocol_pct['Attack'],
                                  marker_color=COLORS["accent_red"]))
 
-            fig = apply_plotly_theme(fig)
+            fig = apply_plotly_theme(fig, title='Protocol Distribution: Attack vs Normal (Stacked)')
             fig.update_layout(
                 barmode='stack',
-                title='Protocol Distribution: Attack vs Normal (Stacked)',
                 xaxis_title='Protocol Type',
                 yaxis_title='Count',
-                height=400
+                height=400,
+                xaxis_tickangle=-30,
+                margin=dict(l=60, r=50, t=60, b=80),
+                xaxis_tickfont=dict(size=10),
+                legend=dict(
+                    orientation="v",
+                    yanchor="top",
+                    y=0.99,
+                    xanchor="right",
+                    x=0.99,
+                    bgcolor="rgba(31, 42, 64, 0.8)",
+                    bordercolor=COLORS["border_color"],
+                    borderwidth=1
+                )
             )
             st.plotly_chart(fig, use_container_width=True)
 
@@ -399,7 +446,12 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
                              color='Count',
                              color_continuous_scale='Blues')
                 fig = apply_plotly_theme(fig)
-                fig.update_layout(height=400)
+                fig.update_layout(
+                    height=400,
+                    xaxis_tickangle=-45,
+                    margin=dict(l=60, r=50, t=60, b=100),
+                    xaxis_tickfont=dict(size=10)
+                )
                 st.plotly_chart(fig, use_container_width=True)
 
             with col2:
@@ -412,12 +464,15 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
                              color='Count',
                              color_continuous_scale='Greens')
                 fig = apply_plotly_theme(fig)
-                fig.update_layout(height=400, yaxis={'categoryorder': 'total ascending'})
+                fig.update_layout(
+                    height=400,
+                    yaxis={'categoryorder': 'total ascending'},
+                    margin=dict(l=120, r=50, t=60, b=50),
+                    yaxis_tickfont=dict(size=10)
+                )
                 st.plotly_chart(fig, use_container_width=True)
 
         with subtab2:
-            st.markdown("## 📈 Feature Distribution Analysis")
-
             numeric_features = [
                 'network_packet_size',
                 'login_attempts',
@@ -441,7 +496,19 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
                             points='outliers',
                             color_discrete_map={'Attack': COLORS["accent_red"], 'Normal': COLORS["accent_blue"]})
             fig = apply_plotly_theme(fig)
-            fig.update_layout(height=500)
+            fig.update_layout(
+                height=500,
+                legend=dict(
+                    orientation="v",
+                    yanchor="top",
+                    y=0.99,
+                    xanchor="right",
+                    x=0.99,
+                    bgcolor="rgba(31, 42, 64, 0.8)",
+                    bordercolor=COLORS["border_color"],
+                    borderwidth=1
+                )
+            )
             st.plotly_chart(fig, use_container_width=True)
 
             col1, col2 = st.columns(2)
@@ -454,7 +521,19 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
                                    opacity=0.7,
                                    color_discrete_map={'Attack': COLORS["accent_red"], 'Normal': COLORS["accent_blue"]})
                 fig = apply_plotly_theme(fig)
-                fig.update_layout(height=400)
+                fig.update_layout(
+                    height=400,
+                    legend=dict(
+                        orientation="v",
+                        yanchor="top",
+                        y=0.99,
+                        xanchor="right",
+                        x=0.99,
+                        bgcolor="rgba(31, 42, 64, 0.8)",
+                        bordercolor=COLORS["border_color"],
+                        borderwidth=1
+                    )
+                )
                 st.plotly_chart(fig, use_container_width=True)
 
             with col2:
@@ -463,10 +542,20 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
                              color='Classification',
                              color_discrete_map={'Attack': COLORS["accent_red"], 'Normal': COLORS["accent_blue"]})
                 fig = apply_plotly_theme(fig)
-                fig.update_layout(height=400)
+                fig.update_layout(
+                    height=400,
+                    legend=dict(
+                        orientation="v",
+                        yanchor="top",
+                        y=0.99,
+                        xanchor="right",
+                        x=0.99,
+                        bgcolor="rgba(31, 42, 64, 0.8)",
+                        bordercolor=COLORS["border_color"],
+                        borderwidth=1
+                    )
+                )
                 st.plotly_chart(fig, use_container_width=True)
-
-            st.markdown("### 📊 All Features Overview")
 
             col1, col2 = st.columns(2)
 
@@ -482,8 +571,6 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
                 st.dataframe(normal_data.describe().round(2), use_container_width=True)
 
         with subtab3:
-            st.markdown("## 🔬 Behavioral Pattern Analysis")
-
             fig = px.scatter(intrusion_data.sample(min(5000, len(intrusion_data))),
                              x='login_attempts',
                              y='failed_logins',
@@ -493,10 +580,20 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
                              color_discrete_map={'Attack': COLORS["accent_red"], 'Normal': COLORS["accent_blue"]},
                              hover_data=['session_duration', 'ip_reputation_score'])
             fig = apply_plotly_theme(fig)
-            fig.update_layout(height=500)
+            fig.update_layout(
+                height=500,
+                legend=dict(
+                    orientation="v",
+                    yanchor="top",
+                    y=0.99,
+                    xanchor="right",
+                    x=0.99,
+                    bgcolor="rgba(31, 42, 64, 0.8)",
+                    bordercolor=COLORS["border_color"],
+                    borderwidth=1
+                )
+            )
             st.plotly_chart(fig, use_container_width=True)
-
-            st.markdown("### 🔥 Feature Correlation Matrix")
 
             corr_data = intrusion_data[numeric_features + ['attack_detected']].corr()
 
@@ -508,7 +605,13 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
                              zmin=-1,
                              zmax=1)
             fig = apply_plotly_theme(fig)
-            fig.update_layout(height=600)
+            fig.update_layout(
+                height=600,
+                xaxis_tickangle=-45,
+                margin=dict(l=120, r=50, t=60, b=120),
+                xaxis_tickfont=dict(size=9),
+                yaxis_tickfont=dict(size=9)
+            )
             st.plotly_chart(fig, use_container_width=True)
 
             col1, col2 = st.columns(2)
@@ -523,7 +626,19 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
                               barmode='group',
                               color_discrete_map={'Attack': COLORS["accent_red"], 'Normal': COLORS["accent_blue"]})
                 fig = apply_plotly_theme(fig)
-                fig.update_layout(height=400)
+                fig.update_layout(
+                    height=400,
+                    legend=dict(
+                        orientation="v",
+                        yanchor="top",
+                        y=0.99,
+                        xanchor="right",
+                        x=0.99,
+                        bgcolor="rgba(31, 42, 64, 0.8)",
+                        bordercolor=COLORS["border_color"],
+                        borderwidth=1
+                    )
+                )
                 st.plotly_chart(fig, use_container_width=True)
 
             with col2:
@@ -534,10 +649,20 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
                                     opacity=0.7,
                                     color_discrete_map={'Attack': COLORS["accent_red"], 'Normal': COLORS["accent_blue"]})
                 fig = apply_plotly_theme(fig)
-                fig.update_layout(height=400)
+                fig.update_layout(
+                    height=400,
+                    legend=dict(
+                        orientation="v",
+                        yanchor="top",
+                        y=0.99,
+                        xanchor="right",
+                        x=0.99,
+                        bgcolor="rgba(31, 42, 64, 0.8)",
+                        bordercolor=COLORS["border_color"],
+                        borderwidth=1
+                    )
+                )
                 st.plotly_chart(fig, use_container_width=True)
-
-            st.markdown("### 🌐 3D Feature Space Visualization")
 
             sample_data = intrusion_data.sample(min(3000, len(intrusion_data)))
 
@@ -550,10 +675,20 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
                                  opacity=0.6,
                                  color_discrete_map={'Attack': COLORS["accent_red"], 'Normal': COLORS["accent_blue"]})
             fig = apply_plotly_theme(fig)
-            fig.update_layout(height=700)
+            fig.update_layout(
+                height=700,
+                legend=dict(
+                    orientation="v",
+                    yanchor="top",
+                    y=0.99,
+                    xanchor="right",
+                    x=0.99,
+                    bgcolor="rgba(31, 42, 64, 0.8)",
+                    bordercolor=COLORS["border_color"],
+                    borderwidth=1
+                )
+            )
             st.plotly_chart(fig, use_container_width=True)
-
-            st.markdown("### 🔐 Protocol and Encryption Patterns")
 
             protocol_encryption = pd.crosstab(intrusion_data['protocol_type'],
                                              intrusion_data['encryption_used'],
@@ -566,5 +701,11 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
                              color_continuous_scale='Reds',
                              aspect='auto')
             fig = apply_plotly_theme(fig)
-            fig.update_layout(height=400)
+            fig.update_layout(
+                height=400,
+                xaxis_tickangle=-45,
+                margin=dict(l=100, r=50, t=60, b=100),
+                xaxis_tickfont=dict(size=10),
+                yaxis_tickfont=dict(size=10)
+            )
             st.plotly_chart(fig, use_container_width=True)

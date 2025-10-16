@@ -124,7 +124,6 @@ def show(global_threats, intrusion_data):
         ))
 
         fig1.update_layout(
-            title='Global Attack Frequency Trend (2015-2024)',
             xaxis_title='Year',
             yaxis_title='Number of Attacks',
             height=400,
@@ -202,7 +201,6 @@ def show(global_threats, intrusion_data):
 
         fig4 = px.bar(attack_sigs_melted, x='protocol_type', y='Average Value',
                      color='Feature',
-                     title='Attack Signatures by Protocol',
                      barmode='group',
                      labels={'protocol_type': 'Protocol', 'Average Value': 'Avg Value'})
         fig4.update_layout(height=500)
