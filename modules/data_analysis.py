@@ -56,75 +56,403 @@ def ensure_year_numeric(df):
     return df
 
 def show(global_threats, intrusion_data):
-    """Display IDA and EDA analysis with a tabbed interface."""
+    """Display IDA and EDA analysis with Visual Dashboard Style."""
 
-    st.title("📊 Data Science Investigation")
-    st.markdown("A deep dive into the datasets, from initial understanding to exploratory analysis and key findings.")
-
-    st.markdown("---")
+    # Add top margin to align with navigation
+    st.markdown("<div style='margin-top: 30px;'></div>", unsafe_allow_html=True)
 
     if global_threats is None or intrusion_data is None:
         st.error("Unable to load data for analysis.")
         return
 
-    # Main tab navigation
-    tab1, tab2, tab3 = st.tabs([
-        "📖 Data Understanding (IDA)",
-        "🔬 Exploratory Analysis (EDA)",
-        "💡 Key Findings & Insights"
-    ])
+    # ==================== DATA QUALITY OVERVIEW ====================
+    st.subheader("📊 Data Quality Dashboard")
 
-    # ==================== DATA UNDERSTANDING (IDA) TAB ====================
-    with tab1:
-        st.header("Initial Data Analysis (IDA)")
+    # Check if missing data file exists and use it for accurate completeness metrics
+    from pathlib import Path
+    missing_file = Path('data/global_threat_landscape_with_missing.csv')
+    if missing_file.exists():
+        # Use the dataset with missing values for accurate metrics
+        try:
+            gt_for_metrics = pd.read_csv(missing_file)
+        except:
+            gt_for_metrics = global_threats
+    else:
+        gt_for_metrics = global_threats
 
-        # Nested tabs for dataset selection
-        ida_tab1, ida_tab2, ida_tab3 = st.tabs([
-            "🌍 Global Threats Dataset",
-            "🔐 Intrusion Detection Dataset",
-            "📋 Raw Data Explorer"
-        ])
+    # Calculate key metrics for both datasets
+    gt_rows, gt_cols = gt_for_metrics.shape
+    gt_missing_pct = (gt_for_metrics.isnull().sum().sum() / (gt_rows * gt_cols)) * 100
+    gt_completeness = 100 - gt_missing_pct
 
-        with ida_tab1:
-            show_ida_global(global_threats)
-        with ida_tab2:
-            show_ida_intrusion(intrusion_data)
-        with ida_tab3:
-            show_data_explorer(global_threats, intrusion_data)
+    id_rows, id_cols = intrusion_data.shape
+    id_missing_pct = (intrusion_data.isnull().sum().sum() / (id_rows * id_cols)) * 100
+    id_completeness = 100 - id_missing_pct
 
-    # ==================== EXPLORATORY ANALYSIS (EDA) TAB ====================
-    with tab2:
-        st.header("Exploratory Data Analysis (EDA)")
-        st.markdown("""
-        > *"Data exploration is detective work. We form hypotheses, test them with visualizations and statistics,
-        > and build evidence for our conclusions."*
+    # Top Row: Data Quality Metrics
+    col1, col2, col3, col4 = st.columns(4)
+
+    # Determine quality label based on completeness
+    def get_quality_label(completeness):
+        if completeness >= 95:
+            return "High quality"
+        elif completeness >= 80:
+            return "Good quality"
+        elif completeness >= 60:
+            return "Fair quality"
+        else:
+            return "Needs attention"
+
+    with col1:
+        st.metric("Global Threats Records", f"{gt_rows:,}", f"{gt_cols} features")
+
+    with col2:
+        st.metric("Data Completeness", f"{gt_completeness:.1f}%", get_quality_label(gt_completeness))
+
+    with col3:
+        st.metric("Intrusion Detection Records", f"{id_rows:,}", f"{id_cols} features")
+
+    with col4:
+        st.metric("Data Completeness", f"{id_completeness:.1f}%", get_quality_label(id_completeness))
+
+    st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
+
+    # ==================== EXPLORATORY VISUALIZATIONS ====================
+    st.subheader("🔍 Key Exploratory Insights")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        # Global Threats: Incidents over time
+        st.markdown("**Attack Trends Over Time**")
+        yearly_attacks = global_threats.groupby('Year').size().reset_index(name='Count')
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(
+            x=yearly_attacks['Year'],
+            y=yearly_attacks['Count'],
+            mode='lines+markers',
+            line=dict(color='#00D9FF', width=3),
+            marker=dict(size=8, color='#00FFB3'),
+            fill='tozeroy',
+            fillcolor='rgba(0, 217, 255, 0.1)'
+        ))
+        fig.update_layout(
+            xaxis_title="Year",
+            yaxis_title="Number of Incidents",
+            height=350,
+            template="plotly_dark",
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)'
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
+    with col2:
+        # Global Threats: Top attack types
+        st.markdown("**Most Common Attack Types**")
+        top_attacks = global_threats['Attack Type'].value_counts().nlargest(5)
+        fig = go.Figure(go.Bar(
+            x=top_attacks.values,
+            y=top_attacks.index,
+            orientation='h',
+            marker_color='#00FFB3'
+        ))
+        fig.update_layout(
+            xaxis_title="Number of Incidents",
+            yaxis=dict(autorange="reversed"),
+            height=350,
+            template="plotly_dark",
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)'
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
+    st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
+
+    # ==================== TECHNICAL DETAILS (COLLAPSIBLE) ====================
+    with st.expander("🔧 Technical Details & Raw Data"):
+        st.markdown("### Global Threats Dataset")
+        st.dataframe(global_threats.head(10), use_container_width=True)
+        st.markdown(f"**Shape:** {gt_rows} rows × {gt_cols} columns")
+
+        st.markdown("---")
+
+        st.markdown("### Intrusion Detection Dataset")
+        st.dataframe(intrusion_data.head(10), use_container_width=True)
+        st.markdown(f"**Shape:** {id_rows} rows × {id_cols} columns")
+
+    with st.expander("📊 Statistical Summary"):
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown("**Global Threats Statistics**")
+            st.dataframe(global_threats.describe(), use_container_width=True)
+        with col2:
+            st.markdown("**Intrusion Detection Statistics**")
+            st.dataframe(intrusion_data.describe(), use_container_width=True)
+
+    # ==================== MICE IMPUTATION ANALYSIS ====================
+    with st.expander("🔬 MICE Imputation Analysis"):
+        show_mice_imputation_section()
+
+
+# ==================== MICE IMPUTATION SECTION ====================
+def show_mice_imputation_section():
+    """Display MICE imputation analysis section."""
+    from pathlib import Path
+
+    st.markdown("### Missing Data Analysis & Imputation")
+    st.markdown("Multiple Imputation by Chained Equations (MICE) for handling missing Financial Loss data")
+
+    # Check if imputation files exist
+    data_dir = Path('data')
+    missing_file = data_dir / 'global_threat_landscape_with_missing.csv'
+    imputed_file = data_dir / 'global_threat_landscape_imputed.csv'
+    comparison_file = data_dir / 'imputation_comparison.csv'
+
+    # Show instructions if files don't exist
+    if not missing_file.exists():
+        st.info("""
+        ℹ️ **MICE Imputation Dataset Not Yet Generated**
+
+        To explore missing data imputation analysis:
+
+        1. Generate dataset with missing values:
+           ```bash
+           python scripts/generate_missing_data.py
+           ```
+
+        2. Run MICE imputation notebook:
+           ```bash
+           jupyter notebook notebooks/mice_imputation_demo.ipynb
+           ```
+
+        3. Refresh this page to see results
+        """)
+        return
+
+    # Load data
+    df_missing = pd.read_csv(missing_file)
+    missing_count = df_missing['Financial Loss (in Million $)'].isnull().sum()
+    missing_pct = (missing_count / len(df_missing)) * 100
+
+    st.markdown("---")
+    st.markdown("#### 📊 Dataset Overview")
+
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Total Records", f"{len(df_missing):,}")
+    with col2:
+        st.metric("Missing Values", f"{missing_count:,}", f"{missing_pct:.1f}%")
+    with col3:
+        if imputed_file.exists():
+            st.metric("Status", "✓ Imputed", "Analysis available")
+        else:
+            st.metric("Status", "⚠ Pending", "Run notebook")
+
+    # Missing Data Randomness Analysis
+    st.markdown("---")
+    st.markdown("#### 🔍 Missing Data Randomness Analysis")
+
+    # Create missing data matrix
+    missing_matrix = df_missing.isnull().astype(int)
+    cols_with_missing = missing_matrix.sum()[missing_matrix.sum() > 0].index.tolist()
+
+    if len(cols_with_missing) > 0:
+        # Analyze randomness for Financial Loss column
+        target_col = 'Financial Loss (in Million $)'
+        if target_col in cols_with_missing:
+            missing_indices = df_missing[df_missing[target_col].isnull()].index.tolist()
+
+            # Calculate spacing between missing values
+            if len(missing_indices) > 1:
+                missing_indices_sorted = sorted(missing_indices)
+                gaps = [missing_indices_sorted[i+1] - missing_indices_sorted[i] for i in range(len(missing_indices_sorted)-1)]
+
+                # Statistical measures of randomness
+                gap_mean = np.mean(gaps)
+                gap_std = np.std(gaps)
+                gap_cv = gap_std / gap_mean if gap_mean > 0 else 0  # Coefficient of variation
+
+                # Expected gap for random missing (total_records / num_missing)
+                expected_gap = len(df_missing) / len(missing_indices)
+
+                # Assess randomness
+                # High CV (>0.7) and gaps close to expected = likely random
+                # Low CV (<0.3) or regular gaps = likely systematic
+                is_random = gap_cv > 0.5 and abs(gap_mean - expected_gap) / expected_gap < 0.3
+
+                # Display randomness assessment
+                col1, col2, col3, col4 = st.columns(4)
+
+                with col1:
+                    status = "✓ Random" if is_random else "⚠ Systematic"
+                    status_color = "🟢" if is_random else "🟡"
+                    st.metric("Pattern Type", status, status_color)
+
+                with col2:
+                    st.metric("Gap Variability", f"{gap_cv:.2f}", "Higher = More Random")
+
+                with col3:
+                    st.metric("Avg Gap", f"{gap_mean:.0f}", "Records between missing")
+
+                with col4:
+                    st.metric("Expected Gap", f"{expected_gap:.0f}", "For random pattern")
+
+                # Interpretation
+                st.markdown("---")
+                if is_random:
+                    st.success("""
+                    **✓ Missing Data Appears Random (MCAR - Missing Completely At Random)**
+
+                    The missing values are scattered randomly throughout the dataset with irregular gaps.
+                    This is ideal for MICE imputation as there's no systematic bias in what's missing.
+
+                    **What this means:**
+                    - High variability in gaps between missing values
+                    - No apparent pattern or clustering
+                    - Safe to use MICE imputation
+                    - Imputed values will be unbiased
+                    """)
+                else:
+                    st.warning("""
+                    **⚠ Missing Data May Be Systematic (MAR/MNAR)**
+
+                    The missing values show some pattern or regularity in their distribution.
+                    This could indicate the data is Missing At Random (related to other variables)
+                    or Missing Not At Random (related to the missing value itself).
+
+                    **What this means:**
+                    - Regular gaps or clustering detected
+                    - May be related to data collection process
+                    - MICE can still work but verify results carefully
+                    - Consider investigating the cause
+                    """)
+
+                # Visualize missing pattern distribution
+                st.markdown("---")
+                st.markdown("**📊 Missing Value Distribution Pattern**")
+
+                # Create histogram of gaps
+                fig = go.Figure()
+
+                fig.add_trace(go.Histogram(
+                    x=gaps,
+                    nbinsx=min(30, len(gaps)),
+                    marker_color='#00D9FF',
+                    opacity=0.7,
+                    name='Actual Gaps'
+                ))
+
+                # Add vertical line for expected gap
+                fig.add_vline(
+                    x=expected_gap,
+                    line_dash="dash",
+                    line_color="#FF9F43",
+                    line_width=2,
+                    annotation_text=f"Expected Gap: {expected_gap:.0f}",
+                    annotation_position="top"
+                )
+
+                # Add vertical line for mean gap
+                fig.add_vline(
+                    x=gap_mean,
+                    line_dash="dash",
+                    line_color="#00FFB3",
+                    line_width=2,
+                    annotation_text=f"Actual Mean: {gap_mean:.0f}",
+                    annotation_position="bottom"
+                )
+
+                fig.update_layout(
+                    title='Distribution of Gaps Between Missing Values',
+                    xaxis_title='Records Between Missing Values',
+                    yaxis_title='Frequency',
+                    height=350,
+                    template='plotly_dark',
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    showlegend=False
+                )
+
+                st.plotly_chart(fig, use_container_width=True)
+
+                st.markdown("""
+                **How to interpret:**
+                - **Wide spread**: More random (good for MICE)
+                - **Narrow spike**: Regular pattern (may be systematic)
+                - **Multiple peaks**: Could indicate multiple missing mechanisms
+                - **Close to expected gap**: Supports randomness
+                """)
+    else:
+        st.success("✅ No missing values detected in any column!")
+
+    # If imputation results exist, show quality metrics
+    if comparison_file.exists():
+        st.markdown("---")
+        st.markdown("#### 📈 Imputation Quality Metrics")
+
+        # Load comparison data
+        comparison_df = pd.read_csv(comparison_file)
+        imputed_only = comparison_df[comparison_df['Was_Missing'] == True]
+
+        # Calculate metrics
+        mae = np.abs(imputed_only['Original'] - imputed_only['Imputed']).mean()
+        rmse = np.sqrt(((imputed_only['Original'] - imputed_only['Imputed']) ** 2).mean())
+        mape = (np.abs((imputed_only['Original'] - imputed_only['Imputed']) / imputed_only['Original']).mean()) * 100
+
+        # Display metrics
+        col1, col2, col3, col4 = st.columns(4)
+
+        with col1:
+            st.metric("MAE", f"${mae:.2f}M", "Mean Absolute Error")
+        with col2:
+            st.metric("RMSE", f"${rmse:.2f}M", "Root Mean Squared")
+        with col3:
+            quality_color = "🟢" if mape < 10 else ("🟡" if mape < 20 else "🔴")
+            st.metric("MAPE", f"{mape:.2f}%", quality_color)
+        with col4:
+            quality_label = "Excellent" if mape < 10 else ("Good" if mape < 20 else "Moderate")
+            st.metric("Quality", quality_label, f"Based on MAPE")
+
+    else:
+        st.info("""
+        ℹ️ **Imputation Results Not Yet Available**
+
+        Run the MICE imputation notebook to generate results:
+
+        ```bash
+        jupyter notebook notebooks/mice_imputation_demo.ipynb
+        ```
+
+        After completion, refresh this page to see the analysis.
         """)
 
-        with st.expander("🎯 How to Navigate This Analysis", expanded=True):
-            st.markdown("""
-            This EDA follows a **narrative arc**, with each section building on the previous to tell a comprehensive story.
-            - **Temporal Analysis:** Are cyber threats growing over time?
-            - **Geographic Analysis:** Where are threats and financial losses concentrated?
-            - **Correlation Analysis:** What factors move together?
-            - **Behavior Analysis:** How can we distinguish an attack from normal traffic?
-            - **Advanced Analytics:** What hidden patterns exist in the data?
-            """)
-        st.markdown("---")
+    # Documentation
+    st.markdown("---")
+    st.markdown("#### 📚 About MICE")
 
-        # Display all EDA sections sequentially
-        show_temporal_analysis(global_threats)
-        st.markdown("---")
-        show_geographic_analysis(global_threats)
-        st.markdown("---")
-        show_correlation_analysis(global_threats, intrusion_data)
-        st.markdown("---")
-        show_behavior_analysis(intrusion_data)
-        st.markdown("---")
-        show_advanced_analytics(global_threats, intrusion_data)
+    with st.expander("ℹ️ Learn More About MICE Imputation"):
+        st.markdown("""
+        **MICE (Multiple Imputation by Chained Equations)** is a robust method for handling missing data.
 
-    # ==================== KEY FINDINGS TAB ====================
-    with tab3:
-        show_key_findings(global_threats, intrusion_data)
+        **How it Works:**
+        1. Make initial guesses for missing values
+        2. Iteratively model each variable as a function of others
+        3. Update predictions until convergence
+
+        **Features Used:**
+        - Year (temporal context)
+        - Incident Resolution Time (severity indicator)
+        - Financial Loss (target variable)
+        - Number of Affected Users (impact indicator)
+
+        **Quality Metrics:**
+        - **MAE**: Average absolute error
+        - **RMSE**: Root mean squared error (penalizes large errors)
+        - **MAPE**: Percentage error (scale-independent)
+          - < 10%: Excellent
+          - 10-20%: Good
+          - > 20%: Moderate
+        """)
 
 
 # ==================== IDA FUNCTIONS ====================
