@@ -40,7 +40,7 @@ st.set_page_config(
 
 # Apply centralized theme CSS
 from modules.theme import apply_dashboard_css
-apply_dashboard_css()
+apply_dashboard_css(sidebar_width=320)
 
 # Data loading with caching
 @st.cache_data

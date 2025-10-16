@@ -98,35 +98,116 @@ def get_plotly_theme():
     }
 
 
-def apply_plotly_theme(fig, title=""):
+def apply_plotly_theme(fig, title: str = None):
     """
-    Apply consistent theme to a Plotly figure.
+    Apply consistent theme to a Plotly figure with optional title.
 
     Args:
         fig: Plotly figure object
-        title: Optional chart title
+        title: Chart title. If None (default), extracts from fig.layout.title.text if present.
+               If empty string "", no title is displayed.
+               If non-empty string, uses that as the title.
 
     Returns:
         Modified figure with theme applied
     """
     theme = get_plotly_theme()
 
-    if title:
-        theme["title"] = {
-            "text": title,
-            "x": 0,
-            "xanchor": "left",
-            "font": {"size": 18, "color": COLORS["text_primary"], "family": FONTS["primary"]}
-        }
+    # Extract existing title from plotly express if title parameter not provided
+    final_title = None
+    if title is None:
+        # Try to extract existing title
+        try:
+            existing = getattr(fig.layout, 'title', None)
+            if existing:
+                existing_text = getattr(existing, 'text', None)
+                if existing_text and isinstance(existing_text, str):
+                    text = existing_text.strip()
+                    # Only use if it's a valid, non-empty string
+                    if text and text.lower() not in ("undefined", "none", "null", "nan"):
+                        final_title = text
+        except Exception:
+            pass
+    elif isinstance(title, str):
+        text = title.strip()
+        # Only use if it's a valid, non-empty string
+        if text and text.lower() not in ("undefined", "none", "null", "nan"):
+            final_title = text
 
+    # Apply theme first
     fig.update_layout(**theme)
+
+    # Add title outside the chart area if we have a valid one
+    if final_title:
+        fig.update_layout(
+            title=dict(
+                text=final_title,
+                x=0,
+                y=0.98,
+                xanchor='left',
+                yanchor='top',
+                font=dict(
+                    size=13,
+                    color=COLORS["text_primary"],
+                    family=FONTS["primary"],
+                    weight=600
+                ),
+                pad=dict(t=10, l=0, b=15)
+            ),
+            margin=dict(t=60, b=50, l=50, r=50)
+        )
+    else:
+        # No title - use smaller top margin
+        fig.update_layout(margin=dict(t=40, b=50, l=50, r=50))
+
     return fig
 
 
-def apply_dashboard_css():
+def add_inplot_title(fig, text: str):
+    """Add a top-left, in-plot title annotation using the same style as apply_plotly_theme.
+    Does nothing if text is empty/undefined/null.
+    """
+    if text is None:
+        return fig
+    t = str(text).strip()
+    if t == "" or t.lower() in ("undefined", "none", "null"):
+        return fig
+    ann = dict(
+        text=t,
+        x=0.01, y=0.99,
+        xref='paper', yref='paper',
+        xanchor='left', yanchor='top',
+        showarrow=False,
+        align='left',
+        font=dict(size=16, color=COLORS["text_primary"], family=FONTS["primary"]),
+        bgcolor='rgba(15,21,32,0.55)'
+    )
+    try:
+        existing_anns = list(fig.layout.annotations) if getattr(fig.layout, 'annotations', None) else []
+        # remove previous title-like anno
+        filtered = []
+        for a in existing_anns:
+            try:
+                keep = not (getattr(a, 'xref', None) == 'paper' and getattr(a, 'yref', None) == 'paper' and getattr(a, 'x', 1) <= 0.02 and getattr(a, 'y', 0) >= 0.98)
+            except Exception:
+                keep = True
+            if keep:
+                filtered.append(a)
+        filtered.insert(0, ann)
+        fig.update_layout(annotations=filtered, margin=dict(t=48), xaxis=dict(automargin=True), yaxis=dict(automargin=True))
+    except Exception:
+        # fallback to classic layout title
+        fig.update_layout(title=dict(text=t, x=0, xanchor='left'))
+    return fig
+
+
+def apply_dashboard_css(sidebar_width: int = 300):
     """
     Apply comprehensive dashboard CSS styling using Streamlit markdown.
     This centralizes all UI styling to maintain consistency across the application.
+
+    Args:
+        sidebar_width: Width of the sidebar in pixels (default 300).
     """
     import streamlit as st
 
@@ -211,6 +292,9 @@ def apply_dashboard_css():
         [data-testid="stSidebar"] {{
             background: {GRADIENTS["background"]};
             border-right: 1px solid var(--border-color);
+            min-width: {sidebar_width}px !important;
+            width: {sidebar_width}px !important;
+            max-width: {sidebar_width}px !important;
         }}
 
         [data-testid="stSidebar"] > div:first-child {{
