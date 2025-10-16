@@ -4,7 +4,7 @@ A Streamlit-powered dashboard for analyzing global cybersecurity threats alongsi
 
 ## Features
 - Dashboard pages: Dashboard Overview, Global Threat Landscape, Intrusion Detection, Data Explorer, IDA/EDA Analysis, Comparative Insights, Methodology
-- Consistent theming via centralized utilities (modules/ui_utils.py)
+- Consistent theming via centralized theme system (modules/theme.py)
 - Robust data loading with clear guidance when datasets are missing
 - Interactive filtering and downloadable data views
 
@@ -41,8 +41,7 @@ Then open http://localhost:8501 in your browser.
 │   ├── comparative_insights.py
 │   ├── methodology.py
 │   ├── filters.py
-│   ├── ui_utils.py
-│   └── components.py
+│   └── theme.py
 ├── data/
 │   ├── Global_Cybersecurity_Threats_2015-2024.csv (you provide)
 │   └── cybersecurity_intrusion_data.csv (you provide)
@@ -52,10 +51,20 @@ Then open http://localhost:8501 in your browser.
 └── LICENSE
 ```
 
+## Documentation
+For comprehensive documentation, see **[docs/CyberGuard_Dashboard_Documentation.md](docs/CyberGuard_Dashboard_Documentation.md)** which includes:
+- 📖 Complete implementation guide
+- 🎨 Design system and component documentation
+- 🎛️ Filter system implementation guides
+- 🧬 Data analysis methodology and reports
+- 🎯 Quick reference guides by use case
+
 ## Notes
-- All UI styling is applied via `modules/ui_utils.apply_base_css()` to avoid large inline CSS in `app.py`.
-- Unused page modules were removed from `modules/` to reduce maintenance burden.
-- For advanced EDA and methodology details, see the docs/ folder and notebooks/.
+- All UI styling is centralized in `modules/theme.py` via `apply_dashboard_css()` to maintain consistency and avoid code duplication
+- The theme system provides consistent colors, typography, and styling across all dashboard pages
+- Redundant code and unused modules have been removed to reduce maintenance burden
+- `data_analysis.py` includes comprehensive documentation for all analysis functions
+- For advanced EDA and methodology details, see the docs/ folder and notebooks/
 
 ## License
 MIT — see `LICENSE`.

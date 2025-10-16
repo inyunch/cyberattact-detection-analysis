@@ -41,7 +41,7 @@ Complete design system documentation:
 ### 🎛️ Filter System Documentation
 
 #### **[FILTER_SYSTEM_GUIDE.md](./FILTER_SYSTEM_GUIDE.md)**
-**Type**: Implementation Guide | **Lines**: 400+
+**Type**: Implementation Guide
 
 Comprehensive filter system implementation guide:
 - Architecture overview (global vs page-specific)
@@ -57,7 +57,7 @@ Comprehensive filter system implementation guide:
 ---
 
 #### **[FILTER_DESIGN_SHOWCASE.md](./FILTER_DESIGN_SHOWCASE.md)**
-**Type**: Visual Design Documentation | **Lines**: 320
+**Type**: Visual Design Documentation
 
 Visual design showcase with ASCII mockups:
 - Global filter sidebar design
@@ -69,6 +69,20 @@ Visual design showcase with ASCII mockups:
 - Interaction flow
 
 👉 **Use this** to understand the visual design and user experience.
+
+---
+
+#### **[FILTER_COLOR_REFERENCE.md](./FILTER_COLOR_REFERENCE.md)**
+**Type**: Color System Reference
+
+Complete color system reference for filters:
+- Filter chip color mapping
+- Filter statistics color scale
+- Accessibility compliance (WCAG)
+- Color psychology guide
+- Usage examples
+
+👉 **Use this** for consistent color application across filter components.
 
 ---
 
@@ -102,6 +116,48 @@ Additional component-specific design guidelines:
 
 ---
 
+### 🧬 Data Analysis Documentation
+
+#### **[IDA_EDA_Analysis_Report.md](./IDA_EDA_Analysis_Report.md)**
+**Type**: Analysis Report
+
+Complete analysis report covering:
+- Initial Data Analysis (IDA) findings
+- Exploratory Data Analysis (EDA) insights
+- Statistical analysis results
+- Visualization documentation
+- Key findings and recommendations
+
+👉 **Read this** for a comprehensive understanding of the data analysis performed.
+
+---
+
+#### **[MICE_IMPUTATION_GUIDE.md](./MICE_IMPUTATION_GUIDE.md)**
+**Type**: Technical Guide
+
+Guide to MICE (Multiple Imputation by Chained Equations):
+- Missing data imputation methodology
+- Implementation details
+- Quality metrics and validation
+- Integration with IDA/EDA page
+
+👉 **Use this** to understand missing data handling.
+
+---
+
+#### **[COMBINED_IDA_EDA_MICE.md](./COMBINED_IDA_EDA_MICE.md)**
+**Type**: Integration Documentation
+
+Documentation of MICE integration into IDA/EDA page:
+- Page structure and workflow
+- User guide and navigation
+- Technical implementation details
+- Benefits of integration
+
+👉 **Read this** to understand how MICE analysis fits into the dashboard.
+
+---
+
 ## 🗂️ Documentation by Use Case
 
 ### "I want to understand the project"
@@ -112,12 +168,18 @@ Additional component-specific design guidelines:
 ### "I want to add filters to a page"
 1. Read [FILTER_SYSTEM_GUIDE.md](./FILTER_SYSTEM_GUIDE.md)
 2. Review [FILTER_DESIGN_SHOWCASE.md](./FILTER_DESIGN_SHOWCASE.md) for visual specs
-3. Follow the step-by-step checklist
+3. Check [FILTER_COLOR_REFERENCE.md](./FILTER_COLOR_REFERENCE.md) for colors
+4. Follow the step-by-step checklist
 
 ### "I want to create a new component"
 1. Review [DESIGN_RULES.md](./DESIGN_RULES.md) for design system
 2. Check [DESIGN_GUIDELINES.md](./DESIGN_GUIDELINES.md) for patterns
 3. Use `modules/theme.py` for colors
+
+### "I want to understand the data analysis"
+1. Read [IDA_EDA_Analysis_Report.md](./IDA_EDA_Analysis_Report.md)
+2. Check [MICE_IMPUTATION_GUIDE.md](./MICE_IMPUTATION_GUIDE.md) for missing data
+3. Review [COMBINED_IDA_EDA_MICE.md](./COMBINED_IDA_EDA_MICE.md) for integration
 
 ### "I want to understand the code structure"
 1. Start with [IMPLEMENTATION_COMPLETE.md](./IMPLEMENTATION_COMPLETE.md)
