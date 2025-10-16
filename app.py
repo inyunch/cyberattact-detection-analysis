@@ -1,10 +1,27 @@
 import streamlit as st
 import pandas as pd
 
-# Handle query params for navigation
-if "page" in st.query_params:
-    page_from_query = st.query_params.get("page").replace('_', ' ')
-    allowed_pages = ["Dashboard Overview", "Global Threat Landscape", "Intrusion Detection", "Data Explorer", "IDA/EDA Analysis", "Comparative Insights", "Methodology"]
+# Handle query params for navigation (supports both new and legacy Streamlit APIs)
+def _get_query_params():
+    try:
+        # Streamlit >= 1.30
+        return dict(st.query_params)
+    except Exception:
+        try:
+            return st.experimental_get_query_params()
+        except Exception:
+            return {}
+
+_qp = _get_query_params()
+if "page" in _qp:
+    page_from_query = _qp.get("page")
+    if isinstance(page_from_query, list):
+        page_from_query = page_from_query[0]
+    page_from_query = str(page_from_query).replace('_', ' ')
+    allowed_pages = [
+        "Dashboard Overview", "Global Threat Landscape", "Intrusion Detection",
+        "Data Explorer", "IDA/EDA Analysis", "Comparative Insights", "Methodology"
+    ]
     if page_from_query in allowed_pages:
         st.session_state.selected_page = page_from_query
 
