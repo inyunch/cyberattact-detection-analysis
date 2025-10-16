@@ -171,6 +171,7 @@ with st.sidebar:
 
     elif selected == "Intrusion Detection":
         from modules.filters import page_filter_panel_intrusion, show_filter_stats, apply_page_filters_intrusion
+        st.sidebar.markdown('<div style="padding: 12px 16px; background: linear-gradient(135deg, rgba(0, 217, 255, 0.05) 0%, rgba(0, 255, 179, 0.05) 100%); border: 1px solid rgba(0, 217, 255, 0.2); border-radius: 12px; margin-bottom: 16px;"><p style="margin: 0; font-size: 0.85rem; color: #A0A7B8; text-align: center;"><span style="color: #00D9FF; font-weight: 600;">Customize</span> this page\'s visualization by applying specific filters below</p></div>', unsafe_allow_html=True)
         page_filters = page_filter_panel_intrusion(intrusion_data)
         st.session_state.page_filters['intrusion_detection'] = page_filters
 
