@@ -337,65 +337,61 @@ def page_filter_panel_global_threats(global_threats: pd.DataFrame, page_name: st
     """
     init_filter_state()
 
-    # Count active page filters
-    active_page_filters = 0
-    page_filters = st.session_state['page_filters'][page_name]
-    if page_filters['attack_types']:
-        active_page_filters += len(page_filters['attack_types'])
-    if page_filters['industries']:
-        active_page_filters += len(page_filters['industries'])
-    if page_filters['countries']:
-        active_page_filters += len(page_filters['countries'])
+    st.markdown('<div style="padding: 12px 16px; background: linear-gradient(135deg, rgba(0, 217, 255, 0.05) 0%, rgba(0, 255, 179, 0.05) 100%); border: 1px solid rgba(0, 217, 255, 0.2); border-radius: 12px; margin-bottom: 16px;"><p style="margin: 0; font-size: 0.85rem; color: #A0A7B8; text-align: center;"><span style="color: #00D9FF; font-weight: 600;">Customize</span> this page\'s visualization by applying specific filters below</p></div>', unsafe_allow_html=True)
 
-    # Modern expander with badge
-    with st.expander(f"🎯 Page Filters {'(' + str(active_page_filters) + ')' if active_page_filters > 0 else ''}", expanded=active_page_filters > 0):
-        st.markdown('<div style="padding: 12px 16px; background: linear-gradient(135deg, rgba(0, 217, 255, 0.05) 0%, rgba(0, 255, 179, 0.05) 100%); border: 1px solid rgba(0, 217, 255, 0.2); border-radius: 12px; margin-bottom: 16px;"><p style="margin: 0; font-size: 0.85rem; color: #A0A7B8; text-align: center;"><span style="color: #00D9FF; font-weight: 600;">Customize</span> this page\'s visualization by applying specific filters below</p></div>', unsafe_allow_html=True)
+    # Attack Type filter
+    attack_types_options = ["All"] + sorted(global_threats['Attack Type'].dropna().unique()) if 'Attack Type' in global_threats.columns else ["All"]
+    selected_attacks = st.multiselect(
+        "⚠️ Attack Type",
+        options=attack_types_options,
+        default="All",
+        key=f'{page_name}_attack_types'
+    )
+    if "All" in selected_attacks and len(selected_attacks) > 1:
+        selected_attacks.remove("All")
+    if not selected_attacks:
+        selected_attacks = ["All"]
+    st.session_state['page_filters'][page_name]['attack_types'] = selected_attacks
 
-        col1, col2 = st.columns(2)
+    # Target Industry filter
+    industries_options = ["All"] + sorted(global_threats['Target Industry'].dropna().unique()) if 'Target Industry' in global_threats.columns else ["All"]
+    selected_industries = st.multiselect(
+        "🏭 Target Industry",
+        options=industries_options,
+        default="All",
+        key=f'{page_name}_industries'
+    )
+    if "All" in selected_industries and len(selected_industries) > 1:
+        selected_industries.remove("All")
+    if not selected_industries:
+        selected_industries = ["All"]
+    st.session_state['page_filters'][page_name]['industries'] = selected_industries
 
-        with col1:
-            # Attack Type filter
-            attack_types = sorted(global_threats['Attack Type'].dropna().unique()) if 'Attack Type' in global_threats.columns else []
-            selected_attacks = st.multiselect(
-                "⚠️ Attack Type",
-                options=attack_types,
-                default=st.session_state['page_filters'][page_name]['attack_types'],
-                key=f'{page_name}_attack_types'
-            )
-            st.session_state['page_filters'][page_name]['attack_types'] = selected_attacks
+    # Country filter
+    countries_options = ["All"] + sorted(global_threats['Country'].dropna().unique()) if 'Country' in global_threats.columns else ["All"]
+    selected_countries = st.multiselect(
+        "🌍 Country",
+        options=countries_options,
+        default="All",
+        key=f'{page_name}_countries'
+    )
+    if "All" in selected_countries and len(selected_countries) > 1:
+        selected_countries.remove("All")
+    if not selected_countries:
+        selected_countries = ["All"]
+    st.session_state['page_filters'][page_name]['countries'] = selected_countries
 
-            # Target Industry filter
-            industries = sorted(global_threats['Target Industry'].dropna().unique()) if 'Target Industry' in global_threats.columns else []
-            selected_industries = st.multiselect(
-                "🏭 Target Industry",
-                options=industries,
-                default=st.session_state['page_filters'][page_name]['industries'],
-                key=f'{page_name}_industries'
-            )
-            st.session_state['page_filters'][page_name]['industries'] = selected_industries
-
-        with col2:
-            # Country filter
-            countries = sorted(global_threats['Country'].dropna().unique()) if 'Country' in global_threats.columns else []
-            selected_countries = st.multiselect(
-                "🌍 Country",
-                options=countries,
-                default=st.session_state['page_filters'][page_name]['countries'],
-                key=f'{page_name}_countries'
-            )
-            st.session_state['page_filters'][page_name]['countries'] = selected_countries
-
-            # Financial Loss Range
-            if 'Financial Loss (in Million $)' in global_threats.columns:
-                max_loss = int(global_threats['Financial Loss (in Million $)'].max())
-                loss_range = st.slider(
-                    "💰 Financial Loss Range (Million $)",
-                    min_value=0,
-                    max_value=max_loss,
-                    value=st.session_state['page_filters'][page_name]['loss_range'],
-                    key=f'{page_name}_loss_range'
-                )
-                st.session_state['page_filters'][page_name]['loss_range'] = loss_range
+    # Financial Loss Range
+    if 'Financial Loss (in Million $)' in global_threats.columns:
+        max_loss = int(global_threats['Financial Loss (in Million $)'].max())
+        loss_range = st.slider(
+            "💰 Financial Loss Range (Million $)",
+            min_value=0,
+            max_value=max_loss,
+            value=st.session_state['page_filters'][page_name]['loss_range'],
+            key=f'{page_name}_loss_range'
+        )
+        st.session_state['page_filters'][page_name]['loss_range'] = loss_range
 
     return st.session_state['page_filters'][page_name]
 
@@ -414,15 +410,15 @@ def apply_page_filters_global_threats(df: pd.DataFrame, filters: Dict[str, Any])
     filtered_df = df.copy()
 
     # Attack Type filter
-    if filters['attack_types'] and 'Attack Type' in filtered_df.columns:
+    if "All" not in filters['attack_types'] and filters['attack_types'] and 'Attack Type' in filtered_df.columns:
         filtered_df = filtered_df[filtered_df['Attack Type'].isin(filters['attack_types'])]
 
     # Industry filter
-    if filters['industries'] and 'Target Industry' in filtered_df.columns:
+    if "All" not in filters['industries'] and filters['industries'] and 'Target Industry' in filtered_df.columns:
         filtered_df = filtered_df[filtered_df['Target Industry'].isin(filters['industries'])]
 
     # Country filter
-    if filters['countries'] and 'Country' in filtered_df.columns:
+    if "All" not in filters['countries'] and filters['countries'] and 'Country' in filtered_df.columns:
         filtered_df = filtered_df[filtered_df['Country'].isin(filters['countries'])]
 
     # Financial Loss range filter
@@ -449,33 +445,30 @@ def page_filter_panel_intrusion(intrusion_data: pd.DataFrame, page_name: str = '
     """
     init_filter_state()
 
-    with st.expander("🎯 Page Filters", expanded=False):
-        st.markdown("**Filter network intrusion data:**")
+    st.markdown("**Filter network intrusion data:**")
 
-        col1, col2 = st.columns(2)
+    # Protocol Type filter
+    protocols_options = ["All"] + sorted(intrusion_data['protocol_type'].dropna().unique()) if 'protocol_type' in intrusion_data.columns else ["All"]
+    selected_protocols = st.multiselect(
+        "🔌 Protocol Type",
+        options=protocols_options,
+        default="All",
+        key=f'{page_name}_protocols'
+    )
+    if "All" in selected_protocols and len(selected_protocols) > 1:
+        selected_protocols.remove("All")
+    if not selected_protocols:
+        selected_protocols = ["All"]
+    st.session_state['page_filters'][page_name]['protocols'] = selected_protocols
 
-        with col1:
-            # Protocol Type filter
-            protocols = sorted(intrusion_data['protocol_type'].dropna().unique()) if 'protocol_type' in intrusion_data.columns else []
-            selected_protocols = st.multiselect(
-                "🔌 Protocol Type",
-                options=protocols,
-                default=st.session_state['page_filters'][page_name]['protocols'],
-                key=f'{page_name}_protocols'
-            )
-            st.session_state['page_filters'][page_name]['protocols'] = selected_protocols
-
-        with col2:
-            # Attack Detected toggle
-            attack_filter = st.radio(
-                "🚨 Attack Detected",
-                options=['both', 'yes', 'no'],
-                index=['both', 'yes', 'no'].index(st.session_state['page_filters'][page_name]['attack_detected']),
-                horizontal=True,
-                key=f'{page_name}_attack_detected'
-            )
-            st.session_state['page_filters'][page_name]['attack_detected'] = attack_filter
-
+    # Attack Detected toggle
+    attack_filter = st.selectbox(
+        "🚨 Attack Detected",
+        options=['both', 'yes', 'no'],
+        index=['both', 'yes', 'no'].index(st.session_state['page_filters'][page_name]['attack_detected']),
+        key=f'{page_name}_attack_detected'
+    )
+    st.session_state['page_filters'][page_name]['attack_detected'] = attack_filter
     return st.session_state['page_filters'][page_name]
 
 
@@ -493,7 +486,7 @@ def apply_page_filters_intrusion(df: pd.DataFrame, filters: Dict[str, Any]) -> p
     filtered_df = df.copy()
 
     # Protocol filter
-    if filters['protocols'] and 'protocol_type' in filtered_df.columns:
+    if "All" not in filters['protocols'] and filters['protocols'] and 'protocol_type' in filtered_df.columns:
         filtered_df = filtered_df[filtered_df['protocol_type'].isin(filters['protocols'])]
 
     # Attack detected filter
@@ -535,16 +528,18 @@ def show_filter_stats(original_count: int, filtered_count: int):
 <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: linear-gradient(180deg, #00D9FF 0%, #00FFB3 100%); box-shadow: 0 0 12px {glow_color};"></div>
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
 <div style="display: flex; align-items: baseline; gap: 8px;">
-<span style="font-size: 0.8rem; color: #6C7489; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Showing</span>
 <span style="font-size: 2rem; font-weight: 800; color: #E8EAF0; font-family: 'JetBrains Mono', monospace; letter-spacing: -0.02em; text-shadow: 0 0 20px rgba(0, 217, 255, 0.3);">{filtered_count:,}</span>
 <span style="font-size: 0.9rem; color: #A0A7B8;">/ {original_count:,}</span>
 </div>
-<div style="padding: 8px 16px; background: linear-gradient(135deg, {bar_color} 0%, {bar_color} 100%); border-radius: 20px; font-size: 0.9rem; color: #141B2D; font-weight: 700; font-family: 'JetBrains Mono', monospace; box-shadow: 0 4px 12px {glow_color};">{percentage:.1f}%</div>
+<span style="font-size: 0.8rem; color: #6C7489; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Showing</span>
 </div>
 <div style="width: 100%; height: 6px; background: rgba(255, 255, 255, 0.05); border-radius: 3px; overflow: hidden;">
 <div style="width: {100 - percentage}%; height: 100%; background: linear-gradient(90deg, #00D9FF 0%, #00FFB3 100%); border-radius: 3px; box-shadow: 0 0 10px {glow_color}; transition: width 0.3s ease;"></div>
 </div>
-<div style="margin-top: 8px; font-size: 0.75rem; color: #6C7489; text-align: right;">{reduction:,} records filtered out</div>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+<div style="font-size: 0.75rem; color: #6C7489;">{reduction:,} records filtered out</div>
+<div style="padding: 4px 12px; background: linear-gradient(135deg, {bar_color} 0%, {bar_color} 100%); border-radius: 12px; font-size: 0.8rem; color: #141B2D; font-weight: 700; font-family: 'JetBrains Mono', monospace; box-shadow: 0 2px 8px {glow_color};">{percentage:.1f}%</div>
+</div>
 </div>'''
 
-    st.markdown(stats_html, unsafe_allow_html=True)
+    st.sidebar.markdown(stats_html, unsafe_allow_html=True)

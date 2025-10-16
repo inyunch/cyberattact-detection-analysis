@@ -1,6 +1,13 @@
 import streamlit as st
 import pandas as pd
 
+# Handle query params for navigation
+if "page" in st.query_params:
+    page_from_query = st.query_params.get("page").replace('_', ' ')
+    allowed_pages = ["Dashboard Overview", "Global Threat Landscape", "Intrusion Detection", "Data Explorer", "IDA/EDA Analysis", "Comparative Insights", "Methodology"]
+    if page_from_query in allowed_pages:
+        st.session_state.selected_page = page_from_query
+
 # Page configuration
 st.set_page_config(
     page_title="CyberGuard - Threat Intelligence Dashboard",
@@ -8,11 +15,15 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded",
     menu_items={
-        'Get Help': 'https://github.com/yourusername/cyberattack-detection-analysis',
-        'Report a bug': 'https://github.com/yourusername/cyberattack-detection-analysis/issues',
+        'Get Help': None,
+        'Report a bug': None,
         'About': "CyberGuard Threat Intelligence Dashboard - Powered by Streamlit & Python"
     }
 )
+
+# Apply centralized base CSS/theme
+from modules.ui_utils import apply_base_css
+apply_base_css()
 
 # Modern dark theme CSS - Following DESIGN_RULES.md
 st.markdown("""
@@ -538,6 +549,51 @@ st.markdown("""
         }
     }
 
+    .tab-content-wrapper {
+        background-color: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 24px;
+        margin-top: 16px;
+    }
+
+    /* Custom Tabs using st.radio */
+div[role="radiogroup"] {
+    display: flex;
+    border-radius: 12px;
+    background: var(--bg-secondary);
+    padding: 8px;
+    margin-bottom: 24px;
+}
+
+div[role="radiogroup"] > div {
+    flex: 1;
+}
+
+div[role="radiogroup"] label {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 12px;
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    transition: all var(--transition-fast);
+    cursor: pointer;
+}
+
+div[role="radiogroup"] label:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+div[role="radiogroup"] input[type="radio"]:checked + label {
+    background: linear-gradient(135deg, rgba(0, 217, 255, 0.15) 0%, rgba(0, 255, 179, 0.15) 100%);
+    color: var(--text-primary);
+    font-weight: 600;
+    box-shadow: inset 0 0 20px rgba(0, 217, 255, 0.1);
+}
+
     /* Responsive Adjustments */
     @media (max-width: 768px) {
         .block-container {
@@ -558,10 +614,25 @@ st.markdown("""
 # Data loading with caching
 @st.cache_data
 def load_data():
-    """Load both datasets"""
+    """Load both datasets with robust checks and clear guidance."""
+    from pathlib import Path
+    data_dir = Path('data')
+    gt_path = data_dir / 'Global_Cybersecurity_Threats_2015-2024.csv'
+    id_path = data_dir / 'cybersecurity_intrusion_data.csv'
+
+    if not gt_path.exists() or not id_path.exists():
+        missing = []
+        if not gt_path.exists():
+            missing.append(str(gt_path))
+        if not id_path.exists():
+            missing.append(str(id_path))
+        st.error("Required dataset(s) missing: " + ", ".join(missing))
+        st.info("Please place the datasets in the 'data/' directory with the exact filenames above, then rerun the app.")
+        st.stop()
+
     try:
-        global_threats = pd.read_csv('data/Global_Cybersecurity_Threats_2015-2024.csv')
-        intrusion_data = pd.read_csv('data/cybersecurity_intrusion_data.csv')
+        global_threats = pd.read_csv(gt_path)
+        intrusion_data = pd.read_csv(id_path)
 
         if 'Year' in global_threats.columns:
             global_threats['Year'] = pd.to_numeric(
@@ -572,7 +643,7 @@ def load_data():
         return global_threats, intrusion_data
     except Exception as e:
         st.error(f"Error loading data: {e}")
-        return None, None
+        st.stop()
 
 # Load data
 global_threats, intrusion_data = load_data()
@@ -620,194 +691,76 @@ with st.sidebar:
 
     # Initialize selected page in session state
     if 'selected_page' not in st.session_state:
-        st.session_state.selected_page = "Dashboard"
+        st.session_state.selected_page = "Dashboard Overview"
 
-    # Navigation Menu - Custom implementation
-    nav_options = [
-        {"name": "Dashboard", "icon": "🏠"},
-        {"name": "IDA/EDA Analysis", "icon": "📊"},
-        {"name": "Global Threat Landscape", "icon": "🌍"},
-        {"name": "Intrusion Detection", "icon": "🛡️"},
-        {"name": "Comparative Insights", "icon": "💡"},
-        {"name": "Methodology", "icon": "📖"}
-    ]
-
-    for option in nav_options:
-        is_selected = st.session_state.selected_page == option["name"]
-
-        # Style for selected vs unselected
-        if is_selected:
-            button_style = """
-                background: linear-gradient(135deg, rgba(0, 217, 255, 0.12) 0%, rgba(0, 255, 179, 0.12) 100%);
-                color: #E8EAF0;
-                font-weight: 600;
-                box-shadow: inset 0 0 20px rgba(0, 217, 255, 0.1);
-                border-left: 4px solid #00D9FF;
-            """
+    # --- Navigation Menu ---
+    
+    def nav_item(name, page_id, is_header=False, icon=""):
+        if is_header:
+            st.markdown(f"<h3 style='padding: 10px 10px 5px 10px; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em;'>{name}</h3>", unsafe_allow_html=True)
         else:
-            button_style = """
-                background: transparent;
-                color: #A0A7B8;
-                font-weight: 500;
-                border-left: 4px solid transparent;
-            """
+            is_selected = st.session_state.selected_page == name
+            link_style = "color: #00FFB3; font-weight: 600; background-color: var(--bg-hover); border-radius: 8px;" if is_selected else "color: #A0A7B8; font-weight: 500;"
+            st.markdown(f'''
+            <a href="/?page={page_id}" target="_self" style="text-decoration: none; display: block; padding: 8px 10px 8px 20px; margin: 2px 10px; {link_style}">
+                {icon} {name}
+            </a>
+            ''', unsafe_allow_html=True)
 
-        # Create button using columns for better control
-        if st.button(
-            f"{option['icon']}  {option['name']}",
-            key=f"nav_{option['name']}",
-            use_container_width=True,
-            type="secondary" if not is_selected else "primary"
-        ):
-            st.session_state.selected_page = option["name"]
-            st.rerun()
+    nav_item("Dashboard", None, is_header=True)
+    nav_item("Dashboard Overview", "Dashboard_Overview", icon="📊")
+    nav_item("Global Threat Landscape", "Global_Threat_Landscape", icon="🌍")
+    nav_item("Intrusion Detection", "Intrusion_Detection", icon="🛡️")
+
+    nav_item("Analysis", None, is_header=True)
+    nav_item("Data Explorer", "Data_Explorer", icon="🔍")
+    nav_item("IDA/EDA Analysis", "IDA/EDA_Analysis", icon="📊")
+    nav_item("Comparative Insights", "Comparative_Insights", icon="💡")
+
+    nav_item("Documentation", None, is_header=True)
+    nav_item("Methodology", "Methodology", icon="📖")
 
     selected = st.session_state.selected_page
 
-    # Filters, Time Period, and Data Stats
-    if global_threats is not None:
-        st.markdown("<div style='margin-top: 4px; margin-bottom: 6px; border-top: 1px solid var(--border-color);'></div>", unsafe_allow_html=True)
+    # --- Filters ---
+    st.markdown("---")
+    st.markdown("<h3 style='padding: 10px 10px 5px 10px; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em;'>Filters</h3>", unsafe_allow_html=True)
 
-        # CSS for selectbox styling
-        st.markdown("""
-            <style>
-            /* Selectbox styling for Time Period */
-            [data-testid="stSidebar"] [data-baseweb="select"] > div {
-                background: linear-gradient(135deg, rgba(0, 217, 255, 0.08) 0%, rgba(0, 255, 179, 0.08) 100%) !important;
-                border-color: rgba(0, 217, 255, 0.3) !important;
-                color: #E8EAF0 !important;
-            }
+    if 'filtered_data' not in st.session_state:
+        st.session_state.filtered_data = {}
 
-            /* Selectbox text color */
-            [data-testid="stSidebar"] [data-baseweb="select"] div[role="button"] {
-                color: #E8EAF0 !important;
-            }
+    if selected == "Global Threat Landscape":
+        from modules.filters import page_filter_panel_global_threats, show_filter_stats, apply_page_filters_global_threats
+        page_filters = page_filter_panel_global_threats(global_threats)
+        st.session_state.page_filters['global_threats'] = page_filters
+        
+        filtered_df = apply_page_filters_global_threats(global_threats, page_filters)
+        st.session_state.filtered_data['global_threats'] = filtered_df
+        show_filter_stats(len(global_threats), len(filtered_df))
 
-            /* Selectbox label color */
-            [data-testid="stSidebar"] label {
-                color: #E8EAF0 !important;
-            }
+    elif selected == "Intrusion Detection":
+        from modules.filters import page_filter_panel_intrusion, show_filter_stats, apply_page_filters_intrusion
+        page_filters = page_filter_panel_intrusion(intrusion_data)
+        st.session_state.page_filters['intrusion_detection'] = page_filters
 
-            /* Selectbox dropdown menu items */
-            [data-baseweb="menu"] [role="option"] {
-                color: #E8EAF0 !important;
-            }
-            </style>
-        """, unsafe_allow_html=True)
+        filtered_df = apply_page_filters_intrusion(intrusion_data, page_filters)
+        st.session_state.filtered_data['intrusion_detection'] = filtered_df
+        show_filter_stats(len(intrusion_data), len(filtered_df))
 
-        # Get year range from data
-        min_year = int(pd.to_numeric(global_threats['Year'], errors='coerce').min())
-        max_year = int(pd.to_numeric(global_threats['Year'], errors='coerce').max())
-
-        if st.session_state['global_filters']['year_range'] is None:
-            st.session_state['global_filters']['year_range'] = (min_year, max_year)
-
-        # 1. Year selection dropdowns (no container)
-        year_options = list(range(min_year, max_year + 1))
-        col1, col2 = st.columns(2)
-
-        with col1:
-            start_year = st.selectbox(
-                "From",
-                options=year_options,
-                index=year_options.index(st.session_state['global_filters']['year_range'][0]),
-                key='sidebar_start_year'
-            )
-
-        with col2:
-            end_year = st.selectbox(
-                "To",
-                options=year_options,
-                index=year_options.index(st.session_state['global_filters']['year_range'][1]),
-                key='sidebar_end_year'
-            )
-
-        # Ensure start_year <= end_year
-        if start_year > end_year:
-            start_year, end_year = end_year, start_year
-
-        st.session_state['global_filters']['year_range'] = (start_year, end_year)
-
-        # Attack Type Filter
-        st.markdown("<div style='margin-bottom: 12px;'></div>", unsafe_allow_html=True)
-        attack_types = ["All"] + sorted(global_threats['Attack Type'].dropna().unique())
-        selected_attack_type = st.selectbox(
-            "Filter by Attack Type",
-            options=attack_types,
-            index=attack_types.index(st.session_state['global_filters']['attack_type']),
-            key='global_attack_type_filter'
-        )
-        st.session_state['global_filters']['attack_type'] = selected_attack_type
-
-        st.markdown("<div style='margin-bottom: 12px;'></div>", unsafe_allow_html=True)
-
-        # 2. TIME PERIOD SECTION - Visual display of selected range
-        current_range = st.session_state['global_filters']['year_range']
-        st.markdown(f"""<div style="background: linear-gradient(135deg, rgba(0, 217, 255, 0.08) 0%, rgba(0, 255, 179, 0.08) 100%); border: 1px solid rgba(0, 217, 255, 0.3); border-radius: 12px 12px 0 0; padding: 12px 14px; margin: 0px; box-shadow: 0 4px 16px rgba(0, 217, 255, 0.1);">
-<div style="display: flex; align-items: center; gap: 6px; margin-bottom: 10px;">
-<span style="font-size: 16px;">📅</span>
-<span style="font-size: 0.9rem; font-weight: 700; color: #E8EAF0;">Time Period</span>
-</div>
-<div style="display: flex; justify-content: center; gap: 6px;">
-<div style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: linear-gradient(135deg, rgba(0, 217, 255, 0.2) 0%, rgba(0, 217, 255, 0.1) 100%); border: 1.5px solid rgba(0, 217, 255, 0.5); border-radius: 24px; font-size: 0.8rem; font-weight: 600; color: #E8EAF0; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);">
-<span style="font-size: 13px;">📅</span>
-<span>{current_range[0]} – {current_range[1]}</span>
-</div>
-</div>
-</div>""", unsafe_allow_html=True)
-
-        # 3. DATA STATS SECTION - Results of filtering
-        from modules.filters import apply_global_filters
-        filtered_data = apply_global_filters(global_threats, st.session_state['global_filters'])
-        original_count = len(global_threats)
-        filtered_count = len(filtered_data)
-        reduction = original_count - filtered_count
-        percentage = (reduction / original_count * 100) if original_count > 0 else 0
-
-        # Determine color based on filter intensity
-        if percentage < 25:
-            bar_color = '#00FFB3'
-            glow_color = 'rgba(0, 255, 179, 0.3)'
-        elif percentage < 50:
-            bar_color = '#00D9FF'
-            glow_color = 'rgba(0, 217, 255, 0.3)'
-        elif percentage < 75:
-            bar_color = '#FF9F43'
-            glow_color = 'rgba(255, 159, 67, 0.3)'
-        else:
-            bar_color = '#7B61FF'
-            glow_color = 'rgba(123, 97, 255, 0.3)'
-
-        stats_html = f'''<div style="background: linear-gradient(135deg, rgba(0, 217, 255, 0.08) 0%, rgba(0, 255, 179, 0.08) 100%); border: 1px solid rgba(0, 217, 255, 0.3); border-top: none; border-radius: 0 0 12px 12px; padding: 12px 14px; box-shadow: 0 4px 16px rgba(0, 217, 255, 0.1); margin-bottom: 12px;">
-<div style="display: flex; align-items: center; gap: 6px; margin-bottom: 10px;">
-<span style="font-size: 16px;">📊</span>
-<span style="font-size: 0.9rem; font-weight: 700; color: #E8EAF0;">Data Stats</span>
-</div>
-<div style="display: flex; align-items: baseline; gap: 6px; margin-bottom: 10px;">
-<span style="font-size: 1.6rem; font-weight: 800; color: #E8EAF0; font-family: 'JetBrains Mono', monospace; letter-spacing: -0.02em; text-shadow: 0 0 20px rgba(0, 217, 255, 0.3);">{filtered_count:,}</span>
-<span style="font-size: 0.8rem; color: #A0A7B8;">/ {original_count:,}</span>
-</div>
-<div style="width: 100%; height: 5px; background: rgba(255, 255, 255, 0.05); border-radius: 3px; overflow: hidden; margin-bottom: 6px;">
-<div style="width: {100 - percentage}%; height: 100%; background: linear-gradient(90deg, #00D9FF 0%, #00FFB3 100%); border-radius: 3px; box-shadow: 0 0 10px {glow_color}; transition: width 0.3s ease;"></div>
-</div>
-<div style="font-size: 0.7rem; color: #6C7489; text-align: center;">{reduction:,} records filtered</div>
-</div>'''
-
-        st.markdown(stats_html, unsafe_allow_html=True)
+    else:
+        st.info("No filters available for this page.")
 
 # Page Routing
-if selected == "Dashboard":
+dash_pages = ["Dashboard Overview", "Global Threat Landscape", "Intrusion Detection"]
+if selected in dash_pages:
     from modules import home
-    home.show(global_threats, intrusion_data)
+    home.show(global_threats, intrusion_data, page=selected)
+elif selected == "Data Explorer":
+    from modules import data_explorer
+    data_explorer.show(intrusion_data)
 elif selected == "IDA/EDA Analysis":
     from modules import data_analysis
     data_analysis.show(global_threats, intrusion_data)
-elif selected == "Global Threat Landscape":
-    from modules import global_threats_page
-    global_threats_page.show(global_threats)
-elif selected == "Intrusion Detection":
-    from modules import intrusion_detection_page
-    intrusion_detection_page.show(intrusion_data)
 elif selected == "Comparative Insights":
     from modules import comparative_insights
     comparative_insights.show(global_threats, intrusion_data)
