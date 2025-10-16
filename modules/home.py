@@ -157,10 +157,9 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
                 color="Financial Loss (in Million $)",
                 hover_name="Country",
                 color_continuous_scale=[[0, COLORS["bg_secondary"]], [0.5, COLORS["accent_blue"]], [1, COLORS["accent_green"]]],
-                projection="natural earth",
-                title='Financial Loss by Country'
+                projection="natural earth"
             )
-            fig6 = apply_plotly_theme(fig6)
+            fig6 = apply_plotly_theme(fig6, title='Financial Loss by Country')
             fig6.update_layout(
                 height=300,
                 geo=dict(
@@ -221,8 +220,8 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
         with col1:
             attack_type_counts = global_threats_tab2['Attack Type'].value_counts().reset_index()
             attack_type_counts.columns = ['Attack Type', 'Count']
-            fig3 = px.bar(attack_type_counts, x='Count', y='Attack Type', orientation='h', title='Attack Type Frequency')
-            fig3 = apply_plotly_theme(fig3)
+            fig3 = px.bar(attack_type_counts, x='Count', y='Attack Type', orientation='h')
+            fig3 = apply_plotly_theme(fig3, title='Attack Type Frequency')
             fig3.update_layout(
                 height=350,
                 yaxis={'categoryorder': 'total ascending'},
@@ -233,8 +232,8 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
         with col2:
             vuln_counts = global_threats_tab2['Security Vulnerability Type'].value_counts().head(10).reset_index()
             vuln_counts.columns = ['Vulnerability', 'Count']
-            fig4 = px.bar(vuln_counts, x='Count', y='Vulnerability', orientation='h', title='Top 10 Security Vulnerabilities')
-            fig4 = apply_plotly_theme(fig4)
+            fig4 = px.bar(vuln_counts, x='Count', y='Vulnerability', orientation='h')
+            fig4 = apply_plotly_theme(fig4, title='Top 10 Security Vulnerabilities')
             fig4.update_layout(
                 height=350,
                 yaxis={'categoryorder': 'total ascending'},
@@ -245,8 +244,8 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
         with col3:
             source_counts = global_threats_tab2['Attack Source'].value_counts().reset_index()
             source_counts.columns = ['Source', 'Count']
-            fig5 = px.pie(source_counts, values='Count', names='Source', title='Attack Sources Distribution')
-            fig5 = apply_plotly_theme(fig5)
+            fig5 = px.pie(source_counts, values='Count', names='Source')
+            fig5 = apply_plotly_theme(fig5, title='Attack Sources Distribution')
             fig5.update_layout(
                 height=350,
                 margin=dict(l=50, r=50, t=60, b=50)
@@ -270,8 +269,8 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
             )
             st.plotly_chart(fig6, use_container_width=True)
         with col2:
-            fig7 = px.box(global_threats_tab2, x='Attack Type', y='Financial Loss (in Million $)', title='Loss Distribution by Attack Type')
-            fig7 = apply_plotly_theme(fig7)
+            fig7 = px.box(global_threats_tab2, x='Attack Type', y='Financial Loss (in Million $)')
+            fig7 = apply_plotly_theme(fig7, title='Loss Distribution by Attack Type')
             fig7.update_layout(
                 height=350,
                 xaxis_tickangle=-45,
@@ -286,8 +285,8 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
         col1, col2 = st.columns(2)
         with col1:
             heatmap_data = pd.crosstab(global_threats_tab2['Attack Type'], global_threats_tab2['Target Industry'])
-            fig8 = px.imshow(heatmap_data, labels=dict(x="Industry", y="Attack Type", color="Frequency"), aspect='auto', color_continuous_scale='Blues', title='Attack Type × Industry Heatmap')
-            fig8 = apply_plotly_theme(fig8)
+            fig8 = px.imshow(heatmap_data, labels=dict(x="Industry", y="Attack Type", color="Frequency"), aspect='auto', color_continuous_scale='Blues')
+            fig8 = apply_plotly_theme(fig8, title='Attack Type × Industry Heatmap')
             fig8.update_layout(
                 height=450,
                 margin=dict(l=120, r=50, t=60, b=120),
@@ -299,8 +298,8 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
         with col2:
             treemap_data = global_threats_tab2.groupby(['Target Industry', 'Attack Type'])['Financial Loss (in Million $)'].sum().reset_index()
             treemap_data = treemap_data.sort_values('Financial Loss (in Million $)', ascending=False).head(50)
-            fig9 = px.treemap(treemap_data, path=['Target Industry', 'Attack Type'], values='Financial Loss (in Million $)', color='Financial Loss (in Million $)', color_continuous_scale='RdYlGn_r', title='Financial Losses by Industry and Attack Type')
-            fig9 = apply_plotly_theme(fig9)
+            fig9 = px.treemap(treemap_data, path=['Target Industry', 'Attack Type'], values='Financial Loss (in Million $)', color='Financial Loss (in Million $)', color_continuous_scale='RdYlGn_r')
+            fig9 = apply_plotly_theme(fig9, title='Financial Losses by Industry and Attack Type')
             fig9.update_layout(
                 height=450,
                 margin=dict(l=50, r=50, t=60, b=50)
@@ -311,8 +310,8 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
 
         # Section 5: Industry Distribution - How attacks vary across industries
         bar_data = global_threats_tab2.groupby(['Target Industry', 'Attack Type']).size().reset_index(name='Count')
-        fig10 = px.bar(bar_data, x='Target Industry', y='Count', color='Attack Type', barmode='group', title='Attack Distribution by Industry and Type')
-        fig10 = apply_plotly_theme(fig10)
+        fig10 = px.bar(bar_data, x='Target Industry', y='Count', color='Attack Type', barmode='group')
+        fig10 = apply_plotly_theme(fig10, title='Attack Distribution by Industry and Type')
         fig10.update_layout(
             height=400,
             xaxis_tickangle=-45,
@@ -381,11 +380,10 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
                 protocol_class['Classification'] = protocol_class['attack_detected'].map({0: 'Normal', 1: 'Attack'})
 
                 fig = px.bar(protocol_class, x='protocol_type', y='Count', color='Classification',
-                             title='Traffic Volume by Protocol and Classification',
                              barmode='group',
                              color_discrete_map={'Attack': COLORS["accent_red"], 'Normal': COLORS["accent_blue"]},
                              labels={'protocol_type': 'Protocol', 'Count': 'Number of Records'})
-                fig = apply_plotly_theme(fig)
+                fig = apply_plotly_theme(fig, title='Traffic Volume by Protocol and Classification')
                 fig.update_layout(
                     height=400,
                     xaxis_tickangle=-30,
@@ -442,10 +440,9 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
                 encryption_dist.columns = ['Encryption', 'Count']
 
                 fig = px.bar(encryption_dist, x='Encryption', y='Count',
-                             title='Encryption Type Distribution',
                              color='Count',
                              color_continuous_scale='Blues')
-                fig = apply_plotly_theme(fig)
+                fig = apply_plotly_theme(fig, title='Encryption Type Distribution')
                 fig.update_layout(
                     height=400,
                     xaxis_tickangle=-45,
@@ -459,11 +456,10 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
                 browser_dist.columns = ['Browser', 'Count']
 
                 fig = px.bar(browser_dist, x='Count', y='Browser',
-                             title='Top 10 Browser Types',
                              orientation='h',
                              color='Count',
                              color_continuous_scale='Greens')
-                fig = apply_plotly_theme(fig)
+                fig = apply_plotly_theme(fig, title='Top 10 Browser Types')
                 fig.update_layout(
                     height=400,
                     yaxis={'categoryorder': 'total ascending'},
@@ -490,12 +486,11 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
             intrusion_data['Classification'] = intrusion_data['attack_detected'].map({0: 'Normal', 1: 'Attack'})
 
             fig = px.violin(intrusion_data, x='Classification', y=selected_feature,
-                            title=f'{selected_feature.replace("_", " ").title()} Distribution by Classification',
                             color='Classification',
                             box=True,
                             points='outliers',
                             color_discrete_map={'Attack': COLORS["accent_red"], 'Normal': COLORS["accent_blue"]})
-            fig = apply_plotly_theme(fig)
+            fig = apply_plotly_theme(fig, title=f'{selected_feature.replace("_", " ").title()} Distribution by Classification')
             fig.update_layout(
                 height=500,
                 legend=dict(
@@ -515,12 +510,11 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
 
             with col1:
                 fig = px.histogram(intrusion_data, x=selected_feature, color='Classification',
-                                   title=f'{selected_feature.replace("_", " ").title()} Distribution',
                                    nbins=50,
                                    barmode='overlay',
                                    opacity=0.7,
                                    color_discrete_map={'Attack': COLORS["accent_red"], 'Normal': COLORS["accent_blue"]})
-                fig = apply_plotly_theme(fig)
+                fig = apply_plotly_theme(fig, title=f'{selected_feature.replace("_", " ").title()} Distribution')
                 fig.update_layout(
                     height=400,
                     legend=dict(
@@ -538,10 +532,9 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
 
             with col2:
                 fig = px.box(intrusion_data, x='Classification', y=selected_feature,
-                             title=f'{selected_feature.replace("_", " ").title()} Box Plot',
                              color='Classification',
                              color_discrete_map={'Attack': COLORS["accent_red"], 'Normal': COLORS["accent_blue"]})
-                fig = apply_plotly_theme(fig)
+                fig = apply_plotly_theme(fig, title=f'{selected_feature.replace("_", " ").title()} Box Plot')
                 fig.update_layout(
                     height=400,
                     legend=dict(
@@ -575,11 +568,10 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
                              x='login_attempts',
                              y='failed_logins',
                              color='Classification',
-                             title='Login Attempts vs Failed Logins',
                              opacity=0.6,
                              color_discrete_map={'Attack': COLORS["accent_red"], 'Normal': COLORS["accent_blue"]},
                              hover_data=['session_duration', 'ip_reputation_score'])
-            fig = apply_plotly_theme(fig)
+            fig = apply_plotly_theme(fig, title='Login Attempts vs Failed Logins')
             fig.update_layout(
                 height=500,
                 legend=dict(
@@ -599,12 +591,11 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
 
             fig = px.imshow(corr_data,
                              labels=dict(color="Correlation"),
-                             title='Feature Correlation Heatmap',
                              color_continuous_scale='RdBu_r',
                              aspect='auto',
                              zmin=-1,
                              zmax=1)
-            fig = apply_plotly_theme(fig)
+            fig = apply_plotly_theme(fig, title='Feature Correlation Heatmap')
             fig.update_layout(
                 height=600,
                 xaxis_tickangle=-45,
@@ -622,10 +613,9 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
                 unusual_time_data['Classification'] = unusual_time_data['attack_detected'].map({0: 'Normal', 1: 'Attack'})
 
                 fig = px.bar(unusual_time_data, x='Unusual Time', y='Count', color='Classification',
-                              title='Attack Distribution by Access Time',
                               barmode='group',
                               color_discrete_map={'Attack': COLORS["accent_red"], 'Normal': COLORS["accent_blue"]})
-                fig = apply_plotly_theme(fig)
+                fig = apply_plotly_theme(fig, title='Attack Distribution by Access Time')
                 fig.update_layout(
                     height=400,
                     legend=dict(
@@ -643,12 +633,11 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
 
             with col2:
                 fig = px.histogram(intrusion_data, x='ip_reputation_score', color='Classification',
-                                    title='IP Reputation Score Distribution',
                                     nbins=50,
                                     barmode='overlay',
                                     opacity=0.7,
                                     color_discrete_map={'Attack': COLORS["accent_red"], 'Normal': COLORS["accent_blue"]})
-                fig = apply_plotly_theme(fig)
+                fig = apply_plotly_theme(fig, title='IP Reputation Score Distribution')
                 fig.update_layout(
                     height=400,
                     legend=dict(
@@ -671,10 +660,9 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
                                  y='session_duration',
                                  z='ip_reputation_score',
                                  color='Classification',
-                                 title='3D Feature Space: Login Attempts × Session Duration × IP Reputation',
                                  opacity=0.6,
                                  color_discrete_map={'Attack': COLORS["accent_red"], 'Normal': COLORS["accent_blue"]})
-            fig = apply_plotly_theme(fig)
+            fig = apply_plotly_theme(fig, title='3D Feature Space: Login Attempts × Session Duration × IP Reputation')
             fig.update_layout(
                 height=700,
                 legend=dict(
@@ -697,10 +685,9 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
 
             fig = px.imshow(protocol_encryption,
                              labels=dict(x="Encryption Type", y="Protocol Type", color="Attack Rate"),
-                             title='Attack Rate by Protocol × Encryption',
                              color_continuous_scale='Reds',
                              aspect='auto')
-            fig = apply_plotly_theme(fig)
+            fig = apply_plotly_theme(fig, title='Attack Rate by Protocol × Encryption')
             fig.update_layout(
                 height=400,
                 xaxis_tickangle=-45,
