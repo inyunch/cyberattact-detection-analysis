@@ -148,10 +148,10 @@ def show(global_threats, intrusion_data):
         protocol_stats = protocol_stats.reset_index()
 
         fig2 = px.bar(protocol_stats, x='protocol_type', y='Attack Rate',
-                     title='Attack Rate by Network Protocol',
                      labels={'protocol_type': 'Protocol', 'Attack Rate': 'Attack Rate'},
                      color='Attack Rate',
                      color_continuous_scale='Reds')
+        fig2 = apply_plotly_theme(fig2, title='Attack Rate by Network Protocol')
         fig2.update_layout(height=400)
         st.plotly_chart(fig2, use_container_width=True)
 
@@ -176,10 +176,10 @@ def show(global_threats, intrusion_data):
         attack_types.columns = ['Attack Type', 'Count']
 
         fig3 = px.bar(attack_types, y='Attack Type', x='Count',
-                     title='Top 10 Attack Types (Global)',
                      orientation='h',
                      color='Count',
                      color_continuous_scale='Blues')
+        fig3 = apply_plotly_theme(fig3, title='Top 10 Attack Types (Global)')
         fig3.update_layout(height=500, yaxis={'categoryorder': 'total ascending'})
         st.plotly_chart(fig3, use_container_width=True)
 

@@ -142,9 +142,9 @@ def apply_plotly_theme(fig, title: str = None):
         fig.update_layout(
             title=dict(
                 text=final_title,
-                x=0,
+                x=0.5,
                 y=0.98,
-                xanchor='left',
+                xanchor='center',
                 yanchor='top',
                 font=dict(
                     size=13,
@@ -200,6 +200,8 @@ def add_inplot_title(fig, text: str):
         fig.update_layout(title=dict(text=t, x=0, xanchor='left'))
     return fig
 
+import streamlit as st
+
 
 def apply_dashboard_css(sidebar_width: int = 300):
     """
@@ -209,7 +211,6 @@ def apply_dashboard_css(sidebar_width: int = 300):
     Args:
         sidebar_width: Width of the sidebar in pixels (default 300).
     """
-    import streamlit as st
 
     st.markdown(f"""
         <style>

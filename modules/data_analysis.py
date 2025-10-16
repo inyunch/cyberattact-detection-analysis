@@ -355,7 +355,7 @@ def show_mice_imputation_section():
 
                 fig = apply_plotly_theme(fig)
                 fig.update_layout(
-                    title='Distribution of Gaps Between Missing Values',
+                    title=dict(text='Distribution of Gaps Between Missing Values', x=0.5),
                     xaxis_title='Records Between Missing Values',
                     yaxis_title='Frequency',
                     height=350,
@@ -586,14 +586,14 @@ def show_ida_global(df):
                                        key='num_var_global')
 
             fig = px.histogram(df, x=selected_num, nbins=50,
-                             title=f'Distribution of {selected_num}',
                              labels={selected_num: selected_num})
+            fig = apply_plotly_theme(fig, title=f'Distribution of {selected_num}')
             fig.update_layout(height=400, showlegend=False)
             st.plotly_chart(fig, use_container_width=True)
 
         with col2:
-            fig = px.box(df, y=selected_num,
-                        title=f'Box Plot of {selected_num}')
+            fig = px.box(df, y=selected_num)
+            fig = apply_plotly_theme(fig, title=f'Box Plot of {selected_num}')
             fig.update_layout(height=400)
             st.plotly_chart(fig, use_container_width=True)
 
@@ -613,10 +613,10 @@ def show_ida_global(df):
 
             fig = px.bar(x=value_counts.values, y=value_counts.index,
                         orientation='h',
-                        title=f'Top 15 {selected_cat}',
                         labels={'x': 'Count', 'y': selected_cat},
                         color=value_counts.values,
                         color_continuous_scale='Blues')
+            fig = apply_plotly_theme(fig, title=f'Top 15 {selected_cat}')
             fig.update_layout(height=500, yaxis={'categoryorder': 'total ascending'})
             st.plotly_chart(fig, use_container_width=True)
 
@@ -777,14 +777,14 @@ def show_ida_intrusion(df):
             selected_feature = st.selectbox("Select Feature", numeric_features, key='num_feat_intrusion')
 
             fig = px.histogram(df, x=selected_feature, nbins=50,
-                             title=f'Distribution of {selected_feature.replace("_", " ").title()}',
                              color_discrete_sequence=['steelblue'])
+            fig = apply_plotly_theme(fig, title=f'Distribution of {selected_feature.replace("_", " ").title()}')
             fig.update_layout(height=400)
             st.plotly_chart(fig, use_container_width=True)
 
         with col2:
-            fig = px.box(df, y=selected_feature,
-                        title=f'Box Plot of {selected_feature.replace("_", " ").title()}')
+            fig = px.box(df, y=selected_feature)
+            fig = apply_plotly_theme(fig, title=f'Box Plot of {selected_feature.replace("_", " ").title()}')
             fig.update_layout(height=400)
             st.plotly_chart(fig, use_container_width=True)
 
@@ -802,10 +802,10 @@ def show_ida_intrusion(df):
 
             fig = px.bar(x=value_counts.values, y=value_counts.index,
                         orientation='h',
-                        title=f'{selected_cat.replace("_", " ").title()} Distribution',
                         labels={'x': 'Count', 'y': selected_cat.replace('_', ' ').title()},
                         color=value_counts.values,
                         color_continuous_scale='Viridis')
+            fig = apply_plotly_theme(fig, title=f'{selected_cat.replace("_", " ").title()} Distribution')
             fig.update_layout(height=400, yaxis={'categoryorder': 'total ascending'})
             st.plotly_chart(fig, use_container_width=True)
 
@@ -1325,9 +1325,8 @@ def show_geographic_analysis(df):
                 textposition='inside'
             )])
 
-            fig = apply_plotly_theme(fig)
+            fig = apply_plotly_theme(fig, title='Geographic Loss Concentration')
             fig.update_layout(
-                title='Geographic Loss Concentration',
                 height=350,
                 showlegend=True
             )
@@ -1451,13 +1450,13 @@ def show_geographic_analysis(df):
                 color='Country',
                 hover_name='Country',
                 size_max=60,
-                title='Attack Volume vs Financial Impact (bubble size = affected users)',
                 labels={
                     'Attack_Count': 'Number of Attacks',
                     'Total_Loss': 'Total Loss ($M)',
                     'Total_Users': 'Affected Users'
                 }
             )
+            fig = apply_plotly_theme(fig, title='Attack Volume vs Financial Impact (bubble size = affected users)')
             fig.update_layout(
                 height=450,
                 showlegend=False,
@@ -1506,10 +1505,10 @@ def show_geographic_analysis(df):
                 x='Country',
                 y='Count',
                 color='Attack Type',
-                title='Attack Type Breakdown (Top 5 Countries)',
                 labels={'Count': 'Number of Attacks'},
                 color_discrete_sequence=px.colors.qualitative.Set3
             )
+            fig = apply_plotly_theme(fig, title='Attack Type Breakdown (Top 5 Countries)')
             fig.update_layout(
                 height=400,
                 xaxis_tickangle=-45,
@@ -1523,10 +1522,10 @@ def show_geographic_analysis(df):
                 attack_breakdown_top,
                 path=['Country', 'Attack Type'],
                 values='Count',
-                title='Hierarchical Attack Distribution',
                 color='Count',
                 color_continuous_scale='Blues'
             )
+            fig = apply_plotly_theme(fig, title='Hierarchical Attack Distribution')
             fig.update_layout(height=400)
             st.plotly_chart(fig, use_container_width=True)
 
@@ -1536,11 +1535,11 @@ def show_geographic_analysis(df):
         fig = px.imshow(
             pivot_data,
             labels=dict(x="Country", y="Attack Type", color="Attacks"),
-            title='Attack Type × Country Heatmap (Top 5)',
             color_continuous_scale='YlOrRd',
             aspect='auto',
             text_auto=True
         )
+        fig = apply_plotly_theme(fig, title='Attack Type × Country Heatmap (Top 5)')
         fig.update_layout(height=400)
         st.plotly_chart(fig, use_container_width=True)
 
@@ -1580,11 +1579,11 @@ def show_geographic_analysis(df):
                 box_data,
                 x='Country',
                 y='Financial Loss (in Million $)',
-                title='Loss Distribution Comparison (Top 6)',
                 labels={'Financial Loss (in Million $)': 'Loss ($M)'},
                 color='Country',
                 color_discrete_sequence=px.colors.qualitative.Pastel
             )
+            fig = apply_plotly_theme(fig, title='Loss Distribution Comparison (Top 6)')
             fig.update_layout(
                 height=400,
                 showlegend=False,
@@ -1784,11 +1783,11 @@ def show_correlation_analysis(global_df, intrusion_df):
                     st.markdown("#### 🔥 Correlation Heatmap")
                     fig = px.imshow(corr_matrix,
                                    labels=dict(color="Correlation"),
-                                   title='Correlation Matrix - Global Threats',
                                    color_continuous_scale='RdBu_r',
                                    zmin=-1, zmax=1,
                                    text_auto='.3f',
                                    aspect='auto')
+                    fig = apply_plotly_theme(fig, title='Correlation Matrix - Global Threats')
                     fig.update_layout(height=500)
                     st.plotly_chart(fig, use_container_width=True)
 
@@ -1842,11 +1841,11 @@ def show_correlation_analysis(global_df, intrusion_df):
                 st.markdown("#### 🔥 Correlation Heatmap")
                 fig = px.imshow(corr_matrix,
                                labels=dict(color="Correlation"),
-                               title='Correlation Matrix - Intrusion Detection',
                                color_continuous_scale='RdBu_r',
                                zmin=-1, zmax=1,
                                text_auto='.3f',
                                aspect='auto')
+                fig = apply_plotly_theme(fig, title='Correlation Matrix - Intrusion Detection')
                 fig.update_layout(height=600)
                 st.plotly_chart(fig, use_container_width=True)
 
@@ -1865,10 +1864,10 @@ def show_correlation_analysis(global_df, intrusion_df):
                 st.markdown("#### 📊 Feature Importance")
                 fig = px.bar(target_corr_df, y='Feature', x='Correlation',
                             orientation='h',
-                            title='Feature Correlation with Attack',
                             color='Correlation',
                             color_continuous_scale='RdYlGn',
                             color_continuous_midpoint=0)
+                fig = apply_plotly_theme(fig, title='Feature Correlation with Attack')
                 fig.update_layout(height=400)
                 st.plotly_chart(fig, use_container_width=True)
         else:
@@ -1932,12 +1931,12 @@ def show_behavior_analysis(df):
                             x='login_attempts',
                             y='failed_logins',
                             color='attack_detected',
-                            title='Login Behavior Pattern',
                             labels={'attack_detected': 'Classification',
                                    'login_attempts': 'Login Attempts',
                                    'failed_logins': 'Failed Logins'},
                             color_discrete_map={0: 'blue', 1: 'red'},
                             opacity=0.6)
+            fig = apply_plotly_theme(fig, title='Login Behavior Pattern')
             fig.update_layout(height=500)
             st.plotly_chart(fig, use_container_width=True)
         else:
@@ -1952,12 +1951,12 @@ def show_behavior_analysis(df):
                         x='session_duration',
                         y='ip_reputation_score',
                         color='attack_detected',
-                        title='Session Duration vs IP Reputation Score',
                         labels={'attack_detected': 'Classification',
                                'session_duration': 'Session Duration (s)',
                                'ip_reputation_score': 'IP Reputation (0-1)'},
                         color_discrete_map={0: 'blue', 1: 'red'},
                         opacity=0.6)
+        fig = apply_plotly_theme(fig, title='Session Duration vs IP Reputation Score')
         fig.update_layout(height=500)
         st.plotly_chart(fig, use_container_width=True)
 
@@ -1978,19 +1977,19 @@ def show_behavior_analysis(df):
 
         with col1:
             fig = px.bar(protocol_attack, x='protocol_type', y='Attack_Rate',
-                        title='Attack Rate by Protocol (%)',
                         labels={'Attack_Rate': 'Attack Rate (%)', 'protocol_type': 'Protocol'},
                         color='Attack_Rate',
                         color_continuous_scale='Reds')
+            fig = apply_plotly_theme(fig, title='Attack Rate by Protocol (%)')
             fig.update_layout(height=400)
             st.plotly_chart(fig, use_container_width=True)
 
         with col2:
             fig = px.bar(encryption_attack, x='encryption_used', y='Attack_Rate',
-                        title='Attack Rate by Encryption (%)',
                         labels={'Attack_Rate': 'Attack Rate (%)', 'encryption_used': 'Encryption'},
                         color='Attack_Rate',
                         color_continuous_scale='Oranges')
+            fig = apply_plotly_theme(fig, title='Attack Rate by Encryption (%)')
             fig.update_layout(height=400)
             st.plotly_chart(fig, use_container_width=True)
 
@@ -2019,10 +2018,10 @@ def show_behavior_analysis(df):
 
         with col2:
             fig = px.box(df, x='attack_detected', y=selected_feature,
-                        title=f'{selected_feature.replace("_", " ").title()} Box Plot',
                         labels={'attack_detected': 'Classification'},
                         color='attack_detected',
                         color_discrete_map={0: 'blue', 1: 'red'})
+            fig = apply_plotly_theme(fig, title=f'{selected_feature.replace("_", " ").title()} Box Plot')
             fig.update_xaxes(ticktext=['Normal', 'Attack'], tickvals=[0, 1])
             fig.update_layout(height=400, showlegend=False)
             st.plotly_chart(fig, use_container_width=True)
@@ -2128,9 +2127,9 @@ def show_advanced_analytics(global_df, intrusion_df):
         sample_pca = pca_df.sample(min(10000, len(pca_df)))
 
         fig = px.scatter(sample_pca, x='PC1', y='PC2', color='Classification',
-                        title=f'PCA Projection (PC1: {explained_var[0]*100:.1f}%, PC2: {explained_var[1]*100:.1f}%)',
                         color_discrete_map={'Normal': 'blue', 'Attack': 'red'},
                         opacity=0.5)
+        fig = apply_plotly_theme(fig, title=f'PCA Projection (PC1: {explained_var[0]*100:.1f}%, PC2: {explained_var[1]*100:.1f}%)')
         fig.update_layout(height=600)
         st.plotly_chart(fig, use_container_width=True)
 
@@ -2153,9 +2152,9 @@ def show_advanced_analytics(global_df, intrusion_df):
         with col2:
             fig = px.imshow(loadings.T,
                            labels=dict(x="Feature", y="Component", color="Loading"),
-                           title='Feature Loadings Heatmap',
                            color_continuous_scale='RdBu_r',
                            aspect='auto')
+            fig = apply_plotly_theme(fig, title='Feature Loadings Heatmap')
             fig.update_layout(height=300)
             st.plotly_chart(fig, use_container_width=True)
 
@@ -2201,8 +2200,9 @@ def show_advanced_analytics(global_df, intrusion_df):
                     plot_df = pd.DataFrame({'Financial Loss (in Million $)': loss_data})
 
                     fig = px.histogram(plot_df, x='Financial Loss (in Million $)',
-                                      nbins=50, title='Financial Loss Distribution',
+                                      nbins=50,
                                       marginal='box')
+                    fig = apply_plotly_theme(fig, title='Financial Loss Distribution')
                     fig.update_layout(height=400)
                     st.plotly_chart(fig, use_container_width=True)
             else:
@@ -2592,9 +2592,9 @@ def show_key_findings(global_threats, intrusion_data):
     with col1:
         fig = px.bar(country_stats.head(10), y='Country', x='Financial Loss (in Million $)',
                     orientation='h',
-                    title='Top 10 Countries by Financial Loss',
                     color='Financial Loss (in Million $)',
                     color_continuous_scale='Reds')
+        fig = apply_plotly_theme(fig, title='Top 10 Countries by Financial Loss')
         fig.update_layout(height=400, yaxis={'categoryorder': 'total ascending'})
         st.plotly_chart(fig, use_container_width=True)
 
@@ -2625,10 +2625,10 @@ def show_key_findings(global_threats, intrusion_data):
 
     with col1:
         fig = px.bar(protocol_stats, x='protocol_type', y='Attack_Rate',
-                    title='Attack Rate by Protocol Type (%)',
                     color='Attack_Rate',
                     color_continuous_scale='Reds',
                     text='Attack_Rate')
+        fig = apply_plotly_theme(fig, title='Attack Rate by Protocol Type (%)')
         fig.update_traces(texttemplate='%{text:.1f}%', textposition='outside')
         fig.update_layout(height=400)
         st.plotly_chart(fig, use_container_width=True)
@@ -2680,10 +2680,10 @@ def show_key_findings(global_threats, intrusion_data):
 
         fig = px.bar(target_corr_df, y='Feature', x='Correlation',
                     orientation='h',
-                    title='Feature Correlation with Attack Detection',
                     color='Correlation',
                     color_continuous_scale='RdYlGn',
                     color_continuous_midpoint=0)
+        fig = apply_plotly_theme(fig, title='Feature Correlation with Attack Detection')
         fig.update_layout(height=400)
         st.plotly_chart(fig, use_container_width=True)
 
