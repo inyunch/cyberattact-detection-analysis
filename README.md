@@ -24,11 +24,21 @@ Place the following CSV files in the `data/` directory with exact filenames:
 
 If files are missing, the app will show an error and stop with instructions.
 
-## Run
+## Run locally
 ```
 streamlit run app.py
 ```
 Then open http://localhost:8501 in your browser.
+
+## Deploy to Streamlit Cloud
+- Repo: point to this repository
+- Main file: `app.py`
+- Python version: 3.10 or 3.11
+- Dependencies: `requirements.txt`
+- Pre-run scripts: none
+- Secrets: not required
+
+If you encounter a theming or import error, make sure the app uses Streamlit >= 1.32 (we set this in requirements.txt) and redeploy.
 
 ## Project Structure
 ```
