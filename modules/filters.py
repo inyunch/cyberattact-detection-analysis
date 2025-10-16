@@ -445,8 +445,6 @@ def page_filter_panel_intrusion(intrusion_data: pd.DataFrame, page_name: str = '
     """
     init_filter_state()
 
-    st.markdown("**Filter network intrusion data:**")
-
     # Protocol Type filter
     protocols_options = ["All"] + sorted(intrusion_data['protocol_type'].dropna().unique()) if 'protocol_type' in intrusion_data.columns else ["All"]
     selected_protocols = st.multiselect(

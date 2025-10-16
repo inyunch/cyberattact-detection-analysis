@@ -59,6 +59,8 @@ TRANSITIONS = {
 }
 
 
+import streamlit as st
+
 def get_plotly_theme():
     """
     Returns Plotly theme configuration matching design rules.
@@ -200,8 +202,33 @@ def add_inplot_title(fig, text: str):
         fig.update_layout(title=dict(text=t, x=0, xanchor='left'))
     return fig
 
-import streamlit as st
+def st_observation_box(observation_text: str, main_text: str):
+    st.markdown(f"""
+    <div style="
+        background-color: {COLORS["bg_tertiary"]}; /* Dark background */
+        border-left: 5px solid {COLORS["accent_blue"]}; /* Blue border */
+        padding: 10px;
+        border-radius: 4px;
+        margin-bottom: 10px;
+        color: {COLORS["text_primary"]}; /* Default text color */
+    ">
+        <span style="color: black;"><strong>{observation_text}</strong></span> {main_text}
+    </div>
+    """, unsafe_allow_html=True)
 
+def st_dark_box(text: str):
+    st.markdown(f"""
+    <div style="
+        background-color: {COLORS["bg_tertiary"]}; /* Dark background */
+        border-left: 5px solid {COLORS["border_color"]}; /* A subtle border */
+        padding: 10px;
+        border-radius: 4px;
+        margin-bottom: 10px;
+        color: {COLORS["text_primary"]}; /* Default text color */
+    ">
+        {text}
+    </div>
+    """, unsafe_allow_html=True)
 
 def apply_dashboard_css(sidebar_width: int = 300):
     """

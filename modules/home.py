@@ -216,6 +216,7 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
         st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
 
         # Section 2: Attack Anatomy - Understanding what attackers do
+        st.subheader("Attack Anatomy")
         col1, col2, col3 = st.columns(3)
         with col1:
             attack_type_counts = global_threats_tab2['Attack Type'].value_counts().reset_index()
@@ -252,36 +253,12 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
             )
             st.plotly_chart(fig5, use_container_width=True)
 
-        st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
 
-        # Section 3: Financial Impact Analysis - The cost of cyber attacks
-        col1, col2 = st.columns(2)
-        with col1:
-            avg_losses_by_year = global_threats_tab2.groupby('Year')['Financial Loss (in Million $)'].mean().reset_index()
-            avg_years = [int(y) for y in avg_losses_by_year['Year']]
-            avg_losses = [float(l) for l in avg_losses_by_year['Financial Loss (in Million $)']]
-            fig6 = go.Figure()
-            fig6.add_trace(go.Scatter(x=avg_years, y=avg_losses, mode='lines+markers', line=dict(color=COLORS["accent_green"], width=3), marker=dict(size=8)))
-            fig6 = apply_plotly_theme(fig6, title='Average Loss Per Incident Over Time')
-            fig6.update_layout(
-                height=350,
-                margin=dict(l=60, r=50, t=60, b=50)
-            )
-            st.plotly_chart(fig6, use_container_width=True)
-        with col2:
-            fig7 = px.box(global_threats_tab2, x='Attack Type', y='Financial Loss (in Million $)')
-            fig7 = apply_plotly_theme(fig7, title='Loss Distribution by Attack Type')
-            fig7.update_layout(
-                height=350,
-                xaxis_tickangle=-45,
-                margin=dict(l=60, r=50, t=60, b=100),
-                xaxis_tickfont=dict(size=9)
-            )
-            st.plotly_chart(fig7, use_container_width=True)
 
         st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
 
         # Section 4: Industry Impact Analysis - Cross-dimensional relationships
+        st.subheader("Industry Impact Analysis")
         col1, col2 = st.columns(2)
         with col1:
             heatmap_data = pd.crosstab(global_threats_tab2['Attack Type'], global_threats_tab2['Target Industry'])
@@ -309,6 +286,7 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
         st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
 
         # Section 5: Industry Distribution - How attacks vary across industries
+        st.subheader("Industry Distribution")
         bar_data = global_threats_tab2.groupby(['Target Industry', 'Attack Type']).size().reset_index(name='Count')
         fig10 = px.bar(bar_data, x='Target Industry', y='Count', color='Attack Type', barmode='group')
         fig10 = apply_plotly_theme(fig10, title='Attack Distribution by Industry and Type')

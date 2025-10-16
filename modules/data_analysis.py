@@ -113,13 +113,11 @@ def show(global_threats, intrusion_data):
     st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
 
     # ==================== EXPLORATORY VISUALIZATIONS ====================
-    st.subheader("🔍 Key Exploratory Insights")
 
     col1, col2 = st.columns(2)
 
     with col1:
         # Global Threats: Incidents over time
-        st.markdown("**Attack Trends Over Time**")
         yearly_attacks = global_threats.groupby('Year').size().reset_index(name='Count')
         fig = go.Figure()
         fig.add_trace(go.Scatter(
@@ -131,7 +129,7 @@ def show(global_threats, intrusion_data):
             fill='tozeroy',
             fillcolor='rgba(0, 217, 255, 0.1)'
         ))
-        fig = apply_plotly_theme(fig)
+        fig = apply_plotly_theme(fig, title="Attack Trends Over Time")
         fig.update_layout(
             xaxis_title="Year",
             yaxis_title="Number of Incidents",
@@ -141,7 +139,6 @@ def show(global_threats, intrusion_data):
 
     with col2:
         # Global Threats: Top attack types
-        st.markdown("**Most Common Attack Types**")
         top_attacks = global_threats['Attack Type'].value_counts().nlargest(5)
         fig = go.Figure(go.Bar(
             x=top_attacks.values,
@@ -149,7 +146,7 @@ def show(global_threats, intrusion_data):
             orientation='h',
             marker_color=COLORS["accent_green"]
         ))
-        fig = apply_plotly_theme(fig)
+        fig = apply_plotly_theme(fig, title="Most Common Attack Types")
         fig.update_layout(
             xaxis_title="Number of Incidents",
             yaxis=dict(autorange="reversed"),

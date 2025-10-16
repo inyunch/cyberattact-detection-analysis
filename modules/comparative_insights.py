@@ -3,6 +3,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
+from modules.theme import COLORS, apply_plotly_theme, st_observation_box, st_dark_box
 
 def show(global_threats, intrusion_data):
     """Display comparative insights from both datasets"""
@@ -83,18 +84,25 @@ def show(global_threats, intrusion_data):
         with col1:
             insight = insights[i]
             with st.expander(f"{insight['icon']} {insight['title']}", expanded=True):
-                st.markdown(f"**Finding:** {insight['finding']}")
-                st.markdown(f"**Implication:** {insight['implication']}")
-                st.caption(f"*Source: {insight['source']}*")
+                st.markdown(f"""
+                <div style="min-height: 150px; overflow-y: auto; color: {COLORS["text_primary"]};">
+                    <b>Finding:</b> {insight['finding']}<br>
+                    <b>Implication:</b> {insight['implication']}<br>
+                    <i>Source: {insight['source']}</i>
+                </div>
+                """, unsafe_allow_html=True)
 
         if i + 1 < len(insights):
             with col2:
                 insight = insights[i + 1]
                 with st.expander(f"{insight['icon']} {insight['title']}", expanded=True):
-                    st.markdown(f"**Finding:** {insight['finding']}")
-                    st.markdown(f"**Implication:** {insight['implication']}")
-                    st.caption(f"*Source: {insight['source']}*")
-
+                    st.markdown(f"""
+                    <div style="min-height: 150px; overflow-y: auto; color: {COLORS["text_primary"]};">
+                        <b>Finding:</b> {insight['finding']}<br>
+                        <b>Implication:</b> {insight['implication']}<br>
+                        <i>Source: {insight['source']}</i>
+                    </div>
+                    """, unsafe_allow_html=True)
     st.markdown("---")
 
     # Cross-Dataset Visualizations
@@ -104,7 +112,7 @@ def show(global_threats, intrusion_data):
     col1, col2 = st.columns(2)
 
     with col1:
-        st.markdown("### 🌍 Global Threat Evolution")
+        # Removed header above chart per request
 
         # Attack growth over time
         attacks_by_year = global_threats.groupby('Year').size().reset_index(name='Count')
@@ -123,6 +131,7 @@ def show(global_threats, intrusion_data):
             name='Attacks'
         ))
 
+        fig1 = apply_plotly_theme(fig1, title='Global Threat Evolution')
         fig1.update_layout(
             xaxis_title='Year',
             yaxis_title='Number of Attacks',
@@ -131,14 +140,13 @@ def show(global_threats, intrusion_data):
         )
         st.plotly_chart(fig1, use_container_width=True)
 
-        st.markdown("""
-        **Observation:** Clear upward trend in reported incidents, with potential
-        acceleration in recent years. This may reflect both increased attack activity
-        and improved detection/reporting capabilities.
-        """)
+        st_observation_box(
+            "Observation:",
+            "Clear upward trend in reported incidents, with potential\n        acceleration in recent years. This may reflect both increased attack activity\n        and improved detection/reporting capabilities."
+        )
 
     with col2:
-        st.markdown("### 🔍 Network-Level Detection")
+        # Removed header above chart per request
 
         # Protocol attack rates
         protocol_stats = intrusion_data.groupby('protocol_type').agg({
@@ -155,22 +163,21 @@ def show(global_threats, intrusion_data):
         fig2.update_layout(height=400)
         st.plotly_chart(fig2, use_container_width=True)
 
-        st.markdown("""
-        **Observation:** Different protocols show varying attack rates, suggesting
-        attackers have preferences or that certain protocols have inherent vulnerabilities.
-        """)
+        st_observation_box(
+            "Observation:",
+            "Different protocols show varying attack rates, suggesting\n        attackers have preferences or that certain protocols have inherent vulnerabilities."
+        )
 
     # Attack type mapping
     st.markdown("## 🔗 Attack Type Patterns")
 
-    st.markdown("""
+    st.info("""
     While the two datasets capture different levels of cyber threat activity, we can draw parallels:
     """)
 
     col1, col2 = st.columns(2)
 
     with col1:
-        st.markdown("### 🌍 Global Attack Types (Macro)")
 
         attack_types = global_threats['Attack Type'].value_counts().head(10).reset_index()
         attack_types.columns = ['Attack Type', 'Count']
@@ -184,7 +191,6 @@ def show(global_threats, intrusion_data):
         st.plotly_chart(fig3, use_container_width=True)
 
     with col2:
-        st.markdown("### 🔍 Network Attack Indicators (Micro)")
 
         # Create attack signature analysis
         attack_signatures = intrusion_data[intrusion_data['attack_detected'] == 1].groupby('protocol_type').agg({
@@ -202,7 +208,8 @@ def show(global_threats, intrusion_data):
         fig4 = px.bar(attack_sigs_melted, x='protocol_type', y='Average Value',
                      color='Feature',
                      barmode='group',
-                     labels={'protocol_type': 'Protocol', 'Average Value': 'Avg Value'})
+                     labels={'protocol_type': 'Protocol', 'Average Value': 'Average Value'})
+        fig4 = apply_plotly_theme(fig4, title='Network Attack Indicators (Micro)')
         fig4.update_layout(height=500)
         st.plotly_chart(fig4, use_container_width=True)
 
@@ -346,7 +353,7 @@ def show(global_threats, intrusion_data):
     # Final thoughts
     st.markdown("## 💭 Concluding Observations")
 
-    st.success("""
+    st_dark_box("""
     **Integration of Macro and Micro Perspectives:**
 
     This analysis demonstrates the value of examining cybersecurity from multiple vantage points:
@@ -365,7 +372,7 @@ def show(global_threats, intrusion_data):
     a comprehensive foundation for risk assessment and defense prioritization.
     """)
 
-    st.info("""
+    st_dark_box("""
     **Future Work:**
     - Develop machine learning models for attack prediction and classification
     - Integrate real-time threat intelligence feeds
