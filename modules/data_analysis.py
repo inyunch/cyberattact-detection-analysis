@@ -1,3 +1,36 @@
+"""
+IDA/EDA Analysis Module for Cybersecurity Dashboard
+
+This module provides comprehensive Initial Data Analysis (IDA) and Exploratory Data Analysis (EDA)
+for cybersecurity threat data and intrusion detection datasets.
+
+Key Features:
+- Data quality assessment and completeness metrics
+- Missing data imputation using MICE algorithm
+- Temporal analysis of cyber threats over time
+- Geographic analysis with interactive visualizations
+- Correlation analysis between threat metrics
+- Behavioral pattern analysis
+- Advanced analytics including PCA and statistical tests
+- Data exploration with filtering and downloadable views
+
+Functions:
+- show(): Main entry point that displays the complete IDA/EDA analysis
+- show_mice_imputation_section(): Handle missing data imputation
+- show_ida_global(): Initial data analysis for global threats dataset
+- show_ida_intrusion(): Initial data analysis for intrusion detection dataset
+- show_temporal_analysis(): Time-based threat analysis
+- show_geographic_analysis(): Geographic threat distribution analysis
+- show_correlation_analysis(): Correlation matrices and insights
+- show_behavior_analysis(): Behavioral pattern analysis
+- show_advanced_analytics(): PCA, statistical tests, and advanced metrics
+- show_data_explorer(): Interactive data exploration interface
+- show_key_findings(): Summary of key insights from analysis
+
+Author: [Project Team]
+Last Updated: 2025-01
+"""
+
 import streamlit as st
 import plotly.express as px
 import plotly.graph_objects as go
@@ -8,45 +41,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 import folium
 from streamlit_folium import folium_static
-
-# Power BI-style color palette
-POWERBI_COLORS = {
-    'primary': '#0078D4',      # Microsoft Blue
-    'secondary': '#005a9e',    # Dark Blue
-    'success': '#107C10',      # Green
-    'warning': '#FFB900',      # Amber
-    'danger': '#D13438',       # Red
-    'info': '#00B7C3',         # Teal
-    'purple': '#8764B8',       # Purple
-    'orange': '#FF8C00',       # Orange
-    'gradient': ['#0078D4', '#005a9e', '#003d66']
-}
-
-def create_kpi_card(label, value, delta=None, icon="📊", color="#0078D4"):
-    """Create a professional KPI card with Power BI styling"""
-    delta_html = ""
-    if delta:
-        delta_color = POWERBI_COLORS['success'] if isinstance(delta, str) and '+' in str(delta) else POWERBI_COLORS['danger']
-        delta_html = f'<div style="color: {delta_color}; font-size: 14px; margin-top: 5px;">{delta}</div>'
-
-    st.markdown(f"""
-    <div style="
-        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        border-left: 4px solid {color};
-        height: 120px;
-    ">
-        <div style="color: #666; font-size: 14px; font-weight: 600; margin-bottom: 8px;">
-            {icon} {label}
-        </div>
-        <div style="color: #2c3e50; font-size: 32px; font-weight: 700;">
-            {value}
-        </div>
-        {delta_html}
-    </div>
-    """, unsafe_allow_html=True)
+from modules.theme import COLORS, apply_plotly_theme
 
 def ensure_year_numeric(df):
     """Ensure Year column is numeric and properly formatted"""
@@ -131,18 +126,16 @@ def show(global_threats, intrusion_data):
             x=yearly_attacks['Year'],
             y=yearly_attacks['Count'],
             mode='lines+markers',
-            line=dict(color='#00D9FF', width=3),
-            marker=dict(size=8, color='#00FFB3'),
+            line=dict(color=COLORS["accent_blue"], width=3),
+            marker=dict(size=8, color=COLORS["accent_green"]),
             fill='tozeroy',
             fillcolor='rgba(0, 217, 255, 0.1)'
         ))
+        fig = apply_plotly_theme(fig)
         fig.update_layout(
             xaxis_title="Year",
             yaxis_title="Number of Incidents",
-            height=350,
-            template="plotly_dark",
-            paper_bgcolor='rgba(0,0,0,0)',
-            plot_bgcolor='rgba(0,0,0,0)'
+            height=350
         )
         st.plotly_chart(fig, use_container_width=True)
 
@@ -154,15 +147,13 @@ def show(global_threats, intrusion_data):
             x=top_attacks.values,
             y=top_attacks.index,
             orientation='h',
-            marker_color='#00FFB3'
+            marker_color=COLORS["accent_green"]
         ))
+        fig = apply_plotly_theme(fig)
         fig.update_layout(
             xaxis_title="Number of Incidents",
             yaxis=dict(autorange="reversed"),
-            height=350,
-            template="plotly_dark",
-            paper_bgcolor='rgba(0,0,0,0)',
-            plot_bgcolor='rgba(0,0,0,0)'
+            height=350
         )
         st.plotly_chart(fig, use_container_width=True)
 
@@ -337,7 +328,7 @@ def show_mice_imputation_section():
                 fig.add_trace(go.Histogram(
                     x=gaps,
                     nbinsx=min(30, len(gaps)),
-                    marker_color='#00D9FF',
+                    marker_color=COLORS["accent_blue"],
                     opacity=0.7,
                     name='Actual Gaps'
                 ))
@@ -346,7 +337,7 @@ def show_mice_imputation_section():
                 fig.add_vline(
                     x=expected_gap,
                     line_dash="dash",
-                    line_color="#FF9F43",
+                    line_color=COLORS["accent_orange"],
                     line_width=2,
                     annotation_text=f"Expected Gap: {expected_gap:.0f}",
                     annotation_position="top"
@@ -356,20 +347,18 @@ def show_mice_imputation_section():
                 fig.add_vline(
                     x=gap_mean,
                     line_dash="dash",
-                    line_color="#00FFB3",
+                    line_color=COLORS["accent_green"],
                     line_width=2,
                     annotation_text=f"Actual Mean: {gap_mean:.0f}",
                     annotation_position="bottom"
                 )
 
+                fig = apply_plotly_theme(fig)
                 fig.update_layout(
                     title='Distribution of Gaps Between Missing Values',
                     xaxis_title='Records Between Missing Values',
                     yaxis_title='Frequency',
                     height=350,
-                    template='plotly_dark',
-                    paper_bgcolor='rgba(0,0,0,0)',
-                    plot_bgcolor='rgba(0,0,0,0)',
                     showlegend=False
                 )
 
@@ -699,8 +688,9 @@ def show_ida_intrusion(df):
         fig = px.pie(values=attack_counts.values,
                     names=['Normal', 'Attack'],
                     title='Attack vs Normal Distribution',
-                    color_discrete_sequence=['#4444ff', '#ff4444'],
+                    color_discrete_sequence=[COLORS["accent_blue"], COLORS["accent_red"]],
                     hole=0.4)
+        fig = apply_plotly_theme(fig)
         fig.update_layout(height=400)
         st.plotly_chart(fig, use_container_width=True)
 
@@ -709,7 +699,8 @@ def show_ida_intrusion(df):
                     title='Attack vs Normal Count',
                     labels={'x': 'Classification', 'y': 'Count'},
                     color=['Normal', 'Attack'],
-                    color_discrete_map={'Normal': '#4444ff', 'Attack': '#ff4444'})
+                    color_discrete_map={'Normal': COLORS["accent_blue"], 'Attack': COLORS["accent_red"]})
+        fig = apply_plotly_theme(fig)
         fig.update_layout(height=400, showlegend=False)
         st.plotly_chart(fig, use_container_width=True)
 
@@ -854,9 +845,9 @@ def show_ida_intrusion(df):
 
         fig = go.Figure()
         fig.add_trace(go.Histogram(x=normal_data[selected_comp], name='Normal',
-                                  opacity=0.6, marker_color='blue', nbinsx=50))
+                                  opacity=0.6, marker_color=COLORS["accent_blue"], nbinsx=50))
         fig.add_trace(go.Histogram(x=attack_data[selected_comp], name='Attack',
-                                  opacity=0.6, marker_color='red', nbinsx=50))
+                                  opacity=0.6, marker_color=COLORS["accent_red"], nbinsx=50))
         fig.update_layout(
             title=f'{selected_comp.replace("_", " ").title()} Distribution: Attack vs Normal',
             xaxis_title=selected_comp.replace('_', ' ').title(),
@@ -916,11 +907,11 @@ def show_temporal_analysis(df):
             x=years, y=counts,
             mode='lines+markers',
             name='Attacks',
-            line=dict(color=POWERBI_COLORS['primary'], width=4),
-            marker=dict(size=10, color=POWERBI_COLORS['primary'],
-                       line=dict(color='white', width=2)),
+            line=dict(color=COLORS["accent_blue"], width=4),
+            marker=dict(size=10, color=COLORS["accent_blue"],
+                       line=dict(color=COLORS["bg_primary"], width=2)),
             fill='tozeroy',
-            fillcolor=f'rgba(0, 120, 212, 0.1)'
+            fillcolor=f'rgba(0, 217, 255, 0.1)'
         ))
 
         # Add trend line
@@ -930,22 +921,15 @@ def show_temporal_analysis(df):
             x=years, y=p(years),
             mode='lines',
             name='Trend',
-            line=dict(dash='dash', color=POWERBI_COLORS['danger'], width=3)
+            line=dict(dash='dash', color=COLORS["accent_red"], width=3)
         ))
 
+        fig = apply_plotly_theme(fig, title='Cyberattack Frequency (2015-2024)')
         fig.update_layout(
-            title={
-                'text': 'Cyberattack Frequency (2015-2024)',
-                'font': {'size': 18, 'color': '#2c3e50', 'family': 'Segoe UI'}
-            },
             xaxis_title='Year',
             yaxis_title='Attack Count',
             height=400,
-            xaxis=dict(range=[2014.5, 2024.5], dtick=1, showgrid=True, gridcolor='#e0e0e0'),
-            yaxis=dict(showgrid=True, gridcolor='#e0e0e0'),
-            plot_bgcolor='white',
-            paper_bgcolor='white',
-            font=dict(family='Segoe UI', size=12, color='#2c3e50'),
+            xaxis=dict(range=[2014.5, 2024.5], dtick=1),
             hovermode='x unified',
             legend=dict(
                 orientation="h",
@@ -968,7 +952,7 @@ def show_temporal_analysis(df):
         growth_values = [float(g) for g in attacks_by_year['YoY_Growth'][1:]]
 
         # Color bars based on positive/negative growth
-        colors = [POWERBI_COLORS['success'] if v >= 0 else POWERBI_COLORS['danger'] for v in growth_values]
+        colors = [COLORS["accent_green"] if v >= 0 else COLORS["accent_red"] for v in growth_values]
 
         fig = go.Figure()
         fig.add_trace(go.Bar(
@@ -976,29 +960,23 @@ def show_temporal_analysis(df):
             y=growth_values,
             marker=dict(
                 color=colors,
-                line=dict(color='white', width=1)
+                line=dict(color=COLORS["text_primary"], width=1)
             ),
             text=[f"{v:+.1f}%" for v in growth_values],
             textposition='outside',
-            textfont=dict(size=11, color='#2c3e50', family='Segoe UI')
+            textfont=dict(size=11, color=COLORS["text_primary"], family='Segoe UI')
         ))
 
         # Add zero line
-        fig.add_hline(y=0, line_dash="dash", line_color="#666", line_width=1)
+        fig.add_hline(y=0, line_dash="dash", line_color=COLORS["text_muted"], line_width=1)
 
+        fig = apply_plotly_theme(fig, title='YoY Growth Rate (%)')
         fig.update_layout(
-            title={
-                'text': 'YoY Growth Rate (%)',
-                'font': {'size': 18, 'color': '#2c3e50', 'family': 'Segoe UI'}
-            },
             xaxis_title='Year',
             yaxis_title='Growth Rate (%)',
             height=400,
             xaxis=dict(range=[2015.5, 2024.5], dtick=1, showgrid=False),
-            yaxis=dict(showgrid=True, gridcolor='#e0e0e0', zeroline=True),
-            plot_bgcolor='white',
-            paper_bgcolor='white',
-            font=dict(family='Segoe UI', size=12, color='#2c3e50'),
+            yaxis=dict(zeroline=True),
             showlegend=False
         )
         st.plotly_chart(fig, use_container_width=True)
@@ -1091,11 +1069,11 @@ def show_temporal_analysis(df):
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=loss_years, y=avg_losses,
                                 mode='lines+markers', name='Mean',
-                                line=dict(color='blue', width=3),
+                                line=dict(color=COLORS["accent_blue"], width=3),
                                 marker=dict(size=8)))
         fig.add_trace(go.Scatter(x=loss_years, y=median_losses,
                                 mode='lines+markers', name='Median',
-                                line=dict(color='green', width=3),
+                                line=dict(color=COLORS["accent_green"], width=3),
                                 marker=dict(size=8)))
         fig.update_layout(
             title='Average vs Median Loss Per Incident',
@@ -1169,72 +1147,40 @@ def show_geographic_analysis(df):
     df = df.drop_duplicates()
 
     # ========== FILTERS SECTION ==========
-    st.markdown("""
-    <div style="
-        background: linear-gradient(135deg, #0078D4 0%, #005a9e 100%);
-        padding: 20px 25px;
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0,120,212,0.3);
-        margin-bottom: 25px;
-    ">
-        <h3 style="color: white; margin: 0 0 8px 0; font-size: 20px; font-weight: 700;">
-            🔍 FILTER DATA
-        </h3>
-        <p style="color: rgba(255,255,255,0.9); margin: 0; font-size: 14px; font-weight: 500;">
-            Refine your analysis by selecting specific parameters below
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # Filter controls with white background panel
-    st.markdown("""
-    <div style="
-        background: white;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-        margin-bottom: 20px;
-    ">
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown("#### 🔍 Filter Data")
+    st.markdown("---")
 
     col1, col2, col3 = st.columns(3)
 
     with col1:
         # Year filter
-        st.markdown('<p style="color: #2c3e50; font-weight: 600; font-size: 14px; margin-bottom: 8px;">📅 Year Range</p>', unsafe_allow_html=True)
         available_years = sorted(df['Year'].dropna().unique().tolist())
         selected_years = st.multiselect(
-            "Year Range",
+            "📅 Year Range",
             options=available_years,
             default=available_years,
             key='geo_year_filter',
-            help="Select one or more years to analyze",
-            label_visibility="collapsed"
+            help="Select one or more years to analyze"
         )
 
     with col2:
         # Attack Type filter
-        st.markdown('<p style="color: #2c3e50; font-weight: 600; font-size: 14px; margin-bottom: 8px;">🎯 Attack Type</p>', unsafe_allow_html=True)
         attack_types = ['All'] + sorted(df['Attack Type'].dropna().unique().tolist())
         selected_attack_type = st.selectbox(
-            "Attack Type",
+            "🎯 Attack Type",
             options=attack_types,
             key='geo_attack_filter',
-            help="Filter by specific attack category",
-            label_visibility="collapsed"
+            help="Filter by specific attack category"
         )
 
     with col3:
         # Industry filter
-        st.markdown('<p style="color: #2c3e50; font-weight: 600; font-size: 14px; margin-bottom: 8px;">🏢 Target Industry</p>', unsafe_allow_html=True)
         industries = ['All'] + sorted(df['Target Industry'].dropna().unique().tolist())
         selected_industry = st.selectbox(
-            "Target Industry",
+            "🏢 Target Industry",
             options=industries,
             key='geo_industry_filter',
-            help="Filter by industry sector",
-            label_visibility="collapsed"
+            help="Filter by industry sector"
         )
 
     # Show active filters summary
@@ -1249,14 +1195,14 @@ def show_geographic_analysis(df):
     if active_filters:
         st.markdown(f"""
         <div style="
-            background-color: #e3f2fd;
+            background-color: var(--bg-secondary);
             padding: 12px 20px;
             border-radius: 6px;
-            border-left: 4px solid #0078D4;
+            border-left: 4px solid var(--accent-blue);
             margin: 15px 0;
         ">
-            <strong style="color: #2c3e50;">🎯 Active Filters:</strong>
-            <span style="color: #555;">{' | '.join(active_filters)}</span>
+            <strong style="color: var(--text-primary);">🎯 Active Filters:</strong>
+            <span style="color: var(--text-secondary);">{' | '.join(active_filters)}</span>
         </div>
         """, unsafe_allow_html=True)
 
@@ -1374,11 +1320,12 @@ def show_geographic_analysis(df):
                 labels=['Top 5 Countries', 'Other Countries'],
                 values=[top_5_loss, other_loss],
                 hole=.4,
-                marker=dict(colors=['#ff4444', '#4444ff']),
+                marker=dict(colors=[COLORS["accent_red"], COLORS["accent_blue"]]),
                 textinfo='label+percent',
                 textposition='inside'
             )])
 
+            fig = apply_plotly_theme(fig)
             fig.update_layout(
                 title='Geographic Loss Concentration',
                 height=350,
@@ -1461,7 +1408,7 @@ def show_geographic_analysis(df):
                 colorscale='RdYlGn_r',
                 showscale=True,
                 colorbar=dict(title="Loss/Attack ($M)", x=1.15),
-                line=dict(width=2, color='white')
+                line=dict(width=2, color=COLORS["text_primary"])
             ),
             text=top_countries['Country'],
             textposition='top center',
@@ -1477,7 +1424,7 @@ def show_geographic_analysis(df):
             yaxis_title='Total Loss ($M)',
             height=500,
             showlegend=False,
-            plot_bgcolor='rgba(240,240,240,0.5)'
+            plot_bgcolor='rgba(31, 42, 64, 0.3)'
         )
         st.plotly_chart(fig, use_container_width=True)
 
@@ -1514,9 +1461,9 @@ def show_geographic_analysis(df):
             fig.update_layout(
                 height=450,
                 showlegend=False,
-                plot_bgcolor='rgba(240,240,240,0.3)',
-                xaxis=dict(gridcolor='white'),
-                yaxis=dict(gridcolor='white')
+                plot_bgcolor='rgba(31, 42, 64, 0.3)',
+                xaxis=dict(gridcolor=COLORS["border_color"]),
+                yaxis=dict(gridcolor=COLORS["border_color"])
             )
             st.plotly_chart(fig, use_container_width=True)
 
@@ -1614,8 +1561,8 @@ def show_geographic_analysis(df):
                 y=waterfall_data['Total_Loss'],
                 text=[f"${x:,.0f}M" for x in waterfall_data['Total_Loss']],
                 textposition="outside",
-                connector={"line": {"color": "rgb(63, 63, 63)"}},
-                increasing={"marker": {"color": "#ff6b6b"}},
+                connector={"line": {"color": COLORS["border_color"]}},
+                increasing={"marker": {"color": COLORS["accent_red"]}},
             ))
             fig.update_layout(
                 title="Cumulative Loss Waterfall (Top 8)",
@@ -2058,9 +2005,9 @@ def show_behavior_analysis(df):
         with col1:
             fig = go.Figure()
             fig.add_trace(go.Histogram(x=normal_data[selected_feature], name='Normal',
-                                      opacity=0.6, marker_color='blue', nbinsx=50))
+                                      opacity=0.6, marker_color=COLORS["accent_blue"], nbinsx=50))
             fig.add_trace(go.Histogram(x=attack_data[selected_feature], name='Attack',
-                                      opacity=0.6, marker_color='red', nbinsx=50))
+                                      opacity=0.6, marker_color=COLORS["accent_red"], nbinsx=50))
             fig.update_layout(
                 title=f'{selected_feature.replace("_", " ").title()} Distribution',
                 xaxis_title=selected_feature.replace('_', ' ').title(),
@@ -2138,12 +2085,12 @@ def show_advanced_analytics(global_df, intrusion_df):
             fig.add_trace(go.Bar(x=list(range(1, len(explained_var)+1)),
                                 y=explained_var,
                                 name='Individual',
-                                marker_color='steelblue'))
+                                marker_color=COLORS["accent_blue"]))
             fig.add_trace(go.Scatter(x=list(range(1, len(cumulative_var)+1)),
                                     y=cumulative_var,
                                     mode='lines+markers',
                                     name='Cumulative',
-                                    marker_color='red',
+                                    marker_color=COLORS["accent_red"],
                                     line=dict(width=3)))
             fig.update_layout(title='PCA Scree Plot',
                              xaxis_title='Principal Component',
@@ -2320,61 +2267,31 @@ def show_data_explorer(global_threats, intrusion_data):
         # Remove duplicates
         df = global_threats.drop_duplicates().copy()
 
-        # Filters in columns
-        st.markdown("""
-        <div style="
-            background: linear-gradient(135deg, #0078D4 0%, #005a9e 100%);
-            padding: 15px 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,120,212,0.3);
-            margin: 20px 0;
-        ">
-            <h4 style="color: white; margin: 0; font-size: 18px; font-weight: 700;">
-                🔍 FILTER DATA
-            </h4>
-            <p style="color: rgba(255,255,255,0.9); margin: 5px 0 0 0; font-size: 13px;">
-                Apply filters to refine the dataset view
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
-
-        # Filter controls with white background panel
-        st.markdown("""
-        <div style="
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-            margin-bottom: 20px;
-        ">
-        </div>
-        """, unsafe_allow_html=True)
+        # Filters section
+        st.markdown("#### 🔍 Filter Data")
+        st.markdown("---")
 
         col1, col2, col3, col4 = st.columns(4)
 
         with col1:
             # Year filter
-            st.markdown('<p style="color: #2c3e50; font-weight: 600; font-size: 14px; margin-bottom: 8px;">📅 Year</p>', unsafe_allow_html=True)
             year_options = ['All'] + sorted(df['Year'].unique().tolist())
-            selected_years = st.multiselect("Year", year_options, default=['All'], key='explorer_year', label_visibility="collapsed")
+            selected_years = st.multiselect("📅 Year", year_options, default=['All'], key='explorer_year')
 
         with col2:
             # Country filter
-            st.markdown('<p style="color: #2c3e50; font-weight: 600; font-size: 14px; margin-bottom: 8px;">🌍 Country</p>', unsafe_allow_html=True)
             country_options = ['All'] + sorted(df['Country'].unique().tolist())
-            selected_countries = st.multiselect("Country", country_options, default=['All'], key='explorer_country', label_visibility="collapsed")
+            selected_countries = st.multiselect("🌍 Country", country_options, default=['All'], key='explorer_country')
 
         with col3:
             # Attack Type filter
-            st.markdown('<p style="color: #2c3e50; font-weight: 600; font-size: 14px; margin-bottom: 8px;">🎯 Attack Type</p>', unsafe_allow_html=True)
             attack_type_options = ['All'] + sorted(df['Attack Type'].unique().tolist())
-            selected_attack_types = st.multiselect("Attack Type", attack_type_options, default=['All'], key='explorer_attack', label_visibility="collapsed")
+            selected_attack_types = st.multiselect("🎯 Attack Type", attack_type_options, default=['All'], key='explorer_attack')
 
         with col4:
             # Industry filter
-            st.markdown('<p style="color: #2c3e50; font-weight: 600; font-size: 14px; margin-bottom: 8px;">🏢 Industry</p>', unsafe_allow_html=True)
             industry_options = ['All'] + sorted(df['Target Industry'].unique().tolist())
-            selected_industries = st.multiselect("Industry", industry_options, default=['All'], key='explorer_industry', label_visibility="collapsed")
+            selected_industries = st.multiselect("🏢 Industry", industry_options, default=['All'], key='explorer_industry')
 
         # Apply filters
         filtered_df = df.copy()
@@ -2452,63 +2369,33 @@ def show_data_explorer(global_threats, intrusion_data):
 
         df = intrusion_data.copy()
 
-        # Filters in columns
-        st.markdown("""
-        <div style="
-            background: linear-gradient(135deg, #0078D4 0%, #005a9e 100%);
-            padding: 15px 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,120,212,0.3);
-            margin: 20px 0;
-        ">
-            <h4 style="color: white; margin: 0; font-size: 18px; font-weight: 700;">
-                🔍 FILTER DATA
-            </h4>
-            <p style="color: rgba(255,255,255,0.9); margin: 5px 0 0 0; font-size: 13px;">
-                Apply filters to refine the dataset view
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
-
-        # Filter controls with white background panel
-        st.markdown("""
-        <div style="
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-            margin-bottom: 20px;
-        ">
-        </div>
-        """, unsafe_allow_html=True)
+        # Filters section
+        st.markdown("#### 🔍 Filter Data")
+        st.markdown("---")
 
         col1, col2, col3, col4 = st.columns(4)
 
         with col1:
             # Attack detected filter
-            st.markdown('<p style="color: #2c3e50; font-weight: 600; font-size: 14px; margin-bottom: 8px;">🚨 Attack Status</p>', unsafe_allow_html=True)
-            attack_filter = st.selectbox("Attack Status", ['All', 'Attack (1)', 'Normal (0)'], key='explorer_attack_status', label_visibility="collapsed")
+            attack_filter = st.selectbox("🚨 Attack Status", ['All', 'Attack (1)', 'Normal (0)'], key='explorer_attack_status')
 
         with col2:
             # Protocol filter - handle mixed types and NaN values
-            st.markdown('<p style="color: #2c3e50; font-weight: 600; font-size: 14px; margin-bottom: 8px;">🌐 Protocol</p>', unsafe_allow_html=True)
             protocol_values = df['protocol_type'].dropna().astype(str).unique().tolist()
             protocol_options = ['All'] + sorted(protocol_values)
-            selected_protocols = st.multiselect("Protocol", protocol_options, default=['All'], key='explorer_protocol', label_visibility="collapsed")
+            selected_protocols = st.multiselect("🌐 Protocol", protocol_options, default=['All'], key='explorer_protocol')
 
         with col3:
             # Encryption filter - handle mixed types and NaN values
-            st.markdown('<p style="color: #2c3e50; font-weight: 600; font-size: 14px; margin-bottom: 8px;">🔐 Encryption</p>', unsafe_allow_html=True)
             encryption_values = df['encryption_used'].dropna().astype(str).unique().tolist()
             encryption_options = ['All'] + sorted(encryption_values)
-            selected_encryptions = st.multiselect("Encryption", encryption_options, default=['All'], key='explorer_encryption', label_visibility="collapsed")
+            selected_encryptions = st.multiselect("🔐 Encryption", encryption_options, default=['All'], key='explorer_encryption')
 
         with col4:
             # Browser filter - handle mixed types and NaN values
-            st.markdown('<p style="color: #2c3e50; font-weight: 600; font-size: 14px; margin-bottom: 8px;">🌐 Browser</p>', unsafe_allow_html=True)
             browser_values = df['browser_type'].dropna().astype(str).unique().tolist()
             browser_options = ['All'] + sorted(browser_values)
-            selected_browsers = st.multiselect("Browser", browser_options, default=['All'], key='explorer_browser', label_visibility="collapsed")
+            selected_browsers = st.multiselect("🌐 Browser", browser_options, default=['All'], key='explorer_browser')
 
         # Apply filters
         filtered_df = df.copy()
@@ -2618,7 +2505,7 @@ def show_key_findings(global_threats, intrusion_data):
         fig.add_trace(go.Scatter(x=find_years, y=find_counts,
                                 mode='lines+markers',
                                 name='Attacks',
-                                line=dict(color='#1f77b4', width=3),
+                                line=dict(color=COLORS["accent_blue"], width=3),
                                 marker=dict(size=8)))
 
         # Add trend line
@@ -2627,7 +2514,7 @@ def show_key_findings(global_threats, intrusion_data):
         fig.add_trace(go.Scatter(x=find_years, y=p(find_years),
                                 mode='lines',
                                 name='Trend',
-                                line=dict(dash='dash', color='red', width=3)))
+                                line=dict(dash='dash', color=COLORS["accent_red"], width=3)))
 
         fig.update_layout(
             title='Attack Frequency Growth (2015-2024)',
@@ -2680,8 +2567,9 @@ def show_key_findings(global_threats, intrusion_data):
         fig = px.pie(values=attack_counts.values,
                     names=['Normal Traffic', 'Attack Traffic'],
                     title='Class Distribution in Intrusion Dataset',
-                    color_discrete_sequence=['#4444ff', '#ff4444'],
+                    color_discrete_sequence=[COLORS["accent_blue"], COLORS["accent_red"]],
                     hole=0.4)
+        fig = apply_plotly_theme(fig)
         fig.update_traces(textposition='inside', textinfo='percent+label')
         fig.update_layout(height=350)
         st.plotly_chart(fig, use_container_width=True)
