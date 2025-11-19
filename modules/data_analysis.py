@@ -51,17 +51,19 @@ def ensure_year_numeric(df):
     return df
 
 def show(global_threats, intrusion_data):
-    """Display IDA and EDA analysis with Visual Dashboard Style."""
-
-    # Add top margin to align with navigation
-    st.markdown("<div style='margin-top: 30px;'></div>", unsafe_allow_html=True)
+    """Display IDA and EDA analysis with clean, organized layout."""
 
     if global_threats is None or intrusion_data is None:
         st.error("Unable to load data for analysis.")
         return
 
+    # Page header
+    st.title("📊 IDA/EDA Analysis")
+    st.markdown("Comprehensive exploratory data analysis of cybersecurity threats and intrusion detection patterns")
+    st.markdown("---")
+
     # ==================== DATA QUALITY OVERVIEW ====================
-    st.subheader("📊 Data Quality Dashboard")
+    st.subheader("Data Quality Dashboard")
 
     # Check if missing data file exists and use it for accurate completeness metrics
     from pathlib import Path
@@ -110,9 +112,10 @@ def show(global_threats, intrusion_data):
     with col4:
         st.metric("Data Completeness", f"{id_completeness:.1f}%", get_quality_label(id_completeness))
 
-    st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
+    st.markdown("---")
 
     # ==================== EXPLORATORY VISUALIZATIONS ====================
+    st.subheader("Quick Overview")
 
     col1, col2 = st.columns(2)
 
@@ -154,7 +157,7 @@ def show(global_threats, intrusion_data):
         )
         st.plotly_chart(fig, use_container_width=True)
 
-    st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
+    st.markdown("---")
 
     # ==================== TECHNICAL DETAILS (COLLAPSIBLE) ====================
     with st.expander("🔧 Technical Details & Raw Data"):
@@ -181,37 +184,25 @@ def show(global_threats, intrusion_data):
     with st.expander("🔬 MICE Imputation Analysis"):
         show_mice_imputation_section()
 
-    st.markdown("<div style='margin: 3rem 0;'></div>", unsafe_allow_html=True)
-
     # ==================== TEMPORAL ANALYSIS ====================
     st.markdown("---")
     show_temporal_analysis(global_threats)
-
-    st.markdown("<div style='margin: 3rem 0;'></div>", unsafe_allow_html=True)
 
     # ==================== GEOGRAPHIC ANALYSIS ====================
     st.markdown("---")
     show_geographic_analysis(global_threats)
 
-    st.markdown("<div style='margin: 3rem 0;'></div>", unsafe_allow_html=True)
-
     # ==================== CORRELATION ANALYSIS ====================
     st.markdown("---")
     show_correlation_analysis(global_threats, intrusion_data)
-
-    st.markdown("<div style='margin: 3rem 0;'></div>", unsafe_allow_html=True)
 
     # ==================== ATTACK BEHAVIOR ANALYSIS ====================
     st.markdown("---")
     show_behavior_analysis(intrusion_data)
 
-    st.markdown("<div style='margin: 3rem 0;'></div>", unsafe_allow_html=True)
-
     # ==================== ADVANCED ANALYTICS ====================
     st.markdown("---")
     show_advanced_analytics(global_threats, intrusion_data)
-
-    st.markdown("<div style='margin: 3rem 0;'></div>", unsafe_allow_html=True)
 
     # ==================== KEY FINDINGS ====================
     st.markdown("---")
@@ -894,29 +885,10 @@ def show_ida_intrusion(df):
 # ==================== EDA FUNCTIONS ====================
 
 def show_temporal_analysis(df):
-    """Temporal Analysis for Global Threats with Narrative Storytelling"""
+    """Temporal Analysis for Global Threats"""
 
-    st.markdown("### 📅 Temporal Trend Analysis: The Evolution of Cyber Threats Over Time")
-
-    st.markdown("""
-    > **The Research Question:** *Are cyberattacks becoming more frequent and costly over time,
-    > or is this merely increased reporting? Let's follow the data trail...*
-    """)
-
-    with st.expander("📖 What This Analysis Reveals", expanded=True):
-        st.markdown("""
-        **Why temporal analysis matters:**
-        - Identifies **emerging trends** and cyclical patterns
-        - Reveals whether threats are **accelerating or stabilizing**
-        - Helps security teams **anticipate future attack volumes**
-        - Informs **budget planning** for cybersecurity investments
-
-        **What to look for:**
-        - 📈 **Upward trends** = growing threat landscape
-        - 📉 **Spikes** = major incident periods or reporting changes
-        - 🔄 **Seasonality** = predictable attack patterns
-        - 💰 **Cost trends** = economic impact evolution
-        """)
+    st.subheader("📅 Temporal Trend Analysis")
+    st.markdown("How have cyberattacks evolved over time?")
 
     st.markdown("---")
 
@@ -1150,29 +1122,10 @@ def show_temporal_analysis(df):
 
 
 def show_geographic_analysis(df):
-    """Geographic Analysis for Global Threats with Storytelling"""
+    """Geographic Analysis for Global Threats"""
 
-    st.markdown("### 🗺️ Geographic Distribution Analysis: Global Threat Landscape")
-
-    st.markdown("""
-    > **The Research Question:** *Is cybercrime evenly distributed globally, or are certain nations bearing
-    > a disproportionate burden? What makes a country an attractive target?*
-    """)
-
-    with st.expander("📖 What This Geographic Analysis Reveals", expanded=True):
-        st.markdown("""
-        **Why geography matters in cybersecurity:**
-        - **Economic targets:** Wealthier nations often face higher attack rates
-        - **Digital infrastructure:** Countries with advanced tech are both safer AND more targeted
-        - **Regulatory environments:** Data protection laws influence breach reporting
-        - **Attack attribution:** Geographic patterns may reveal state-sponsored activity
-
-        **Key questions we're answering:**
-        - 🌍 Which countries are **most targeted**?
-        - 💰 Where are the **costliest breaches** occurring?
-        - 🎯 Do attack **types vary by region**?
-        - 📊 Is there a correlation between attack frequency and financial impact?
-        """)
+    st.subheader("🗺️ Geographic Distribution Analysis")
+    st.markdown("Where are cyberattacks happening around the world?")
 
     st.markdown("---")
 
@@ -1719,54 +1672,16 @@ def show_geographic_analysis(df):
     - **For all regions:** Share threat intelligence across borders to combat organized cybercrime
     """)
 
-    st.markdown("---")
-
-    # ========== DETAILED DATA TABLE ==========
-    st.markdown("#### 📊 Detailed Country Statistics")
-
-    # Format the dataframe for display
-    display_df = country_stats.copy()
-    display_df.columns = ['Country', 'Total Loss ($M)', 'Avg Loss ($M)', 'Attack Count', 'Total Users Affected', 'Loss per Attack ($M)']
-    display_df = display_df.round(2)
-
-    # Color code the table
-    st.dataframe(
-        display_df.head(25).style.background_gradient(subset=['Total Loss ($M)'], cmap='Reds')
-                                  .background_gradient(subset=['Attack Count'], cmap='Blues')
-                                  .background_gradient(subset=['Avg Loss ($M)'], cmap='Oranges')
-                                  .format({
-                                      'Total Loss ($M)': '${:,.1f}',
-                                      'Avg Loss ($M)': '${:,.2f}',
-                                      'Attack Count': '{:,.0f}',
-                                      'Total Users Affected': '{:,.0f}',
-                                      'Loss per Attack ($M)': '${:,.2f}'
-                                  }),
-        use_container_width=True,
-        height=600
-    )
-
-    # Download button
-    csv = display_df.to_csv(index=False).encode('utf-8')
-    st.download_button(
-        label="📥 Download Geographic Analysis Data (CSV)",
-        data=csv,
-        file_name='geographic_threat_analysis.csv',
-        mime='text/csv',
-        help="Download the complete geographic analysis data"
-    )
-
 
 def show_correlation_analysis(global_df, intrusion_df):
-    """Correlation Analysis with Storytelling"""
+    """Correlation Analysis"""
 
-    st.markdown("### 🔗 Correlation Analysis: Uncovering Hidden Relationships")
+    st.subheader("🔗 Correlation Analysis")
+    st.markdown("Understanding relationships between cybersecurity metrics")
 
-    st.markdown("""
-    > **The Research Question:** *Which cybersecurity metrics move together? Can understanding these relationships
-    > help us predict attack severity or response effectiveness?*
-    """)
+    st.markdown("---")
 
-    with st.expander("📖 Why Correlation Analysis Matters", expanded=True):
+    with st.expander("ℹ️ About Correlation Analysis", expanded=False):
         st.markdown("""
         **Correlation reveals causal candidates:**
         - **Strong positive correlation (> 0.7):** Variables tend to increase together
@@ -1910,8 +1825,8 @@ def show_correlation_analysis(global_df, intrusion_df):
 def show_behavior_analysis(df):
     """Attack Behavior Analysis for Intrusion Detection"""
 
-    st.markdown("### ⚔️ Attack Behavior Analysis")
-    st.info("**Dataset:** Intrusion Detection Dataset")
+    st.subheader("⚔️ Attack Behavior Analysis")
+    st.markdown("Comparing attack traffic patterns with normal network behavior")
 
     attack_data = df[df['attack_detected'] == 1]
     normal_data = df[df['attack_detected'] == 0]
@@ -2063,17 +1978,18 @@ def show_behavior_analysis(df):
 def show_advanced_analytics(global_df, intrusion_df):
     """Advanced Analytics: PCA and Other Advanced Techniques"""
 
-    st.markdown("### 🔬 Advanced Analytics")
+    st.subheader("🔬 Advanced Analytics")
+    st.markdown("Deep dive into data patterns using statistical techniques")
+
+    st.markdown("---")
 
     analysis_type = st.radio("Select Analysis",
-                             ["🔬 PCA (Intrusion Detection)", "📊 Advanced Statistics (Both Datasets)"],
+                             ["Principal Component Analysis", "Advanced Statistics"],
                              horizontal=True)
 
-    if "PCA" in analysis_type:
-        st.info("**Dataset:** Intrusion Detection | **Technique:** Principal Component Analysis")
-
-        st.markdown("#### 🎯 Principal Component Analysis (PCA)")
-        st.markdown("PCA reduces dimensionality while preserving variance in the data")
+    if "Principal Component" in analysis_type:
+        st.markdown("#### Principal Component Analysis (PCA)")
+        st.markdown("Reducing dimensionality while preserving data variance")
 
         # Prepare data
         features_for_pca = ['network_packet_size', 'login_attempts', 'session_duration',
