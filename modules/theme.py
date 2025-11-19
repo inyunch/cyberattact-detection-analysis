@@ -3,46 +3,46 @@ Centralized theme configuration following DESIGN_RULES.md
 This module provides consistent color palettes and theming across the dashboard.
 """
 
-# Design System Colors - Based on DESIGN_RULES.md
+# Design System Colors - Light Theme for White Background
 COLORS = {
     # Backgrounds
-    "bg_primary": "#141B2D",
-    "bg_secondary": "#1F2A40",
-    "bg_tertiary": "#0F1520",
-    "bg_hover": "#2A3650",
+    "bg_primary": "#FFFFFF",
+    "bg_secondary": "#F8F9FA",
+    "bg_tertiary": "#F1F3F5",
+    "bg_hover": "#E9ECEF",
 
     # Text Colors
-    "text_primary": "#E8EAF0",
-    "text_secondary": "#A0A7B8",
-    "text_muted": "#6C7489",
+    "text_primary": "#1A1A1A",
+    "text_secondary": "#4A5568",
+    "text_muted": "#718096",
 
-    # Accent Colors
-    "accent_blue": "#00D9FF",
-    "accent_green": "#00FFB3",
-    "accent_purple": "#7B61FF",
-    "accent_orange": "#FF9F43",
-    "accent_red": "#FF5370",
+    # Accent Colors - Simplified and muted for readability
+    "accent_blue": "#3182CE",
+    "accent_green": "#38A169",
+    "accent_purple": "#805AD5",
+    "accent_orange": "#DD6B20",
+    "accent_red": "#E53E3E",
 
     # Borders & Dividers
-    "border_color": "#2E3A52",
+    "border_color": "#E2E8F0",
 
-    # Chart Palette (5 colors for variety)
-    "chart_palette": ["#00D9FF", "#00FFB3", "#7B61FF", "#FF9F43", "#60A5FA"],
+    # Chart Palette (5 colors for variety) - Softer, more readable colors
+    "chart_palette": ["#3182CE", "#38A169", "#805AD5", "#DD6B20", "#E53E3E"],
 }
 
-# Shadow definitions
+# Shadow definitions - Lighter for white background
 SHADOWS = {
-    "sm": "0 2px 8px rgba(0, 0, 0, 0.3)",
-    "md": "0 4px 16px rgba(0, 0, 0, 0.4)",
-    "lg": "0 8px 32px rgba(0, 0, 0, 0.5)",
-    "glow": "0 8px 32px rgba(0, 217, 255, 0.2)",
+    "sm": "0 1px 3px rgba(0, 0, 0, 0.1)",
+    "md": "0 2px 8px rgba(0, 0, 0, 0.08)",
+    "lg": "0 4px 16px rgba(0, 0, 0, 0.1)",
+    "glow": "0 0 0 1px rgba(49, 130, 206, 0.1)",
 }
 
-# Gradients
+# Gradients - Simplified for light theme
 GRADIENTS = {
-    "primary": "linear-gradient(135deg, #00D9FF 0%, #00FFB3 100%)",
-    "background": "linear-gradient(180deg, #141B2D 0%, #0A0F1C 100%)",
-    "active": "linear-gradient(135deg, rgba(0, 217, 255, 0.12) 0%, rgba(0, 255, 179, 0.12) 100%)",
+    "primary": "linear-gradient(135deg, #3182CE 0%, #38A169 100%)",
+    "background": "linear-gradient(180deg, #FFFFFF 0%, #F8F9FA 100%)",
+    "active": "linear-gradient(135deg, rgba(49, 130, 206, 0.08) 0%, rgba(56, 161, 105, 0.08) 100%)",
 }
 
 # Typography
