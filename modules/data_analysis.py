@@ -181,6 +181,42 @@ def show(global_threats, intrusion_data):
     with st.expander("🔬 MICE Imputation Analysis"):
         show_mice_imputation_section()
 
+    st.markdown("<div style='margin: 3rem 0;'></div>", unsafe_allow_html=True)
+
+    # ==================== TEMPORAL ANALYSIS ====================
+    st.markdown("---")
+    show_temporal_analysis(global_threats)
+
+    st.markdown("<div style='margin: 3rem 0;'></div>", unsafe_allow_html=True)
+
+    # ==================== GEOGRAPHIC ANALYSIS ====================
+    st.markdown("---")
+    show_geographic_analysis(global_threats)
+
+    st.markdown("<div style='margin: 3rem 0;'></div>", unsafe_allow_html=True)
+
+    # ==================== CORRELATION ANALYSIS ====================
+    st.markdown("---")
+    show_correlation_analysis(global_threats, intrusion_data)
+
+    st.markdown("<div style='margin: 3rem 0;'></div>", unsafe_allow_html=True)
+
+    # ==================== ATTACK BEHAVIOR ANALYSIS ====================
+    st.markdown("---")
+    show_behavior_analysis(intrusion_data)
+
+    st.markdown("<div style='margin: 3rem 0;'></div>", unsafe_allow_html=True)
+
+    # ==================== ADVANCED ANALYTICS ====================
+    st.markdown("---")
+    show_advanced_analytics(global_threats, intrusion_data)
+
+    st.markdown("<div style='margin: 3rem 0;'></div>", unsafe_allow_html=True)
+
+    # ==================== KEY FINDINGS ====================
+    st.markdown("---")
+    show_key_findings(global_threats, intrusion_data)
+
 
 # ==================== MICE IMPUTATION SECTION ====================
 def show_mice_imputation_section():
