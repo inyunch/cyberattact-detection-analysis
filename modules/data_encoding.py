@@ -272,12 +272,15 @@ def encode_global_threats(df):
 
                     with col1:
                         # Original distribution
+                        value_counts_df = df[selected_viz_col].value_counts().reset_index()
+                        value_counts_df.columns = ['Category', 'Count']
+
                         fig = px.bar(
-                            df[selected_viz_col].value_counts().reset_index(),
-                            x='index',
-                            y=selected_viz_col,
-                            labels={'index': selected_viz_col, selected_viz_col: 'Count'},
-                            color=selected_viz_col,
+                            value_counts_df,
+                            x='Category',
+                            y='Count',
+                            labels={'Category': selected_viz_col, 'Count': 'Count'},
+                            color='Count',
                             color_continuous_scale='Blues'
                         )
                         fig = apply_plotly_theme(fig, title=f'Original: {selected_viz_col}')
@@ -288,12 +291,15 @@ def encode_global_threats(df):
                     with col2:
                         # Encoded distribution
                         encoded_col = f'{selected_viz_col}_Encoded'
+                        value_counts_df = df_label[encoded_col].value_counts().sort_index().reset_index()
+                        value_counts_df.columns = ['Encoded_Value', 'Count']
+
                         fig = px.bar(
-                            df_label[encoded_col].value_counts().sort_index().reset_index(),
-                            x='index',
-                            y=encoded_col,
-                            labels={'index': 'Encoded Value', encoded_col: 'Count'},
-                            color=encoded_col,
+                            value_counts_df,
+                            x='Encoded_Value',
+                            y='Count',
+                            labels={'Encoded_Value': 'Encoded Value', 'Count': 'Count'},
+                            color='Count',
                             color_continuous_scale='Greens'
                         )
                         fig = apply_plotly_theme(fig, title=f'Encoded: {encoded_col}')
