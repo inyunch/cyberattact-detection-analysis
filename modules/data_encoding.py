@@ -409,7 +409,13 @@ def encode_intrusion_detection(df):
                 if apply_scaling:
                     numeric_cols = df_onehot.select_dtypes(include=[np.number]).columns
                     scaler = StandardScaler()
-                    df_onehot[numeric_cols] = scaler.fit_transform(df_onehot[numeric_cols])
+                    # Pandas 2.0+ compatibility: convert numpy array back to DataFrame
+                    scaled_data = scaler.fit_transform(df_onehot[numeric_cols])
+                    df_onehot[numeric_cols] = pd.DataFrame(
+                        scaled_data,
+                        columns=numeric_cols,
+                        index=df_onehot.index
+                    )
                     st.success("✅ StandardScaler applied to numeric features")
 
                 # Show results
@@ -520,7 +526,13 @@ def encode_intrusion_detection(df):
                 if apply_scaling:
                     numeric_cols = df_label.select_dtypes(include=[np.number]).columns
                     scaler = StandardScaler()
-                    df_label[numeric_cols] = scaler.fit_transform(df_label[numeric_cols])
+                    # Pandas 2.0+ compatibility: convert numpy array back to DataFrame
+                    scaled_data = scaler.fit_transform(df_label[numeric_cols])
+                    df_label[numeric_cols] = pd.DataFrame(
+                        scaled_data,
+                        columns=numeric_cols,
+                        index=df_label.index
+                    )
                     st.success("✅ StandardScaler applied to numeric features")
 
                 # Show results
