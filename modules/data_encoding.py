@@ -156,10 +156,19 @@ def encode_global_threats(df):
                 with st.expander("📖 View Encoding Mappings"):
                     for col, info in encoding_info.items():
                         st.markdown(f"**{col}**")
+                        # Create one row per category showing which encoded column(s) it maps to
+                        encoded_cols_list = []
+                        for cat in info['original_categories']:
+                            # Find columns that contain this category
+                            matching_cols = [c for c in info['new_columns'] if str(cat) in c]
+                            if len(matching_cols) > 3:
+                                encoded_cols_list.append(', '.join(matching_cols[:3]) + '...')
+                            else:
+                                encoded_cols_list.append(', '.join(matching_cols) if matching_cols else 'N/A')
+
                         mapping_df = pd.DataFrame({
                             'Original Category': info['original_categories'],
-                            'Encoded Columns': [', '.join([c for c in info['new_columns'] if col in c][:3]) + '...'
-                                              if len(info['new_columns']) > 3 else ', '.join(info['new_columns'])]
+                            'Encoded Columns': encoded_cols_list
                         })
                         st.dataframe(mapping_df, hide_index=True)
                         st.markdown("")
