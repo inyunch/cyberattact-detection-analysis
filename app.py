@@ -20,6 +20,7 @@ if "page" in _qp:
     page_from_query = str(page_from_query).replace('_', ' ')
     allowed_pages = [
         "Dashboard Overview", "Global Threat Landscape", "Intrusion Detection",
+        "Malware Detection", "Phishing Detection", "CVE Intelligence",
         "Data Explorer", "IDA/EDA Analysis", "Data Encoding", "Comparative Insights", "Methodology"
     ]
     if page_from_query in allowed_pages:
@@ -45,12 +46,20 @@ apply_dashboard_css(sidebar_width=320)
 # Data loading with caching
 @st.cache_data
 def load_data():
-    """Load both datasets with robust checks and clear guidance."""
+    """Load all datasets with robust checks and clear guidance."""
     from pathlib import Path
     data_dir = Path('data')
+
+    # Core datasets
     gt_path = data_dir / 'Global_Cybersecurity_Threats_2015-2024.csv'
     id_path = data_dir / 'cybersecurity_intrusion_data.csv'
 
+    # New ML-focused datasets
+    malware_path = data_dir / 'malware_detection_dataset.csv'
+    phishing_path = data_dir / 'phishing_detection_dataset.csv'
+    cve_path = data_dir / 'cve_vulnerability_dataset.csv'
+
+    # Check core datasets
     if not gt_path.exists() or not id_path.exists():
         missing = []
         if not gt_path.exists():
@@ -62,6 +71,7 @@ def load_data():
         st.stop()
 
     try:
+        # Load core datasets
         global_threats = pd.read_csv(gt_path)
         intrusion_data = pd.read_csv(id_path)
 
@@ -71,13 +81,22 @@ def load_data():
                 errors='coerce'
             ).astype('Int64')
 
-        return global_threats, intrusion_data
+        # Load ML-focused datasets (optional, with fallback)
+        malware_data = pd.read_csv(malware_path) if malware_path.exists() else None
+        phishing_data = pd.read_csv(phishing_path) if phishing_path.exists() else None
+        cve_data = pd.read_csv(cve_path) if cve_path.exists() else None
+
+        # Convert CVE date to datetime if exists
+        if cve_data is not None and 'published_date' in cve_data.columns:
+            cve_data['published_date'] = pd.to_datetime(cve_data['published_date'])
+
+        return global_threats, intrusion_data, malware_data, phishing_data, cve_data
     except Exception as e:
         st.error(f"Error loading data: {e}")
         st.stop()
 
 # Load data
-global_threats, intrusion_data = load_data()
+global_threats, intrusion_data, malware_data, phishing_data, cve_data = load_data()
 
 # Import filter system
 from modules.filters import global_filter_sidebar, init_filter_state
@@ -143,6 +162,11 @@ with st.sidebar:
     nav_item("Global Threat Landscape", "Global_Threat_Landscape", icon="🌍")
     nav_item("Intrusion Detection", "Intrusion_Detection", icon="🛡️")
 
+    nav_item("ML Security", None, is_header=True)
+    nav_item("Malware Detection", "Malware_Detection", icon="🦠")
+    nav_item("Phishing Detection", "Phishing_Detection", icon="🎣")
+    nav_item("CVE Intelligence", "CVE_Intelligence", icon="🔐")
+
     nav_item("Analysis", None, is_header=True)
     nav_item("Data Explorer", "Data_Explorer", icon="🔍")
     nav_item("IDA/EDA Analysis", "IDA/EDA_Analysis", icon="📊")
@@ -188,6 +212,24 @@ dash_pages = ["Dashboard Overview", "Global Threat Landscape", "Intrusion Detect
 if selected in dash_pages:
     from modules import home
     home.show(global_threats, intrusion_data, page=selected)
+elif selected == "Malware Detection":
+    if malware_data is not None:
+        from modules import malware_detection
+        malware_detection.show(malware_data)
+    else:
+        st.error("Malware detection dataset not found. Please run the data generation script.")
+elif selected == "Phishing Detection":
+    if phishing_data is not None:
+        from modules import phishing_detection
+        phishing_detection.show(phishing_data)
+    else:
+        st.error("Phishing detection dataset not found. Please run the data generation script.")
+elif selected == "CVE Intelligence":
+    if cve_data is not None:
+        from modules import cve_intelligence
+        cve_intelligence.show(cve_data)
+    else:
+        st.error("CVE vulnerability dataset not found. Please run the data generation script.")
 elif selected == "Data Explorer":
     from modules import data_explorer
     data_explorer.show(intrusion_data)
