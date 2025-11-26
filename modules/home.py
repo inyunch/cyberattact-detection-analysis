@@ -197,7 +197,7 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
                     y=1.0,
                     xanchor="left",
                     x=1.02,
-                    bgcolor="rgba(31, 42, 64, 0.8)",
+                    bgcolor="rgba(255, 255, 255, 0.9)",
                     bordercolor=COLORS["border_color"],
                     borderwidth=1
                 )
@@ -301,7 +301,7 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
                 y=1.0,
                 xanchor="left",
                 x=1.02,
-                bgcolor="rgba(31, 42, 64, 0.8)",
+                bgcolor="rgba(255, 255, 255, 0.9)",
                 bordercolor=COLORS["border_color"],
                 borderwidth=1
             )
@@ -373,7 +373,7 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
                         y=1.0,
                         xanchor="left",
                         x=1.02,
-                        bgcolor="rgba(31, 42, 64, 0.8)",
+                        bgcolor="rgba(255, 255, 255, 0.9)",
                         bordercolor=COLORS["border_color"],
                         borderwidth=1
                     )
@@ -404,7 +404,7 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
                     y=0.99,
                     xanchor="right",
                     x=0.99,
-                    bgcolor="rgba(31, 42, 64, 0.8)",
+                    bgcolor="rgba(255, 255, 255, 0.9)",
                     bordercolor=COLORS["border_color"],
                     borderwidth=1
                 )
@@ -477,7 +477,7 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
                     y=0.99,
                     xanchor="right",
                     x=0.99,
-                    bgcolor="rgba(31, 42, 64, 0.8)",
+                    bgcolor="rgba(255, 255, 255, 0.9)",
                     bordercolor=COLORS["border_color"],
                     borderwidth=1
                 )
@@ -501,7 +501,7 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
                         y=0.99,
                         xanchor="right",
                         x=0.99,
-                        bgcolor="rgba(31, 42, 64, 0.8)",
+                        bgcolor="rgba(255, 255, 255, 0.9)",
                         bordercolor=COLORS["border_color"],
                         borderwidth=1
                     )
@@ -521,7 +521,7 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
                         y=0.99,
                         xanchor="right",
                         x=0.99,
-                        bgcolor="rgba(31, 42, 64, 0.8)",
+                        bgcolor="rgba(255, 255, 255, 0.9)",
                         bordercolor=COLORS["border_color"],
                         borderwidth=1
                     )
@@ -558,7 +558,7 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
                     y=0.99,
                     xanchor="right",
                     x=0.99,
-                    bgcolor="rgba(31, 42, 64, 0.8)",
+                    bgcolor="rgba(255, 255, 255, 0.9)",
                     bordercolor=COLORS["border_color"],
                     borderwidth=1
                 )
@@ -602,7 +602,7 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
                         y=0.99,
                         xanchor="right",
                         x=0.99,
-                        bgcolor="rgba(31, 42, 64, 0.8)",
+                        bgcolor="rgba(255, 255, 255, 0.9)",
                         bordercolor=COLORS["border_color"],
                         borderwidth=1
                     )
@@ -624,7 +624,7 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
                         y=0.99,
                         xanchor="right",
                         x=0.99,
-                        bgcolor="rgba(31, 42, 64, 0.8)",
+                        bgcolor="rgba(255, 255, 255, 0.9)",
                         bordercolor=COLORS["border_color"],
                         borderwidth=1
                     )
@@ -649,7 +649,7 @@ def show(global_threats_original, intrusion_data_original, page="Dashboard Overv
                     y=0.99,
                     xanchor="right",
                     x=0.99,
-                    bgcolor="rgba(31, 42, 64, 0.8)",
+                    bgcolor="rgba(255, 255, 255, 0.9)",
                     bordercolor=COLORS["border_color"],
                     borderwidth=1
                 )

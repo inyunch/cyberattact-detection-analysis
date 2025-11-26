@@ -1409,7 +1409,7 @@ def show_geographic_analysis(df):
             yaxis_title='Total Loss ($M)',
             height=500,
             showlegend=False,
-            plot_bgcolor='rgba(31, 42, 64, 0.3)'
+            plot_bgcolor='rgba(248, 249, 250, 0.5)'
         )
         st.plotly_chart(fig, use_container_width=True)
 
@@ -1446,7 +1446,7 @@ def show_geographic_analysis(df):
             fig.update_layout(
                 height=450,
                 showlegend=False,
-                plot_bgcolor='rgba(31, 42, 64, 0.3)',
+                plot_bgcolor='rgba(248, 249, 250, 0.5)',
                 xaxis=dict(gridcolor=COLORS["border_color"]),
                 yaxis=dict(gridcolor=COLORS["border_color"])
             )
