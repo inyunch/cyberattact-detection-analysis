@@ -1,80 +1,53 @@
 # Cybersecurity Threat Analysis Dashboard
 
-A Streamlit-powered dashboard for analyzing global cybersecurity threats alongside network intrusion patterns. This README has been streamlined to reflect the actual repository contents and provide precise setup instructions.
+Interactive dashboard for analyzing global cybersecurity threats and network intrusion patterns.
 
-## Features
-- Dashboard pages: Dashboard Overview, Global Threat Landscape, Intrusion Detection, Data Explorer, IDA/EDA Analysis, Comparative Insights, Methodology
-- Consistent theming via centralized theme system (modules/theme.py)
-- Robust data loading with clear guidance when datasets are missing
-- Interactive filtering and downloadable data views
+## Quick Start
 
-## Requirements
-- Python 3.8+
-- pip
-
-## Installation
-```
+### Installation
+```bash
 pip install -r requirements.txt
 ```
 
-## Datasets
-Place the following CSV files in the `data/` directory with exact filenames:
-- `data/Global_Cybersecurity_Threats_2015-2024.csv`
-- `data/cybersecurity_intrusion_data.csv`
+### Required Datasets
+Place these files in the `data/` directory:
+- `Global_Cybersecurity_Threats_2015-2024.csv`
+- `cybersecurity_intrusion_data.csv`
 
-If files are missing, the app will show an error and stop with instructions.
-
-## Run locally
-```
+### Run
+```bash
 streamlit run app.py
 ```
-Then open http://localhost:8501 in your browser.
+Open http://localhost:8501
 
-## Deploy to Streamlit Cloud
-- Repo: point to this repository
-- Main file: `app.py`
-- Python version: 3.10 or 3.11
-- Dependencies: `requirements.txt`
-- Pre-run scripts: none
-- Secrets: not required
-
-If you encounter a theming or import error, make sure the app uses Streamlit >= 1.32 (we set this in requirements.txt) and redeploy.
+## Features
+- **Pages**: Dashboard Overview, Global Threat Landscape, Intrusion Detection, Data Explorer, IDA/EDA Analysis, Comparative Insights, Methodology
+- **Theme**: Dark mode with neon accents (centralized in `modules/theme.py`)
+- **Filters**: Interactive global and page-specific filters
+- **Analysis**: Complete IDA/EDA with MICE imputation
 
 ## Project Structure
 ```
-.
-├── app.py
+├── app.py                      # Main entry point
 ├── modules/
-│   ├── home.py
-│   ├── data_explorer.py
-│   ├── data_analysis.py
-│   ├── comparative_insights.py
-│   ├── methodology.py
-│   ├── filters.py
-│   └── theme.py
-├── data/
-│   ├── Global_Cybersecurity_Threats_2015-2024.csv (you provide)
-│   └── cybersecurity_intrusion_data.csv (you provide)
-├── notebooks/
-├── docs/
-├── requirements.txt
-└── LICENSE
+│   ├── theme.py               # Colors and styles
+│   ├── filters.py             # Filter components
+│   └── *.py                   # Page modules
+├── data/                      # CSV datasets
+└── docs/                      # Documentation
 ```
 
 ## Documentation
-For comprehensive documentation, see **[docs/CyberGuard_Dashboard_Documentation.md](docs/CyberGuard_Dashboard_Documentation.md)** which includes:
-- 📖 Complete implementation guide
-- 🎨 Design system and component documentation
-- 🎛️ Filter system implementation guides
-- 🧬 Data analysis methodology and reports
-- 🎯 Quick reference guides by use case
+See **[docs/CyberGuard_Dashboard_Documentation.md](docs/CyberGuard_Dashboard_Documentation.md)** for:
+- Complete implementation guide
+- Design system and components
+- Filter system guide
+- Data analysis methodology
 
-## Notes
-- All UI styling is centralized in `modules/theme.py` via `apply_dashboard_css()` to maintain consistency and avoid code duplication
-- The theme system provides consistent colors, typography, and styling across all dashboard pages
-- Redundant code and unused modules have been removed to reduce maintenance burden
-- `data_analysis.py` includes comprehensive documentation for all analysis functions
-- For advanced EDA and methodology details, see the docs/ folder and notebooks/
+## Deploy to Streamlit Cloud
+- Main file: `app.py`
+- Python version: 3.10+
+- Dependencies: `requirements.txt`
 
 ## License
-MIT — see `LICENSE`.
+MIT — see `LICENSE`
