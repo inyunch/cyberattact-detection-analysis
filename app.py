@@ -183,30 +183,33 @@ with st.sidebar:
     else:
         st.info("No filters available for this page.")
 
-# Main Tabs
+# Define page categories
+product_pages = ["Dashboard Overview", "Global Threat Landscape", "Intrusion Detection", "Comparative Insights"]
+ds_pages = ["Data Explorer", "IDA/EDA Analysis", "Data Encoding", "Methodology"]
+
+# Show tabs
 tab1, tab2 = st.tabs(["📊 Product", "🔬 Data Science"])
 
-# Product Tab
-with tab1:
-    # Product pages
-    product_pages = ["Dashboard Overview", "Global Threat Landscape", "Intrusion Detection", "Comparative Insights"]
-
-    if selected in product_pages:
+# Determine which tab to show content in
+if selected in product_pages:
+    # Show content in Product tab
+    with tab1:
         if selected in ["Dashboard Overview", "Global Threat Landscape", "Intrusion Detection"]:
             from modules import home
             home.show(global_threats, intrusion_data, page=selected)
         elif selected == "Comparative Insights":
             from modules import comparative_insights
             comparative_insights.show(global_threats, intrusion_data)
-    else:
-        st.info("Please select a product page from the sidebar.")
 
-# Data Science Tab
-with tab2:
-    # Data Science pages
-    ds_pages = ["Data Explorer", "IDA/EDA Analysis", "Data Encoding", "Methodology"]
+    with tab2:
+        st.info("👈 Select a Data Science page from the sidebar to view data analysis and methodology.")
 
-    if selected in ds_pages:
+elif selected in ds_pages:
+    # Show content in Data Science tab
+    with tab1:
+        st.info("👈 Select a Product page from the sidebar to view dashboards and insights.")
+
+    with tab2:
         if selected == "Data Explorer":
             from modules import data_explorer
             data_explorer.show(intrusion_data)
@@ -219,5 +222,10 @@ with tab2:
         elif selected == "Methodology":
             from modules import methodology
             methodology.show()
-    else:
-        st.info("Please select a data science page from the sidebar.")
+
+else:
+    # Default view
+    with tab1:
+        st.info("👈 Select a Product page from the sidebar.")
+    with tab2:
+        st.info("👈 Select a Data Science page from the sidebar.")
