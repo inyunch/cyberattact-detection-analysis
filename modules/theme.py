@@ -87,13 +87,15 @@ def get_plotly_theme():
             "tickfont": {"size": 11, "color": COLORS["text_secondary"]}
         },
         "legend": {
-            "bgcolor": "rgba(0,0,0,0)",
+            "bgcolor": "rgba(255, 255, 255, 0.9)",
+            "bordercolor": COLORS["border_color"],
+            "borderwidth": 1,
             "orientation": "h",
             "yanchor": "bottom",
             "y": 1.02,
             "xanchor": "left",
             "x": 0,
-            "font": {"size": 11, "color": COLORS["text_secondary"]}
+            "font": {"size": 11, "color": COLORS["text_primary"]}
         },
         "colorway": COLORS["chart_palette"],
         "margin": {"t": 40, "b": 30, "l": 30, "r": 30}
