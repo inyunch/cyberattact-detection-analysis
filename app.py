@@ -20,7 +20,7 @@ if "page" in _qp:
     page_from_query = str(page_from_query).replace('_', ' ')
     allowed_pages = [
         "Dashboard Overview", "Global Threat Landscape", "Intrusion Detection",
-        "Data Explorer", "IDA/EDA Analysis", "Comparative Insights", "Methodology"
+        "Data Explorer", "Data Encoding", "IDA/EDA Analysis", "Comparative Insights", "Methodology"
     ]
     if page_from_query in allowed_pages:
         st.session_state.selected_page = page_from_query
@@ -145,6 +145,7 @@ with st.sidebar:
 
     nav_item("Analysis", None, is_header=True)
     nav_item("Data Explorer", "Data_Explorer", icon="🔍")
+    nav_item("Data Encoding", "Data_Encoding", icon="🔢")
     nav_item("IDA/EDA Analysis", "IDA/EDA_Analysis", icon="📊")
     nav_item("Comparative Insights", "Comparative_Insights", icon="💡")
 
@@ -190,6 +191,9 @@ if selected in dash_pages:
 elif selected == "Data Explorer":
     from modules import data_explorer
     data_explorer.show(intrusion_data)
+elif selected == "Data Encoding":
+    from modules import data_encoding
+    data_encoding.show(global_threats, intrusion_data)
 elif selected == "IDA/EDA Analysis":
     from modules import data_analysis
     data_analysis.show(global_threats, intrusion_data)
