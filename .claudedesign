@@ -92,127 +92,117 @@ Contextual filters that appear only on relevant pages:
 ✅ Use BLUE (#00D9FF) and GREEN (#00FFB3) gradients for all regular buttons
 ✅ Sidebar preset buttons (3Y, 5Y, All) MUST be blue, never red!
 
-**Color Specifications**:
+**Color Specifications (Light Theme)**:
 ```css
 /* Core Colors (hex values for inline styles) */
---bg-primary: #141B2D          /* Main background */
---bg-secondary: #1F2A40        /* Cards, panels */
---bg-tertiary: #0F1520         /* Darker elements */
---bg-hover: #2A3650            /* Hover states */
+--bg-primary: #F8F9FA          /* Main background */
+--bg-secondary: #FFFFFF        /* Cards, panels */
+--bg-tertiary: #E9ECEF         /* Slightly darker */
+--bg-hover: #DEE2E6            /* Hover states */
 
---text-primary: #E8EAF0        /* Main text */
---text-secondary: #A0A7B8      /* Secondary text */
---text-muted: #6C7489          /* Labels, muted text */
+--text-primary: #1A1A1A        /* Main text */
+--text-secondary: #4A5568      /* Secondary text */
+--text-muted: #718096          /* Labels, muted text */
 
---accent-blue: #00D9FF         /* Primary accent */
---accent-green: #00FFB3        /* Secondary accent */
---accent-purple: #7B61FF       /* Tertiary accent */
---accent-orange: #FF9F43       /* Warning/attention */
---accent-red: #FF5370          /* Error/remove */
+--accent-blue: #3182CE         /* Primary accent */
+--accent-green: #38A169        /* Secondary accent */
+--accent-purple: #805AD5       /* Tertiary accent */
+--accent-orange: #DD6B20       /* Warning/attention */
+--accent-red: #E53E3E          /* Error/remove */
 
---border-color: #2E3A52        /* Standard borders */
+--border-color: #E2E8F0        /* Standard borders */
 ```
 
-**Filter Component Colors**:
+**Filter Component Colors (Light Theme)**:
 ```css
 /* Time Period Container (All Sections) */
-background: linear-gradient(135deg,
-    rgba(0, 217, 255, 0.08) 0%,
-    rgba(0, 255, 179, 0.08) 100%);
-border: 1px solid rgba(0, 217, 255, 0.3);
+background: #FFFFFF;
+border: 1px solid #E2E8F0;
 border-radius: 12px;
 padding: 16px;
 margin-bottom: 12px;
-box-shadow: 0 4px 16px rgba(0, 217, 255, 0.1);
+box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
 /* Section Overlap Technique */
 margin-top: -12px;  /* Use on middle/footer sections to visually connect */
 
 /* Time Period Header */
 icon: 📅 (calendar, 18px)
-title: "Time Period" (0.95rem, 700 weight, #E8EAF0)
+title: "Time Period" (0.95rem, 700 weight, #1A1A1A)
 no-badge: DO NOT show active count badge
 
 /* Active Filter Chips Container */
-background: linear-gradient(135deg,
-    rgba(0, 217, 255, 0.05) 0%,
-    rgba(0, 255, 179, 0.05) 50%,
-    rgba(123, 97, 255, 0.05) 100%);
-border: 1px solid rgba(0, 217, 255, 0.2);
-top-border: linear-gradient(90deg, #00D9FF 0%, #00FFB3 50%, #7B61FF 100%);
+background: #FFFFFF;
+border: 1px solid #E2E8F0;
+border-radius: 12px;
+box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 
 /* Filter Chip - Blue (Global) */
-background: linear-gradient(135deg,
-    rgba(0, 217, 255, 0.2) 0%,
-    rgba(0, 217, 255, 0.1) 100%);
-border: 1.5px solid rgba(0, 217, 255, 0.5);
+background: rgba(49, 130, 206, 0.1);
+border: 1.5px solid #3182CE;
+color: #3182CE;
 
 /* Filter Chip - Green (Page) */
-background: linear-gradient(135deg,
-    rgba(0, 255, 179, 0.2) 0%,
-    rgba(0, 255, 179, 0.1) 100%);
-border: 1.5px solid rgba(0, 255, 179, 0.5);
+background: rgba(56, 161, 105, 0.1);
+border: 1.5px solid #38A169;
+color: #38A169;
 
 /* Filter Chip - Purple (Ranges) */
-background: linear-gradient(135deg,
-    rgba(123, 97, 255, 0.2) 0%,
-    rgba(123, 97, 255, 0.1) 100%);
-border: 1.5px solid rgba(123, 97, 255, 0.5);
+background: rgba(128, 90, 213, 0.1);
+border: 1.5px solid #805AD5;
+color: #805AD5;
 
 /* Filter Chip - Orange (Other) */
-background: linear-gradient(135deg,
-    rgba(255, 159, 67, 0.2) 0%,
-    rgba(255, 159, 67, 0.1) 100%);
-border: 1.5px solid rgba(255, 159, 67, 0.5);
+background: rgba(221, 107, 32, 0.1);
+border: 1.5px solid #DD6B20;
+color: #DD6B20;
 
 /* Selected Year Range Display */
-background: linear-gradient(135deg,
-    rgba(0, 217, 255, 0.15) 0%,
-    rgba(0, 255, 179, 0.15) 100%);
+background: rgba(49, 130, 206, 0.08);
 border-radius: 8px;
 padding: 10px;
 text-align: center;
-start-year-color: #00D9FF (1.1rem, 700 weight, JetBrains Mono);
-arrow: → (#6C7489, 600 weight);
-end-year-color: #00FFB3 (1.1rem, 700 weight, JetBrains Mono);
+start-year-color: #3182CE (1.1rem, 700 weight, JetBrains Mono);
+arrow: → (#718096, 600 weight);
+end-year-color: #38A169 (1.1rem, 700 weight, JetBrains Mono);
 
-/* Sidebar Preset Buttons (3Y, 5Y, All) - MUST BE BLUE, NOT RED! */
+/* Sidebar Preset Buttons (3Y, 5Y, All) */
 background: transparent;
-background-image: linear-gradient(135deg, rgba(0, 217, 255, 0.12) 0%, rgba(0, 255, 179, 0.12) 100%);
-color: #00D9FF;
-border: 1.5px solid rgba(0, 217, 255, 0.5);
-hover-background: linear-gradient(135deg, rgba(0, 217, 255, 0.25) 0%, rgba(0, 255, 179, 0.25) 100%);
-hover-color: #00FFB3;
+background-image: rgba(49, 130, 206, 0.08);
+color: #3182CE;
+border: 1.5px solid #3182CE;
+hover-background: rgba(49, 130, 206, 0.15);
+hover-color: #38A169;
 
-/* Clear All Button - RED IS OK HERE (destructive action) */
+/* Clear All Button - RED for destructive action */
 background: transparent;
-border: 1px solid rgba(255, 83, 112, 0.5);
-color: #FF5370;
-hover-background: rgba(255, 83, 112, 0.1);
+border: 1px solid #E53E3E;
+color: #E53E3E;
+hover-background: rgba(229, 62, 62, 0.1);
 
-/* Filter Stats - Intensity Colors */
-< 25% filtered: #00FFB3 (green - light filtering, broad view)
-25-50% filtered: #00D9FF (blue - moderate filtering, balanced)
-50-75% filtered: #FF9F43 (orange - heavy filtering, focused)
-> 75% filtered: #7B61FF (purple - very focused, precision filtering)
+/* Filter Stats - Intensity Colors (Light theme) */
+< 25% filtered: #38A169 (green - light filtering, broad view)
+25-50% filtered: #3182CE (blue - moderate filtering, balanced)
+50-75% filtered: #DD6B20 (orange - heavy filtering, focused)
+> 75% filtered: #805AD5 (purple - very focused, precision filtering)
 
 /* Progress Bar */
-track: rgba(255, 255, 255, 0.05);
-fill: linear-gradient(90deg, #00D9FF 0%, #00FFB3 100%);
+track: rgba(0, 0, 0, 0.05);
+fill: linear-gradient(90deg, #3182CE 0%, #38A169 100%);
 glow: dynamic based on intensity color
 ```
 
-**Visual Design Standards**:
+**Visual Design Standards (Light Theme)**:
 ```css
 /* Filter container */
-background: #1F2A40;
-border: 1px solid #2E3A52;
+background: #FFFFFF;
+border: 1px solid #E2E8F0;
 border-radius: 12px;
 padding: 16px;
-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 
 /* Filter section headers */
-color: #6C7489;
+color: #718096;
 font-size: 0.75rem;
 font-weight: 600;
 text-transform: uppercase;

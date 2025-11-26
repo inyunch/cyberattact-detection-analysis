@@ -1,10 +1,10 @@
 [theme]
-# Force dark theme to match our custom CSS
-base = "dark"
-primaryColor = "#00D9FF"
-backgroundColor = "#141B2D"
-secondaryBackgroundColor = "#1F2A40"
-textColor = "#E8EAF0"
+# Light theme configuration
+base = "light"
+primaryColor = "#3182CE"
+backgroundColor = "#F8F9FA"
+secondaryBackgroundColor = "#FFFFFF"
+textColor = "#1A1A1A"
 font = "sans serif"
 
 [server]

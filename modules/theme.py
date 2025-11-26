@@ -623,12 +623,12 @@ def apply_dashboard_css(sidebar_width: int = 300):
             font-weight: 500 !important;
         }}
 
-        /* Multiselect - Remove red backgrounds from selected items/chips */
+        /* Multiselect - Chips for light theme */
         .stMultiSelect [data-baseweb="tag"],
         .stMultiSelect span[data-baseweb="tag"] {{
-            background-color: rgba(0, 217, 255, 0.15) !important;
-            border-color: rgba(0, 217, 255, 0.4) !important;
-            color: var(--text-primary) !important;
+            background-color: rgba(49, 130, 206, 0.1) !important;
+            border-color: var(--accent-blue) !important;
+            color: var(--accent-blue) !important;
         }}
 
         /* Multiselect dropdown menu */

@@ -135,17 +135,17 @@ def global_filter_sidebar(global_threats: pd.DataFrame) -> Dict[str, Any]:
         if st.session_state['global_filters']['year_range'] is None:
             st.session_state['global_filters']['year_range'] = (min_year, max_year)
 
-        # Time Period Container - header with top border
+        # Time Period Container - header with top border (Light theme)
         with st.sidebar.container():
-            st.markdown("""<div style="background: linear-gradient(135deg, rgba(0, 217, 255, 0.08) 0%, rgba(0, 255, 179, 0.08) 100%); border: 1px solid rgba(0, 217, 255, 0.3); border-bottom: none; border-radius: 12px 12px 0 0; padding: 16px 18px 14px 18px; margin-bottom: 0px; box-shadow: 0 4px 16px rgba(0, 217, 255, 0.1);">
+            st.markdown("""<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-bottom: none; border-radius: 12px 12px 0 0; padding: 16px 18px 14px 18px; margin-bottom: 0px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
 <div style="display: flex; align-items: center; gap: 8px;">
 <span style="font-size: 18px;">📅</span>
-<span style="font-size: 0.95rem; font-weight: 700; color: #E8EAF0;">Time Period</span>
+<span style="font-size: 0.95rem; font-weight: 700; color: #1A1A1A;">Time Period</span>
 </div>
 </div>""", unsafe_allow_html=True)
 
             # Dropdowns wrapper with side borders and background
-            st.markdown("""<div style="background: linear-gradient(135deg, rgba(0, 217, 255, 0.08) 0%, rgba(0, 255, 179, 0.08) 100%); border-left: 1px solid rgba(0, 217, 255, 0.3); border-right: 1px solid rgba(0, 217, 255, 0.3); padding: 0px 18px 8px 18px; margin-top: 0px; margin-bottom: 0px;">
+            st.markdown("""<div style="background: #FFFFFF; border-left: 1px solid #E2E8F0; border-right: 1px solid #E2E8F0; padding: 0px 18px 8px 18px; margin-top: 0px; margin-bottom: 0px;">
 </div>""", unsafe_allow_html=True)
 
             # Year selection dropdowns
@@ -168,8 +168,8 @@ def global_filter_sidebar(global_threats: pd.DataFrame) -> Dict[str, Any]:
                     key='end_year_select'
                 )
 
-            # Bottom border closure
-            st.markdown("""<div style="background: linear-gradient(135deg, rgba(0, 217, 255, 0.08) 0%, rgba(0, 255, 179, 0.08) 100%); border: 1px solid rgba(0, 217, 255, 0.3); border-top: none; border-radius: 0 0 12px 12px; padding: 10px; margin-top: 0px; margin-bottom: 20px;">
+            # Bottom border closure (Light theme)
+            st.markdown("""<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-top: none; border-radius: 0 0 12px 12px; padding: 10px; margin-top: 0px; margin-bottom: 20px;">
 </div>""", unsafe_allow_html=True)
 
         # Ensure start_year <= end_year
@@ -252,23 +252,27 @@ def filter_summary_chips(active_filters: Dict[str, Any], page_filters: Optional[
                     'color': 'orange'
                 })
 
-    # Color schemes for different chip types
+    # Color schemes for different chip types - Light theme
     color_schemes = {
         'blue': {
-            'bg': 'linear-gradient(135deg, rgba(0, 217, 255, 0.2) 0%, rgba(0, 217, 255, 0.1) 100%)',
-            'border': 'rgba(0, 217, 255, 0.5)',
+            'bg': 'rgba(49, 130, 206, 0.1)',
+            'border': '#3182CE',
+            'text': '#3182CE'
         },
         'green': {
-            'bg': 'linear-gradient(135deg, rgba(0, 255, 179, 0.2) 0%, rgba(0, 255, 179, 0.1) 100%)',
-            'border': 'rgba(0, 255, 179, 0.5)',
+            'bg': 'rgba(56, 161, 105, 0.1)',
+            'border': '#38A169',
+            'text': '#38A169'
         },
         'purple': {
-            'bg': 'linear-gradient(135deg, rgba(123, 97, 255, 0.2) 0%, rgba(123, 97, 255, 0.1) 100%)',
-            'border': 'rgba(123, 97, 255, 0.5)',
+            'bg': 'rgba(128, 90, 213, 0.1)',
+            'border': '#805AD5',
+            'text': '#805AD5'
         },
         'orange': {
-            'bg': 'linear-gradient(135deg, rgba(255, 159, 67, 0.2) 0%, rgba(255, 159, 67, 0.1) 100%)',
-            'border': 'rgba(255, 159, 67, 0.5)',
+            'bg': 'rgba(221, 107, 32, 0.1)',
+            'border': '#DD6B20',
+            'text': '#DD6B20'
         }
     }
 
@@ -277,16 +281,16 @@ def filter_summary_chips(active_filters: Dict[str, Any], page_filters: Optional[
     if chips:
         for chip in chips:
             color_scheme = color_schemes.get(chip.get('color', 'blue'), color_schemes['blue'])
-            chips_html += f'<div style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: {color_scheme["bg"]}; border: 1.5px solid {color_scheme["border"]}; border-radius: 24px; font-size: 0.85rem; font-weight: 600; color: #E8EAF0; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); transition: all 0.2s ease; cursor: default;"><span style="font-size: 14px; line-height: 1;">{chip["icon"]}</span><span style="letter-spacing: 0.02em;">{chip["label"]}</span></div>'
+            chips_html += f'<div style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: {color_scheme["bg"]}; border: 1.5px solid {color_scheme["border"]}; border-radius: 24px; font-size: 0.85rem; font-weight: 600; color: {color_scheme["text"]}; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); transition: all 0.2s ease; cursor: default;"><span style="font-size: 14px; line-height: 1;">{chip["icon"]}</span><span style="letter-spacing: 0.02em;">{chip["label"]}</span></div>'
     else:
-        chips_html = '<div style="flex: 1; display: flex; align-items: center; justify-content: center; color: #6C7489; font-size: 0.85rem;">No filters applied</div>'
+        chips_html = '<div style="flex: 1; display: flex; align-items: center; justify-content: center; color: #718096; font-size: 0.85rem;">No filters applied</div>'
 
-    # Render complete HTML in one call with consistent height
-    html_content = f'''<div style="position: relative; background: linear-gradient(135deg, rgba(0, 217, 255, 0.08) 0%, rgba(0, 255, 179, 0.08) 100%); border: 1px solid rgba(0, 217, 255, 0.3); border-radius: 12px; padding: 18px; box-shadow: 0 4px 16px rgba(0, 217, 255, 0.1); min-height: 200px; display: flex; flex-direction: column;">
+    # Render complete HTML in one call with consistent height - Light theme
+    html_content = f'''<div style="position: relative; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 18px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); min-height: 200px; display: flex; flex-direction: column;">
 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">
 <span style="font-size: 18px;">✨</span>
-<span style="font-size: 0.95rem; font-weight: 700; color: #E8EAF0;">Active Filters</span>
-<div style="background: linear-gradient(135deg, #00D9FF 0%, #00FFB3 100%); color: #141B2D; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; box-shadow: 0 2px 8px rgba(0, 217, 255, 0.3); margin-left: auto;">{len(chips)}</div>
+<span style="font-size: 0.95rem; font-weight: 700; color: #1A1A1A;">Active Filters</span>
+<div style="background: #3182CE; color: #FFFFFF; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); margin-left: auto;">{len(chips)}</div>
 </div>
 <div style="flex: 1; display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-start; align-content: flex-start;">
 {chips_html}
