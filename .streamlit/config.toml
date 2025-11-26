@@ -1,0 +1,16 @@
+[theme]
+# Force dark theme to match our custom CSS
+primaryColor = "#00D9FF"
+backgroundColor = "#141B2D"
+secondaryBackgroundColor = "#1F2A40"
+textColor = "#E8EAF0"
+font = "sans serif"
+
+[server]
+# Improve performance
+enableXsrfProtection = false
+enableCORS = false
+
+[browser]
+# Better UX
+gatherUsageStats = false
