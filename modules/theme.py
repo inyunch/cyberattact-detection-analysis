@@ -182,7 +182,7 @@ def add_inplot_title(fig, text: str):
         showarrow=False,
         align='left',
         font=dict(size=16, color=COLORS["text_primary"], family=FONTS["primary"]),
-        bgcolor='rgba(15,21,32,0.55)'
+        bgcolor='rgba(248, 249, 250, 0.9)'
     )
     try:
         existing_anns = list(fig.layout.annotations) if getattr(fig.layout, 'annotations', None) else []

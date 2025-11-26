@@ -106,24 +106,24 @@ def global_filter_sidebar(global_threats: pd.DataFrame) -> Dict[str, Any]:
 
     st.sidebar.markdown("---")
 
-    # CSS for slider and selectbox colors
+    # CSS for slider and selectbox colors (Light theme)
     st.sidebar.markdown("""
         <style>
         .stSlider > div > div > div > div {
-            background: #00D9FF !important;
+            background: #3182CE !important;
         }
         .stSlider > div > div > div > div > div {
-            background: #00D9FF !important;
-            box-shadow: 0 0 8px rgba(0, 217, 255, 0.5) !important;
+            background: #3182CE !important;
+            box-shadow: 0 0 8px rgba(49, 130, 206, 0.5) !important;
         }
         .stSlider > div > div > div {
-            background: rgba(0, 217, 255, 0.2) !important;
+            background: rgba(49, 130, 206, 0.15) !important;
         }
 
         /* Selectbox styling for Time Period */
         [data-testid="stSidebar"] [data-baseweb="select"] > div {
             background: transparent !important;
-            border-color: rgba(0, 217, 255, 0.3) !important;
+            border-color: #E2E8F0 !important;
         }
         </style>
     """, unsafe_allow_html=True)
@@ -341,7 +341,7 @@ def page_filter_panel_global_threats(global_threats: pd.DataFrame, page_name: st
     """
     init_filter_state()
 
-    st.markdown('<div style="padding: 12px 16px; background: linear-gradient(135deg, rgba(0, 217, 255, 0.05) 0%, rgba(0, 255, 179, 0.05) 100%); border: 1px solid rgba(0, 217, 255, 0.2); border-radius: 12px; margin-bottom: 16px;"><p style="margin: 0; font-size: 0.85rem; color: #A0A7B8; text-align: center;"><span style="color: #00D9FF; font-weight: 600;">Customize</span> this page\'s visualization by applying specific filters below</p></div>', unsafe_allow_html=True)
+    st.markdown('<div style="padding: 12px 16px; background: rgba(49, 130, 206, 0.05); border: 1px solid #E2E8F0; border-radius: 12px; margin-bottom: 16px;"><p style="margin: 0; font-size: 0.85rem; color: #4A5568; text-align: center;"><span style="color: #3182CE; font-weight: 600;">Customize</span> this page\'s visualization by applying specific filters below</p></div>', unsafe_allow_html=True)
 
     # Attack Type filter
     attack_types_options = ["All"] + sorted(global_threats['Attack Type'].dropna().unique()) if 'Attack Type' in global_threats.columns else ["All"]
@@ -512,35 +512,35 @@ def show_filter_stats(original_count: int, filtered_count: int):
     reduction = original_count - filtered_count
     percentage = (reduction / original_count * 100) if original_count > 0 else 0
 
-    # Determine color based on filter intensity
+    # Determine color based on filter intensity (Light theme)
     if percentage < 25:
-        bar_color = '#00FFB3'
-        glow_color = 'rgba(0, 255, 179, 0.3)'
+        bar_color = '#38A169'
+        glow_color = 'rgba(56, 161, 105, 0.3)'
     elif percentage < 50:
-        bar_color = '#00D9FF'
-        glow_color = 'rgba(0, 217, 255, 0.3)'
+        bar_color = '#3182CE'
+        glow_color = 'rgba(49, 130, 206, 0.3)'
     elif percentage < 75:
-        bar_color = '#FF9F43'
-        glow_color = 'rgba(255, 159, 67, 0.3)'
+        bar_color = '#DD6B20'
+        glow_color = 'rgba(221, 107, 32, 0.3)'
     else:
-        bar_color = '#7B61FF'
-        glow_color = 'rgba(123, 97, 255, 0.3)'
+        bar_color = '#805AD5'
+        glow_color = 'rgba(128, 90, 213, 0.3)'
 
-    stats_html = f'''<div style="position: relative; background: #1F2A40; border: 1px solid #2E3A52; border-radius: 16px; padding: 20px 24px; margin-bottom: 20px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3); overflow: hidden;">
-<div style="position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: linear-gradient(180deg, #00D9FF 0%, #00FFB3 100%); box-shadow: 0 0 12px {glow_color};"></div>
+    stats_html = f'''<div style="position: relative; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; padding: 20px 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); overflow: hidden;">
+<div style="position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: linear-gradient(180deg, #3182CE 0%, #38A169 100%); box-shadow: 0 0 8px {glow_color};"></div>
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
 <div style="display: flex; align-items: baseline; gap: 8px;">
-<span style="font-size: 2rem; font-weight: 800; color: #E8EAF0; font-family: 'JetBrains Mono', monospace; letter-spacing: -0.02em; text-shadow: 0 0 20px rgba(0, 217, 255, 0.3);">{filtered_count:,}</span>
-<span style="font-size: 0.9rem; color: #A0A7B8;">/ {original_count:,}</span>
+<span style="font-size: 2rem; font-weight: 800; color: #1A1A1A; font-family: 'JetBrains Mono', monospace; letter-spacing: -0.02em;">{filtered_count:,}</span>
+<span style="font-size: 0.9rem; color: #4A5568;">/ {original_count:,}</span>
 </div>
-<span style="font-size: 0.8rem; color: #6C7489; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Showing</span>
+<span style="font-size: 0.8rem; color: #718096; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Showing</span>
 </div>
-<div style="width: 100%; height: 6px; background: rgba(255, 255, 255, 0.05); border-radius: 3px; overflow: hidden;">
-<div style="width: {100 - percentage}%; height: 100%; background: linear-gradient(90deg, #00D9FF 0%, #00FFB3 100%); border-radius: 3px; box-shadow: 0 0 10px {glow_color}; transition: width 0.3s ease;"></div>
+<div style="width: 100%; height: 6px; background: rgba(0, 0, 0, 0.05); border-radius: 3px; overflow: hidden;">
+<div style="width: {100 - percentage}%; height: 100%; background: linear-gradient(90deg, #3182CE 0%, #38A169 100%); border-radius: 3px; box-shadow: 0 0 6px {glow_color}; transition: width 0.3s ease;"></div>
 </div>
 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
-<div style="font-size: 0.75rem; color: #6C7489;">{reduction:,} records filtered out</div>
-<div style="padding: 4px 12px; background: linear-gradient(135deg, {bar_color} 0%, {bar_color} 100%); border-radius: 12px; font-size: 0.8rem; color: #141B2D; font-weight: 700; font-family: 'JetBrains Mono', monospace; box-shadow: 0 2px 8px {glow_color};">{percentage:.1f}%</div>
+<div style="font-size: 0.75rem; color: #718096;">{reduction:,} records filtered out</div>
+<div style="padding: 4px 12px; background: {bar_color}; border-radius: 12px; font-size: 0.8rem; color: #FFFFFF; font-weight: 700; font-family: 'JetBrains Mono', monospace; box-shadow: 0 2px 4px {glow_color};">{percentage:.1f}%</div>
 </div>
 </div>'''
 
