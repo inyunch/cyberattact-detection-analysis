@@ -611,6 +611,18 @@ def apply_dashboard_css(sidebar_width: int = 300):
             color: var(--text-primary);
         }}
 
+        /* Input Labels - Remove red color, use theme colors */
+        .stTextInput > label,
+        .stSelectbox > label,
+        .stMultiSelect > label,
+        .stSlider > label,
+        .stNumberInput > label,
+        [data-testid="stWidgetLabel"] {{
+            color: var(--text-secondary) !important;
+            font-size: 0.9rem !important;
+            font-weight: 500 !important;
+        }}
+
         /* Slider */
         .stSlider > div > div > div > div {{
             background: var(--accent-blue);
