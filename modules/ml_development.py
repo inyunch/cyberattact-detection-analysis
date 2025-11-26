@@ -51,17 +51,14 @@ def show(global_threats, intrusion_data):
     @st.cache_data
     def analyze_features(df):
         """Analyze and rank features by importance"""
-        # Select numerical features
-        feature_cols = ['duration', 'src_bytes', 'dst_bytes', 'land', 'wrong_fragment',
-                       'urgent', 'hot', 'num_failed_logins', 'logged_in', 'num_compromised',
-                       'root_shell', 'su_attempted', 'num_root', 'num_file_creations',
-                       'num_shells', 'num_access_files', 'count', 'srv_count',
-                       'serror_rate', 'srv_serror_rate', 'rerror_rate', 'srv_rerror_rate',
-                       'same_srv_rate', 'diff_srv_rate', 'srv_diff_host_rate']
+        # Get all numeric columns except target
+        numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
 
-        available_features = [col for col in feature_cols if col in df.columns]
+        # Remove target and ID columns
+        exclude_cols = ['attack_detected', 'session_id', 'id']
+        available_features = [col for col in numeric_cols if col not in exclude_cols]
 
-        if len(available_features) < 5:
+        if len(available_features) < 2:
             return None, None, None
 
         X = df[available_features].copy()
@@ -69,6 +66,11 @@ def show(global_threats, intrusion_data):
 
         # Handle missing values
         X = X.fillna(X.mean())
+
+        # Encode categorical columns if any remain
+        for col in X.select_dtypes(include=['object']).columns:
+            le = LabelEncoder()
+            X[col] = le.fit_transform(X[col].astype(str))
 
         # Train quick Random Forest to get feature importance
         rf = RandomForestClassifier(n_estimators=50, random_state=42, max_depth=10)
@@ -157,17 +159,20 @@ def show(global_threats, intrusion_data):
     @st.cache_data
     def prepare_ml_data(df):
         """Prepare data for ML training"""
-        feature_columns = ['duration', 'src_bytes', 'dst_bytes', 'land', 'wrong_fragment',
-                          'urgent', 'hot', 'num_failed_logins', 'logged_in', 'num_compromised',
-                          'root_shell', 'su_attempted', 'num_root', 'num_file_creations',
-                          'num_shells', 'num_access_files', 'count', 'srv_count',
-                          'serror_rate', 'srv_serror_rate', 'rerror_rate', 'srv_rerror_rate',
-                          'same_srv_rate', 'diff_srv_rate', 'srv_diff_host_rate']
+        # Get all numeric columns except target
+        numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
 
-        available_features = [col for col in feature_columns if col in df.columns]
+        # Remove target and ID columns
+        exclude_cols = ['attack_detected', 'session_id', 'id']
+        available_features = [col for col in numeric_cols if col not in exclude_cols]
 
         X = df[available_features].copy()
         y = df['attack_detected'] if 'attack_detected' in df.columns else df.iloc[:, -1]
+
+        # Encode any remaining categorical columns
+        for col in X.select_dtypes(include=['object']).columns:
+            le = LabelEncoder()
+            X[col] = le.fit_transform(X[col].astype(str))
 
         # Handle missing values
         X = X.fillna(X.mean())
