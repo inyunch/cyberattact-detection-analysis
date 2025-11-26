@@ -183,23 +183,41 @@ with st.sidebar:
     else:
         st.info("No filters available for this page.")
 
-# Page Routing
-dash_pages = ["Dashboard Overview", "Global Threat Landscape", "Intrusion Detection"]
-if selected in dash_pages:
-    from modules import home
-    home.show(global_threats, intrusion_data, page=selected)
-elif selected == "Data Explorer":
-    from modules import data_explorer
-    data_explorer.show(intrusion_data)
-elif selected == "IDA/EDA Analysis":
-    from modules import data_analysis
-    data_analysis.show(global_threats, intrusion_data)
-elif selected == "Data Encoding":
-    from modules import data_encoding
-    data_encoding.show(global_threats, intrusion_data)
-elif selected == "Comparative Insights":
-    from modules import comparative_insights
-    comparative_insights.show(global_threats, intrusion_data)
-elif selected == "Methodology":
-    from modules import methodology
-    methodology.show()
+# Main Tabs
+tab1, tab2 = st.tabs(["📊 Product", "🔬 Data Science"])
+
+# Product Tab
+with tab1:
+    # Product pages
+    product_pages = ["Dashboard Overview", "Global Threat Landscape", "Intrusion Detection", "Comparative Insights"]
+
+    if selected in product_pages:
+        if selected in ["Dashboard Overview", "Global Threat Landscape", "Intrusion Detection"]:
+            from modules import home
+            home.show(global_threats, intrusion_data, page=selected)
+        elif selected == "Comparative Insights":
+            from modules import comparative_insights
+            comparative_insights.show(global_threats, intrusion_data)
+    else:
+        st.info("Please select a product page from the sidebar.")
+
+# Data Science Tab
+with tab2:
+    # Data Science pages
+    ds_pages = ["Data Explorer", "IDA/EDA Analysis", "Data Encoding", "Methodology"]
+
+    if selected in ds_pages:
+        if selected == "Data Explorer":
+            from modules import data_explorer
+            data_explorer.show(intrusion_data)
+        elif selected == "IDA/EDA Analysis":
+            from modules import data_analysis
+            data_analysis.show(global_threats, intrusion_data)
+        elif selected == "Data Encoding":
+            from modules import data_encoding
+            data_encoding.show(global_threats, intrusion_data)
+        elif selected == "Methodology":
+            from modules import methodology
+            methodology.show()
+    else:
+        st.info("Please select a data science page from the sidebar.")
