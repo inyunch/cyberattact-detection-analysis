@@ -623,6 +623,49 @@ def apply_dashboard_css(sidebar_width: int = 300):
             font-weight: 500 !important;
         }}
 
+        /* Multiselect - Remove red backgrounds from selected items/chips */
+        .stMultiSelect [data-baseweb="tag"],
+        .stMultiSelect span[data-baseweb="tag"] {{
+            background-color: rgba(0, 217, 255, 0.15) !important;
+            border-color: rgba(0, 217, 255, 0.4) !important;
+            color: var(--text-primary) !important;
+        }}
+
+        /* Multiselect dropdown menu */
+        .stMultiSelect [data-baseweb="popover"],
+        [data-baseweb="popover"] {{
+            background-color: var(--bg-secondary) !important;
+        }}
+
+        /* Multiselect options in dropdown */
+        .stMultiSelect [role="option"],
+        [data-baseweb="menu"] [role="option"] {{
+            background-color: var(--bg-secondary) !important;
+            color: var(--text-primary) !important;
+        }}
+
+        .stMultiSelect [role="option"]:hover,
+        [data-baseweb="menu"] [role="option"]:hover {{
+            background-color: var(--bg-hover) !important;
+            color: var(--accent-blue) !important;
+        }}
+
+        /* Selectbox dropdown options */
+        .stSelectbox [data-baseweb="popover"],
+        .stSelectbox [data-baseweb="menu"] {{
+            background-color: var(--bg-secondary) !important;
+        }}
+
+        .stSelectbox [role="option"] {{
+            background-color: var(--bg-secondary) !important;
+            color: var(--text-primary) !important;
+        }}
+
+        .stSelectbox [role="option"]:hover {{
+            background-color: var(--bg-hover) !important;
+            color: var(--accent-blue) !important;
+        }}
+
         /* Slider */
         .stSlider > div > div > div > div {{
             background: var(--accent-blue);
