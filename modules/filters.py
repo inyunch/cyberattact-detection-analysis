@@ -122,7 +122,7 @@ def global_filter_sidebar(global_threats: pd.DataFrame) -> Dict[str, Any]:
 
         /* Selectbox styling for Time Period */
         [data-testid="stSidebar"] [data-baseweb="select"] > div {
-            background: linear-gradient(135deg, rgba(0, 217, 255, 0.08) 0%, rgba(0, 255, 179, 0.08) 100%) !important;
+            background: transparent !important;
             border-color: rgba(0, 217, 255, 0.3) !important;
         }
         </style>
