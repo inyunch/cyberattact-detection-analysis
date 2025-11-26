@@ -138,18 +138,16 @@ with st.sidebar:
             </a>
             ''', unsafe_allow_html=True)
 
-    nav_item("Dashboard", None, is_header=True)
+    nav_item("📊 Product", None, is_header=True)
     nav_item("Dashboard Overview", "Dashboard_Overview", icon="📊")
     nav_item("Global Threat Landscape", "Global_Threat_Landscape", icon="🌍")
     nav_item("Intrusion Detection", "Intrusion_Detection", icon="🛡️")
-
-    nav_item("Analysis", None, is_header=True)
-    nav_item("Data Explorer", "Data_Explorer", icon="🔍")
-    nav_item("IDA/EDA Analysis", "IDA/EDA_Analysis", icon="📊")
-    nav_item("Data Encoding", "Data_Encoding", icon="🔢")
     nav_item("Comparative Insights", "Comparative_Insights", icon="💡")
 
-    nav_item("Documentation", None, is_header=True)
+    nav_item("🔬 Data Science", None, is_header=True)
+    nav_item("Data Explorer", "Data_Explorer", icon="🔍")
+    nav_item("IDA/EDA Analysis", "IDA/EDA_Analysis", icon="📈")
+    nav_item("Data Encoding", "Data_Encoding", icon="🔢")
     nav_item("Methodology", "Methodology", icon="📖")
 
     selected = st.session_state.selected_page
@@ -183,49 +181,23 @@ with st.sidebar:
     else:
         st.info("No filters available for this page.")
 
-# Define page categories
-product_pages = ["Dashboard Overview", "Global Threat Landscape", "Intrusion Detection", "Comparative Insights"]
-ds_pages = ["Data Explorer", "IDA/EDA Analysis", "Data Encoding", "Methodology"]
-
-# Show tabs
-tab1, tab2 = st.tabs(["📊 Product", "🔬 Data Science"])
-
-# Determine which tab to show content in
-if selected in product_pages:
-    # Show content in Product tab
-    with tab1:
-        if selected in ["Dashboard Overview", "Global Threat Landscape", "Intrusion Detection"]:
-            from modules import home
-            home.show(global_threats, intrusion_data, page=selected)
-        elif selected == "Comparative Insights":
-            from modules import comparative_insights
-            comparative_insights.show(global_threats, intrusion_data)
-
-    with tab2:
-        st.info("👈 Select a Data Science page from the sidebar to view data analysis and methodology.")
-
-elif selected in ds_pages:
-    # Show content in Data Science tab
-    with tab1:
-        st.info("👈 Select a Product page from the sidebar to view dashboards and insights.")
-
-    with tab2:
-        if selected == "Data Explorer":
-            from modules import data_explorer
-            data_explorer.show(intrusion_data)
-        elif selected == "IDA/EDA Analysis":
-            from modules import data_analysis
-            data_analysis.show(global_threats, intrusion_data)
-        elif selected == "Data Encoding":
-            from modules import data_encoding
-            data_encoding.show(global_threats, intrusion_data)
-        elif selected == "Methodology":
-            from modules import methodology
-            methodology.show()
-
-else:
-    # Default view
-    with tab1:
-        st.info("👈 Select a Product page from the sidebar.")
-    with tab2:
-        st.info("👈 Select a Data Science page from the sidebar.")
+# Page Routing
+dash_pages = ["Dashboard Overview", "Global Threat Landscape", "Intrusion Detection"]
+if selected in dash_pages:
+    from modules import home
+    home.show(global_threats, intrusion_data, page=selected)
+elif selected == "Data Explorer":
+    from modules import data_explorer
+    data_explorer.show(intrusion_data)
+elif selected == "IDA/EDA Analysis":
+    from modules import data_analysis
+    data_analysis.show(global_threats, intrusion_data)
+elif selected == "Data Encoding":
+    from modules import data_encoding
+    data_encoding.show(global_threats, intrusion_data)
+elif selected == "Comparative Insights":
+    from modules import comparative_insights
+    comparative_insights.show(global_threats, intrusion_data)
+elif selected == "Methodology":
+    from modules import methodology
+    methodology.show()
