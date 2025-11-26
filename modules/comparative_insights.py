@@ -127,7 +127,7 @@ def show(global_threats, intrusion_data):
             y=comp_counts,
             mode='lines',
             fill='tozeroy',
-            line=dict(color='#ff7f0e', width=2),
+            line=dict(color=COLORS['accent_orange'], width=2),
             name='Attacks'
         ))
 
@@ -233,9 +233,9 @@ def show(global_threats, intrusion_data):
     mapping_df = pd.DataFrame(mapping_data)
 
     st.dataframe(
-        mapping_df.style.apply(lambda x: ['background-color: #ffcccc' if v == 'Critical'
-                                          else 'background-color: #ffe6cc' if v == 'High'
-                                          else 'background-color: #ffffcc' if v == 'Medium'
+        mapping_df.style.apply(lambda x: [f'background-color: {COLORS["accent_red"]}33' if v == 'Critical'
+                                          else f'background-color: {COLORS["accent_orange"]}33' if v == 'High'
+                                          else f'background-color: {COLORS["accent_blue"]}1A' if v == 'Medium'
                                           else '' for v in x], subset=['Defense Priority']),
         use_container_width=True,
         hide_index=True

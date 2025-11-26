@@ -39,7 +39,7 @@ st.set_page_config(
 )
 
 # Apply centralized theme CSS
-from modules.theme import apply_dashboard_css
+from modules.theme import apply_dashboard_css, COLORS
 apply_dashboard_css(sidebar_width=320)
 
 # Data loading with caching
@@ -131,7 +131,7 @@ with st.sidebar:
             st.markdown(f"<h3 style='padding: 10px 10px 5px 10px; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em;'>{name}</h3>", unsafe_allow_html=True)
         else:
             is_selected = st.session_state.selected_page == name
-            link_style = "color: #00FFB3; font-weight: 600; background-color: var(--bg-hover); border-radius: 8px;" if is_selected else "color: #A0A7B8; font-weight: 500;"
+            link_style = f"color: {COLORS['accent_green']}; font-weight: 600; background-color: var(--bg-hover); border-radius: 8px;" if is_selected else f"color: {COLORS['text_muted']}; font-weight: 500;"
             st.markdown(f'''
             <a href="/?page={page_id}" target="_self" style="text-decoration: none; display: block; padding: 8px 10px 8px 20px; margin: 2px 10px; {link_style}">
                 {icon} {name}
@@ -172,7 +172,7 @@ with st.sidebar:
 
     elif selected == "Intrusion Detection":
         from modules.filters import page_filter_panel_intrusion, show_filter_stats, apply_page_filters_intrusion
-        st.sidebar.markdown('<div style="padding: 12px 16px; background: linear-gradient(135deg, rgba(0, 217, 255, 0.05) 0%, rgba(0, 255, 179, 0.05) 100%); border: 1px solid rgba(0, 217, 255, 0.2); border-radius: 12px; margin-bottom: 16px;"><p style="margin: 0; font-size: 0.85rem; color: #A0A7B8; text-align: center;"><span style="color: #00D9FF; font-weight: 600;">Customize</span> this page\'s visualization by applying specific filters below</p></div>', unsafe_allow_html=True)
+        st.sidebar.markdown(f'<div style="padding: 12px 16px; background: {COLORS["accent_blue"]}0D; border: 1px solid {COLORS["border_color"]}; border-radius: 12px; margin-bottom: 16px;"><p style="margin: 0; font-size: 0.85rem; color: {COLORS["text_secondary"]}; text-align: center;"><span style="color: {COLORS["accent_blue"]}; font-weight: 600;">Customize</span> this page\'s visualization by applying specific filters below</p></div>', unsafe_allow_html=True)
         page_filters = page_filter_panel_intrusion(intrusion_data)
         st.session_state.page_filters['intrusion_detection'] = page_filters
 

@@ -6,7 +6,7 @@ Follows DESIGN_RULES.md and filter architecture from .claudedesign
 import streamlit as st
 import pandas as pd
 from typing import Dict, Any, List, Tuple, Optional
-from modules.theme import COLORS
+from modules.theme import COLORS, SHADOWS
 
 
 def init_filter_state():
@@ -106,25 +106,25 @@ def global_filter_sidebar(global_threats: pd.DataFrame) -> Dict[str, Any]:
 
     st.sidebar.markdown("---")
 
-    # CSS for slider and selectbox colors (Light theme)
-    st.sidebar.markdown("""
+    # CSS for slider and selectbox colors
+    st.sidebar.markdown(f"""
         <style>
-        .stSlider > div > div > div > div {
-            background: #3182CE !important;
-        }
-        .stSlider > div > div > div > div > div {
-            background: #3182CE !important;
+        .stSlider > div > div > div > div {{
+            background: {COLORS['accent_blue']} !important;
+        }}
+        .stSlider > div > div > div > div > div {{
+            background: {COLORS['accent_blue']} !important;
             box-shadow: 0 0 8px rgba(49, 130, 206, 0.5) !important;
-        }
-        .stSlider > div > div > div {
+        }}
+        .stSlider > div > div > div {{
             background: rgba(49, 130, 206, 0.15) !important;
-        }
+        }}
 
         /* Selectbox styling for Time Period */
-        [data-testid="stSidebar"] [data-baseweb="select"] > div {
+        [data-testid="stSidebar"] [data-baseweb="select"] > div {{
             background: transparent !important;
-            border-color: #E2E8F0 !important;
-        }
+            border-color: {COLORS['border_color']} !important;
+        }}
         </style>
     """, unsafe_allow_html=True)
 
@@ -135,17 +135,17 @@ def global_filter_sidebar(global_threats: pd.DataFrame) -> Dict[str, Any]:
         if st.session_state['global_filters']['year_range'] is None:
             st.session_state['global_filters']['year_range'] = (min_year, max_year)
 
-        # Time Period Container - header with top border (Light theme)
+        # Time Period Container - header with top border
         with st.sidebar.container():
-            st.markdown("""<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-bottom: none; border-radius: 12px 12px 0 0; padding: 16px 18px 14px 18px; margin-bottom: 0px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
+            st.markdown(f"""<div style="background: {COLORS['bg_secondary']}; border: 1px solid {COLORS['border_color']}; border-bottom: none; border-radius: 12px 12px 0 0; padding: 16px 18px 14px 18px; margin-bottom: 0px; box-shadow: {SHADOWS['sm']};">
 <div style="display: flex; align-items: center; gap: 8px;">
 <span style="font-size: 18px;">📅</span>
-<span style="font-size: 0.95rem; font-weight: 700; color: #1A1A1A;">Time Period</span>
+<span style="font-size: 0.95rem; font-weight: 700; color: {COLORS['text_primary']};">Time Period</span>
 </div>
 </div>""", unsafe_allow_html=True)
 
             # Dropdowns wrapper with side borders and background
-            st.markdown("""<div style="background: #FFFFFF; border-left: 1px solid #E2E8F0; border-right: 1px solid #E2E8F0; padding: 0px 18px 8px 18px; margin-top: 0px; margin-bottom: 0px;">
+            st.markdown(f"""<div style="background: {COLORS['bg_secondary']}; border-left: 1px solid {COLORS['border_color']}; border-right: 1px solid {COLORS['border_color']}; padding: 0px 18px 8px 18px; margin-top: 0px; margin-bottom: 0px;">
 </div>""", unsafe_allow_html=True)
 
             # Year selection dropdowns
@@ -168,8 +168,8 @@ def global_filter_sidebar(global_threats: pd.DataFrame) -> Dict[str, Any]:
                     key='end_year_select'
                 )
 
-            # Bottom border closure (Light theme)
-            st.markdown("""<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-top: none; border-radius: 0 0 12px 12px; padding: 10px; margin-top: 0px; margin-bottom: 20px;">
+            # Bottom border closure
+            st.markdown(f"""<div style="background: {COLORS['bg_secondary']}; border: 1px solid {COLORS['border_color']}; border-top: none; border-radius: 0 0 12px 12px; padding: 10px; margin-top: 0px; margin-bottom: 20px;">
 </div>""", unsafe_allow_html=True)
 
         # Ensure start_year <= end_year
@@ -252,27 +252,27 @@ def filter_summary_chips(active_filters: Dict[str, Any], page_filters: Optional[
                     'color': 'orange'
                 })
 
-    # Color schemes for different chip types - Light theme
+    # Color schemes for different chip types
     color_schemes = {
         'blue': {
-            'bg': 'rgba(49, 130, 206, 0.1)',
-            'border': '#3182CE',
-            'text': '#3182CE'
+            'bg': f'{COLORS["accent_blue"]}1A',  # 10% opacity
+            'border': COLORS['accent_blue'],
+            'text': COLORS['accent_blue']
         },
         'green': {
-            'bg': 'rgba(56, 161, 105, 0.1)',
-            'border': '#38A169',
-            'text': '#38A169'
+            'bg': f'{COLORS["accent_green"]}1A',
+            'border': COLORS['accent_green'],
+            'text': COLORS['accent_green']
         },
         'purple': {
-            'bg': 'rgba(128, 90, 213, 0.1)',
-            'border': '#805AD5',
-            'text': '#805AD5'
+            'bg': f'{COLORS["accent_purple"]}1A',
+            'border': COLORS['accent_purple'],
+            'text': COLORS['accent_purple']
         },
         'orange': {
-            'bg': 'rgba(221, 107, 32, 0.1)',
-            'border': '#DD6B20',
-            'text': '#DD6B20'
+            'bg': f'{COLORS["accent_orange"]}1A',
+            'border': COLORS['accent_orange'],
+            'text': COLORS['accent_orange']
         }
     }
 
@@ -281,16 +281,16 @@ def filter_summary_chips(active_filters: Dict[str, Any], page_filters: Optional[
     if chips:
         for chip in chips:
             color_scheme = color_schemes.get(chip.get('color', 'blue'), color_schemes['blue'])
-            chips_html += f'<div style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: {color_scheme["bg"]}; border: 1.5px solid {color_scheme["border"]}; border-radius: 24px; font-size: 0.85rem; font-weight: 600; color: {color_scheme["text"]}; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); transition: all 0.2s ease; cursor: default;"><span style="font-size: 14px; line-height: 1;">{chip["icon"]}</span><span style="letter-spacing: 0.02em;">{chip["label"]}</span></div>'
+            chips_html += f'<div style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: {color_scheme["bg"]}; border: 1.5px solid {color_scheme["border"]}; border-radius: 24px; font-size: 0.85rem; font-weight: 600; color: {color_scheme["text"]}; box-shadow: {SHADOWS["sm"]}; transition: all 0.2s ease; cursor: default;"><span style="font-size: 14px; line-height: 1;">{chip["icon"]}</span><span style="letter-spacing: 0.02em;">{chip["label"]}</span></div>'
     else:
-        chips_html = '<div style="flex: 1; display: flex; align-items: center; justify-content: center; color: #718096; font-size: 0.85rem;">No filters applied</div>'
+        chips_html = f'<div style="flex: 1; display: flex; align-items: center; justify-content: center; color: {COLORS["text_muted"]}; font-size: 0.85rem;">No filters applied</div>'
 
-    # Render complete HTML in one call with consistent height - Light theme
-    html_content = f'''<div style="position: relative; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 18px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); min-height: 200px; display: flex; flex-direction: column;">
+    # Render complete HTML in one call with consistent height
+    html_content = f'''<div style="position: relative; background: {COLORS['bg_secondary']}; border: 1px solid {COLORS['border_color']}; border-radius: 12px; padding: 18px; box-shadow: {SHADOWS['md']}; min-height: 200px; display: flex; flex-direction: column;">
 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">
 <span style="font-size: 18px;">✨</span>
-<span style="font-size: 0.95rem; font-weight: 700; color: #1A1A1A;">Active Filters</span>
-<div style="background: #3182CE; color: #FFFFFF; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); margin-left: auto;">{len(chips)}</div>
+<span style="font-size: 0.95rem; font-weight: 700; color: {COLORS['text_primary']};">Active Filters</span>
+<div style="background: {COLORS['accent_blue']}; color: {COLORS['bg_secondary']}; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; box-shadow: {SHADOWS['sm']}; margin-left: auto;">{len(chips)}</div>
 </div>
 <div style="flex: 1; display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-start; align-content: flex-start;">
 {chips_html}
@@ -341,7 +341,7 @@ def page_filter_panel_global_threats(global_threats: pd.DataFrame, page_name: st
     """
     init_filter_state()
 
-    st.markdown('<div style="padding: 12px 16px; background: rgba(49, 130, 206, 0.05); border: 1px solid #E2E8F0; border-radius: 12px; margin-bottom: 16px;"><p style="margin: 0; font-size: 0.85rem; color: #4A5568; text-align: center;"><span style="color: #3182CE; font-weight: 600;">Customize</span> this page\'s visualization by applying specific filters below</p></div>', unsafe_allow_html=True)
+    st.markdown(f'<div style="padding: 12px 16px; background: {COLORS["accent_blue"]}0D; border: 1px solid {COLORS["border_color"]}; border-radius: 12px; margin-bottom: 16px;"><p style="margin: 0; font-size: 0.85rem; color: {COLORS["text_secondary"]}; text-align: center;"><span style="color: {COLORS["accent_blue"]}; font-weight: 600;">Customize</span> this page\'s visualization by applying specific filters below</p></div>', unsafe_allow_html=True)
 
     # Attack Type filter
     attack_types_options = ["All"] + sorted(global_threats['Attack Type'].dropna().unique()) if 'Attack Type' in global_threats.columns else ["All"]
@@ -514,33 +514,33 @@ def show_filter_stats(original_count: int, filtered_count: int):
 
     # Determine color based on filter intensity (Light theme)
     if percentage < 25:
-        bar_color = '#38A169'
-        glow_color = 'rgba(56, 161, 105, 0.3)'
+        bar_color = COLORS['accent_green']
+        glow_color = f'{COLORS["accent_green"]}4D'
     elif percentage < 50:
-        bar_color = '#3182CE'
-        glow_color = 'rgba(49, 130, 206, 0.3)'
+        bar_color = COLORS['accent_blue']
+        glow_color = f'{COLORS["accent_blue"]}4D'
     elif percentage < 75:
-        bar_color = '#DD6B20'
-        glow_color = 'rgba(221, 107, 32, 0.3)'
+        bar_color = COLORS['accent_orange']
+        glow_color = f'{COLORS["accent_orange"]}4D'
     else:
-        bar_color = '#805AD5'
-        glow_color = 'rgba(128, 90, 213, 0.3)'
+        bar_color = COLORS['accent_purple']
+        glow_color = f'{COLORS["accent_purple"]}4D'
 
-    stats_html = f'''<div style="position: relative; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; padding: 20px 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); overflow: hidden;">
-<div style="position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: linear-gradient(180deg, #3182CE 0%, #38A169 100%); box-shadow: 0 0 8px {glow_color};"></div>
+    stats_html = f'''<div style="position: relative; background: {COLORS['bg_secondary']}; border: 1px solid {COLORS['border_color']}; border-radius: 16px; padding: 20px 24px; margin-bottom: 20px; box-shadow: {SHADOWS['md']}; overflow: hidden;">
+<div style="position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: linear-gradient(180deg, {COLORS['accent_blue']} 0%, {COLORS['accent_green']} 100%); box-shadow: 0 0 8px {glow_color};"></div>
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
 <div style="display: flex; align-items: baseline; gap: 8px;">
-<span style="font-size: 2rem; font-weight: 800; color: #1A1A1A; font-family: 'JetBrains Mono', monospace; letter-spacing: -0.02em;">{filtered_count:,}</span>
-<span style="font-size: 0.9rem; color: #4A5568;">/ {original_count:,}</span>
+<span style="font-size: 2rem; font-weight: 800; color: {COLORS['text_primary']}; font-family: 'JetBrains Mono', monospace; letter-spacing: -0.02em;">{filtered_count:,}</span>
+<span style="font-size: 0.9rem; color: {COLORS['text_secondary']};">/ {original_count:,}</span>
 </div>
-<span style="font-size: 0.8rem; color: #718096; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Showing</span>
+<span style="font-size: 0.8rem; color: {COLORS['text_muted']}; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Showing</span>
 </div>
-<div style="width: 100%; height: 6px; background: rgba(0, 0, 0, 0.05); border-radius: 3px; overflow: hidden;">
-<div style="width: {100 - percentage}%; height: 100%; background: linear-gradient(90deg, #3182CE 0%, #38A169 100%); border-radius: 3px; box-shadow: 0 0 6px {glow_color}; transition: width 0.3s ease;"></div>
+<div style="width: 100%; height: 6px; background: {COLORS['bg_tertiary']}; border-radius: 3px; overflow: hidden;">
+<div style="width: {100 - percentage}%; height: 100%; background: linear-gradient(90deg, {COLORS['accent_blue']} 0%, {COLORS['accent_green']} 100%); border-radius: 3px; box-shadow: 0 0 6px {glow_color}; transition: width 0.3s ease;"></div>
 </div>
 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
-<div style="font-size: 0.75rem; color: #718096;">{reduction:,} records filtered out</div>
-<div style="padding: 4px 12px; background: {bar_color}; border-radius: 12px; font-size: 0.8rem; color: #FFFFFF; font-weight: 700; font-family: 'JetBrains Mono', monospace; box-shadow: 0 2px 4px {glow_color};">{percentage:.1f}%</div>
+<div style="font-size: 0.75rem; color: {COLORS['text_muted']};">{reduction:,} records filtered out</div>
+<div style="padding: 4px 12px; background: {bar_color}; border-radius: 12px; font-size: 0.8rem; color: {COLORS['bg_secondary']}; font-weight: 700; font-family: 'JetBrains Mono', monospace; box-shadow: 0 2px 4px {glow_color};">{percentage:.1f}%</div>
 </div>
 </div>'''
 
