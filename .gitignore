@@ -33,12 +33,16 @@ wheels/
 *.swo
 *~
 
+# Claude Code
+.claude/
+.claudedesign
+
 # OS
 .DS_Store
 Thumbs.db
 
 # Streamlit
-.streamlit/secrets.toml
+.streamlit/
 
 # Data (if too large)
 # data/*.csv
