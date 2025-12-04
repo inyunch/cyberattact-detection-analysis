@@ -42,3 +42,9 @@ Thumbs.db
 
 # Data (if too large)
 # data/*.csv
+
+# Presentation documents (personal/private)
+PRESENTATION_GUIDE.md
+PRESENTATION_QUICK_REFERENCE.md
+PRESENTATION_SLIDES_OUTLINE.md
+presentation.md

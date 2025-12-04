@@ -545,3 +545,166 @@ def show_filter_stats(original_count: int, filtered_count: int):
 </div>'''
 
     st.sidebar.markdown(stats_html, unsafe_allow_html=True)
+
+
+# ============================================================================
+# PHISHING DETECTION FILTERS
+# ============================================================================
+
+def page_filter_panel_phishing(df: pd.DataFrame) -> Dict[str, Any]:
+    """
+    Render page-specific filters for Phishing Detection page in sidebar.
+
+    Args:
+        df: Phishing detection dataframe
+
+    Returns:
+        Dictionary with filter values
+    """
+    filters = {}
+
+    # URL Length filter
+    st.sidebar.markdown("**URL Length**")
+    min_length, max_length = int(df['UrlLength'].min()), int(df['UrlLength'].max())
+    filters['url_length_range'] = st.sidebar.slider(
+        "URL Length Range",
+        min_value=min_length,
+        max_value=max_length,
+        value=(min_length, max_length),
+        key='phishing_url_length'
+    )
+
+    st.sidebar.markdown("---")
+
+    # HTTPS filter
+    st.sidebar.markdown("**HTTPS Usage**")
+    filters['https_filter'] = st.sidebar.radio(
+        "HTTPS Filter",
+        options=['All', 'HTTPS Only', 'No HTTPS'],
+        key='phishing_https_filter',
+        index=0
+    )
+
+    st.sidebar.markdown("---")
+
+    # IP Address filter
+    st.sidebar.markdown("**URL Type**")
+    filters['ip_filter'] = st.sidebar.radio(
+        "IP Address in URL",
+        options=['All', 'Domain Names Only', 'IP Addresses Only'],
+        key='phishing_ip_filter',
+        index=0
+    )
+
+    st.sidebar.markdown("---")
+
+    # Classification filter
+    st.sidebar.markdown("**Classification**")
+    filters['class_filter'] = st.sidebar.radio(
+        "Show URLs",
+        options=['All', 'Phishing Only', 'Legitimate Only'],
+        key='phishing_class_filter',
+        index=0
+    )
+
+    st.sidebar.markdown("---")
+
+    # Behavioral indicators
+    st.sidebar.markdown("**Behavioral Indicators**")
+    filters['popup_window'] = st.sidebar.checkbox(
+        "Has PopUp Window",
+        value=False,
+        key='phishing_popup'
+    )
+
+    filters['right_click_disabled'] = st.sidebar.checkbox(
+        "Right Click Disabled",
+        value=False,
+        key='phishing_rightclick'
+    )
+
+    filters['submit_to_email'] = st.sidebar.checkbox(
+        "Submits Info to Email",
+        value=False,
+        key='phishing_email'
+    )
+
+    st.sidebar.markdown("---")
+
+    # Security indicators
+    st.sidebar.markdown("**Security Indicators**")
+    filters['insecure_forms'] = st.sidebar.checkbox(
+        "Has Insecure Forms",
+        value=False,
+        key='phishing_insecure_forms'
+    )
+
+    filters['embedded_brand'] = st.sidebar.checkbox(
+        "Has Embedded Brand Name",
+        value=False,
+        key='phishing_brand'
+    )
+
+    return filters
+
+
+def apply_page_filters_phishing(df: pd.DataFrame, filters: Dict[str, Any]) -> pd.DataFrame:
+    """
+    Apply page-specific filters to phishing detection dataframe.
+
+    Args:
+        df: Original phishing detection dataframe
+        filters: Dictionary containing filter values
+
+    Returns:
+        Filtered dataframe
+    """
+    filtered_df = df.copy()
+
+    # Apply URL length filter
+    if filters.get('url_length_range'):
+        min_len, max_len = filters['url_length_range']
+        filtered_df = filtered_df[
+            (filtered_df['UrlLength'] >= min_len) &
+            (filtered_df['UrlLength'] <= max_len)
+        ]
+
+    # Apply HTTPS filter
+    https_filter = filters.get('https_filter', 'All')
+    if https_filter == 'HTTPS Only':
+        filtered_df = filtered_df[filtered_df['NoHttps'] == 0]
+    elif https_filter == 'No HTTPS':
+        filtered_df = filtered_df[filtered_df['NoHttps'] == 1]
+
+    # Apply IP address filter
+    ip_filter = filters.get('ip_filter', 'All')
+    if ip_filter == 'Domain Names Only':
+        filtered_df = filtered_df[filtered_df['IpAddress'] == 0]
+    elif ip_filter == 'IP Addresses Only':
+        filtered_df = filtered_df[filtered_df['IpAddress'] == 1]
+
+    # Apply classification filter
+    class_filter = filters.get('class_filter', 'All')
+    if class_filter == 'Phishing Only':
+        filtered_df = filtered_df[filtered_df['CLASS_LABEL'] == 1]
+    elif class_filter == 'Legitimate Only':
+        filtered_df = filtered_df[filtered_df['CLASS_LABEL'] == 0]
+
+    # Apply behavioral indicators
+    if filters.get('popup_window', False):
+        filtered_df = filtered_df[filtered_df['PopUpWindow'] == 1]
+
+    if filters.get('right_click_disabled', False):
+        filtered_df = filtered_df[filtered_df['RightClickDisabled'] == 1]
+
+    if filters.get('submit_to_email', False):
+        filtered_df = filtered_df[filtered_df['SubmitInfoToEmail'] == 1]
+
+    # Apply security indicators
+    if filters.get('insecure_forms', False):
+        filtered_df = filtered_df[filtered_df['InsecureForms'] == 1]
+
+    if filters.get('embedded_brand', False):
+        filtered_df = filtered_df[filtered_df['EmbeddedBrandName'] == 1]
+
+    return filtered_df

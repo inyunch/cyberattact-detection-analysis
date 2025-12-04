@@ -25,7 +25,7 @@ import plotly.graph_objects as go
 from modules.theme import COLORS, apply_plotly_theme
 
 
-def show(global_threats, intrusion_data):
+def show(global_threats, intrusion_data, phishing_data):
     """Main entry point for data encoding page."""
 
     st.title("🔢 Data Encoding & Feature Engineering")
@@ -35,22 +35,29 @@ def show(global_threats, intrusion_data):
     # Dataset selection
     dataset_choice = st.radio(
         "Select Dataset to Encode",
-        ["Global Threats Dataset", "Intrusion Detection Dataset", "Both Datasets"],
+        ["Global Threats Dataset", "Intrusion Detection Dataset", "Phishing Detection Dataset", "All Datasets"],
         horizontal=True
     )
 
     st.markdown("---")
 
-    if dataset_choice in ["Global Threats Dataset", "Both Datasets"]:
+    if dataset_choice in ["Global Threats Dataset", "All Datasets"]:
         st.subheader("🌍 Global Threats Dataset Encoding")
         encode_global_threats(global_threats)
 
-        if dataset_choice == "Both Datasets":
+        if dataset_choice == "All Datasets":
             st.markdown("---")
 
-    if dataset_choice in ["Intrusion Detection Dataset", "Both Datasets"]:
+    if dataset_choice in ["Intrusion Detection Dataset", "All Datasets"]:
         st.subheader("🛡️ Intrusion Detection Dataset Encoding")
         encode_intrusion_detection(intrusion_data)
+
+        if dataset_choice == "All Datasets":
+            st.markdown("---")
+
+    if dataset_choice in ["Phishing Detection Dataset", "All Datasets"]:
+        st.subheader("🎣 Phishing Detection Dataset Encoding")
+        encode_phishing_detection(phishing_data)
 
 
 def encode_global_threats(df):
@@ -664,3 +671,151 @@ def encode_intrusion_detection(df):
         - Use stratified splitting to maintain class proportions
         - Evaluate with Precision, Recall, F1-Score (not just accuracy)
         """)
+
+
+def encode_phishing_detection(df):
+    """Encode categorical variables in Phishing Detection dataset."""
+
+    st.markdown("#### 📋 Dataset Overview")
+    st.info("The Phishing Detection dataset contains primarily numeric features extracted from URLs. Most features are already encoded and ready for ML.")
+
+    # Display basic info
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.metric("Total Records", f"{len(df):,}")
+
+    with col2:
+        st.metric("Total Features", len(df.columns))
+
+    with col3:
+        phishing_rate = (df['CLASS_LABEL'].sum() / len(df)) * 100
+        st.metric("Phishing Rate", f"{phishing_rate:.1f}%")
+
+    st.markdown("---")
+
+    # Feature types
+    st.markdown("#### 🔍 Feature Analysis")
+
+    numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
+    categorical_cols = df.select_dtypes(include=['object']).columns.tolist()
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.markdown("**Numeric Features**")
+        st.info(f"✓ **{len(numeric_cols)} features** already numeric and ready for ML")
+        with st.expander("View numeric features"):
+            st.write([col for col in numeric_cols if col != 'CLASS_LABEL'][:20])
+
+    with col2:
+        st.markdown("**Target Variable**")
+        target_dist = df['CLASS_LABEL'].value_counts()
+        st.dataframe(pd.DataFrame({
+            'Class': ['Legitimate (0)', 'Phishing (1)'],
+            'Count': [target_dist.get(0, 0), target_dist.get(1, 0)],
+            'Percentage': [
+                f"{(target_dist.get(0, 0)/len(df)*100):.1f}%",
+                f"{(target_dist.get(1, 0)/len(df)*100):.1f}%"
+            ]
+        }), hide_index=True)
+
+    st.markdown("---")
+
+    # Feature engineering suggestions
+    st.markdown("#### 🔧 Feature Engineering")
+
+    st.markdown("""
+    The Phishing Detection dataset already contains well-engineered features. Key feature categories:
+
+    **URL Structure Features:**
+    - `NumDots`, `SubdomainLevel`, `PathLevel`, `UrlLength`
+    - `NumDash`, `NumUnderscore`, `NumPercent`
+
+    **Security Indicators:**
+    - `NoHttps`, `IpAddress`, `AtSymbol`
+    - `InsecureForms`, `ExtFavicon`
+
+    **Content-Based Features:**
+    - `EmbeddedBrandName`, `NumSensitiveWords`
+    - `PctExtHyperlinks`, `PctExtResourceUrls`
+
+    **Behavioral Features:**
+    - `PopUpWindow`, `RightClickDisabled`
+    - `IframeOrFrame`, `SubmitInfoToEmail`
+    """)
+
+    st.markdown("---")
+
+    # Download encoded data
+    st.markdown("#### 💾 Export Encoded Data")
+
+    # Prepare data for download (ensure all numeric)
+    df_encoded = df.copy()
+
+    # Handle any categorical columns if they exist
+    for col in categorical_cols:
+        if col != 'CLASS_LABEL':
+            le = LabelEncoder()
+            df_encoded[col] = le.fit_transform(df[col].astype(str))
+
+    csv = df_encoded.to_csv(index=False).encode('utf-8')
+    st.download_button(
+        label="📥 Download Encoded Phishing Dataset (CSV)",
+        data=csv,
+        file_name='phishing_detection_encoded.csv',
+        mime='text/csv',
+        help="Download the encoded dataset ready for ML training"
+    )
+
+    # Display sample of encoded data
+    with st.expander("👁️ Preview Encoded Data"):
+        st.dataframe(df_encoded.head(20), use_container_width=True)
+
+    st.markdown("---")
+
+    # ML Preparation Guide
+    st.markdown("#### 🤖 ML Preparation Guide")
+
+    st.code("""
+# Load the encoded dataset
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import RandomForestClassifier
+
+# Load data
+df = pd.read_csv('phishing_detection_encoded.csv')
+
+# Separate features and target
+X = df.drop(['CLASS_LABEL', 'id'], axis=1)  # Drop target and ID
+y = df['CLASS_LABEL']
+
+# Split data (stratified due to class imbalance)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=42, stratify=y
+)
+
+# Scale features
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# Train model
+model = RandomForestClassifier(
+    n_estimators=100,
+    random_state=42,
+    class_weight='balanced'
+)
+model.fit(X_train_scaled, y_train)
+
+# Evaluate
+from sklearn.metrics import classification_report, roc_auc_score
+y_pred = model.predict(X_test_scaled)
+y_pred_proba = model.predict_proba(X_test_scaled)[:, 1]
+
+print(classification_report(y_test, y_pred))
+print(f"ROC-AUC: {roc_auc_score(y_test, y_pred_proba):.3f}")
+    """, language='python')
+
+    st.success("✓ Dataset is ready for machine learning! All features are numeric and properly encoded.")

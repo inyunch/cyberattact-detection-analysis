@@ -20,8 +20,8 @@ if "page" in _qp:
     page_from_query = str(page_from_query).replace('_', ' ')
     allowed_pages = [
         "Dashboard Overview", "Global Threat Landscape", "Intrusion Detection",
-        "Data Explorer", "IDA/EDA Analysis", "Data Encoding", "ML Model Development",
-        "Comparative Insights", "Methodology"
+        "Phishing Detection", "Data Explorer", "IDA/EDA Analysis", "Data Encoding",
+        "ML Model Development", "Comparative Insights", "Methodology"
     ]
     if page_from_query in allowed_pages:
         st.session_state.selected_page = page_from_query
@@ -46,18 +46,21 @@ apply_dashboard_css(sidebar_width=320)
 # Data loading with caching
 @st.cache_data
 def load_data():
-    """Load both datasets with robust checks and clear guidance."""
+    """Load all three datasets with robust checks and clear guidance."""
     from pathlib import Path
     data_dir = Path('data')
     gt_path = data_dir / 'Global_Cybersecurity_Threats_2015-2024.csv'
     id_path = data_dir / 'cybersecurity_intrusion_data.csv'
+    ph_path = data_dir / 'Phishing_Legitimate_full.csv'
 
-    if not gt_path.exists() or not id_path.exists():
+    if not gt_path.exists() or not id_path.exists() or not ph_path.exists():
         missing = []
         if not gt_path.exists():
             missing.append(str(gt_path))
         if not id_path.exists():
             missing.append(str(id_path))
+        if not ph_path.exists():
+            missing.append(str(ph_path))
         st.error("Required dataset(s) missing: " + ", ".join(missing))
         st.info("Please place the datasets in the 'data/' directory with the exact filenames above, then rerun the app.")
         st.stop()
@@ -65,6 +68,7 @@ def load_data():
     try:
         global_threats = pd.read_csv(gt_path)
         intrusion_data = pd.read_csv(id_path)
+        phishing_data = pd.read_csv(ph_path)
 
         if 'Year' in global_threats.columns:
             global_threats['Year'] = pd.to_numeric(
@@ -72,13 +76,13 @@ def load_data():
                 errors='coerce'
             ).astype('Int64')
 
-        return global_threats, intrusion_data
+        return global_threats, intrusion_data, phishing_data
     except Exception as e:
         st.error(f"Error loading data: {e}")
         st.stop()
 
 # Load data
-global_threats, intrusion_data = load_data()
+global_threats, intrusion_data, phishing_data = load_data()
 
 # Import filter system
 from modules.filters import global_filter_sidebar, init_filter_state
@@ -143,6 +147,7 @@ with st.sidebar:
     nav_item("Dashboard Overview", "Dashboard_Overview", icon="📊")
     nav_item("Global Threat Landscape", "Global_Threat_Landscape", icon="🌍")
     nav_item("Intrusion Detection", "Intrusion_Detection", icon="🛡️")
+    nav_item("Phishing Detection", "Phishing_Detection", icon="🎣")
     nav_item("Comparative Insights", "Comparative_Insights", icon="💡")
 
     nav_item("🔬 Data Science", None, is_header=True)
@@ -180,6 +185,16 @@ with st.sidebar:
         st.session_state.filtered_data['intrusion_detection'] = filtered_df
         show_filter_stats(len(intrusion_data), len(filtered_df))
 
+    elif selected == "Phishing Detection":
+        from modules.filters import page_filter_panel_phishing, show_filter_stats, apply_page_filters_phishing
+        st.sidebar.markdown(f'<div style="padding: 12px 16px; background: {COLORS["accent_blue"]}0D; border: 1px solid {COLORS["border_color"]}; border-radius: 12px; margin-bottom: 16px;"><p style="margin: 0; font-size: 0.85rem; color: {COLORS["text_secondary"]}; text-align: center;"><span style="color: {COLORS["accent_blue"]}; font-weight: 600;">Customize</span> this page\'s visualization by applying specific filters below</p></div>', unsafe_allow_html=True)
+        page_filters = page_filter_panel_phishing(phishing_data)
+        st.session_state.page_filters['phishing_detection'] = page_filters
+
+        filtered_df = apply_page_filters_phishing(phishing_data, page_filters)
+        st.session_state.filtered_data['phishing_detection'] = filtered_df
+        show_filter_stats(len(phishing_data), len(filtered_df))
+
     else:
         st.info("No filters available for this page.")
 
@@ -188,18 +203,21 @@ dash_pages = ["Dashboard Overview", "Global Threat Landscape", "Intrusion Detect
 if selected in dash_pages:
     from modules import home
     home.show(global_threats, intrusion_data, page=selected)
+elif selected == "Phishing Detection":
+    from modules import phishing_detection
+    phishing_detection.show(phishing_data)
 elif selected == "Data Explorer":
     from modules import data_explorer
-    data_explorer.show(intrusion_data)
+    data_explorer.show(intrusion_data, phishing_data)
 elif selected == "IDA/EDA Analysis":
     from modules import data_analysis
-    data_analysis.show(global_threats, intrusion_data)
+    data_analysis.show(global_threats, intrusion_data, phishing_data)
 elif selected == "Data Encoding":
     from modules import data_encoding
-    data_encoding.show(global_threats, intrusion_data)
+    data_encoding.show(global_threats, intrusion_data, phishing_data)
 elif selected == "ML Model Development":
     from modules import ml_development
-    ml_development.show(global_threats, intrusion_data)
+    ml_development.show(global_threats, intrusion_data, phishing_data)
 elif selected == "Comparative Insights":
     from modules import comparative_insights
     comparative_insights.show(global_threats, intrusion_data)

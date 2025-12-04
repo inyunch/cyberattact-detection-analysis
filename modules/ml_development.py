@@ -22,7 +22,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 
-def show(global_threats, intrusion_data):
+def show(global_threats, intrusion_data, phishing_data):
     """Display ML model development and evaluation"""
 
     st.title("🤖 ML Model Development and Evaluation")
@@ -30,12 +30,35 @@ def show(global_threats, intrusion_data):
     st.markdown(f"""
     <div style="background: {COLORS['accent_blue']}0D; border-left: 4px solid {COLORS['accent_blue']}; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
         <p style="margin: 0; color: {COLORS['text_primary']}; line-height: 1.6;">
-            <strong>Purpose:</strong> Develop and evaluate machine learning models for network intrusion detection.
+            <strong>Purpose:</strong> Develop and evaluate machine learning models for cybersecurity threat detection.
             This module implements multiple supervised learning algorithms, performs model comparison, and demonstrates
             proper validation techniques.
         </p>
     </div>
     """, unsafe_allow_html=True)
+
+    # Dataset selection
+    st.markdown("### 📊 Select Dataset")
+    dataset_option = st.radio(
+        "Choose the dataset for ML model development:",
+        ["Intrusion Detection Dataset", "Phishing Detection Dataset"],
+        horizontal=True,
+        help="Select which dataset to use for training and evaluation"
+    )
+
+    # Set the active dataset based on selection
+    if dataset_option == "Intrusion Detection Dataset":
+        active_data = intrusion_data.copy()
+        dataset_type = "intrusion"
+        target_col = "attack_detected"
+        st.info("🛡️ **Intrusion Detection Dataset** selected - Network traffic analysis for intrusion detection")
+    else:
+        active_data = phishing_data.copy()
+        dataset_type = "phishing"
+        target_col = "CLASS_LABEL"
+        st.info("🎣 **Phishing Detection Dataset** selected - URL feature analysis for phishing detection")
+
+    st.markdown("---")
 
     # ============================================
     # SECTION 1: FEATURE ENGINEERING
@@ -49,20 +72,20 @@ def show(global_threats, intrusion_data):
 
     # Feature importance from Random Forest
     @st.cache_data
-    def analyze_features(df):
+    def analyze_features(df, target_column):
         """Analyze and rank features by importance"""
         # Get all numeric columns except target
         numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
 
         # Remove target and ID columns
-        exclude_cols = ['attack_detected', 'session_id', 'id']
+        exclude_cols = [target_column, 'session_id', 'id', 'attack_detected', 'CLASS_LABEL']
         available_features = [col for col in numeric_cols if col not in exclude_cols]
 
         if len(available_features) < 2:
             return None, None, None
 
         X = df[available_features].copy()
-        y = df['attack_detected'] if 'attack_detected' in df.columns else df.iloc[:, -1]
+        y = df[target_column] if target_column in df.columns else df.iloc[:, -1]
 
         # Handle missing values
         X = X.fillna(X.mean())
@@ -84,7 +107,7 @@ def show(global_threats, intrusion_data):
 
         return importance_df, X, y
 
-    importance_df, X_features, y_target = analyze_features(intrusion_data)
+    importance_df, X_features, y_target = analyze_features(active_data, target_col)
 
     if importance_df is not None:
         # Feature importance chart
@@ -121,7 +144,7 @@ def show(global_threats, intrusion_data):
         # Feature correlation heatmap
         with st.expander("📊 Feature Correlation Analysis", expanded=False):
             top_features = importance_df.head(10)['Feature'].tolist()
-            corr_matrix = intrusion_data[top_features].corr()
+            corr_matrix = active_data[top_features].corr()
 
             fig = go.Figure(data=go.Heatmap(
                 z=corr_matrix.values,
@@ -157,17 +180,17 @@ def show(global_threats, intrusion_data):
 
     # Data preparation
     @st.cache_data
-    def prepare_ml_data(df):
+    def prepare_ml_data(df, target_column):
         """Prepare data for ML training"""
         # Get all numeric columns except target
         numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
 
         # Remove target and ID columns
-        exclude_cols = ['attack_detected', 'session_id', 'id']
+        exclude_cols = [target_column, 'session_id', 'id', 'attack_detected', 'CLASS_LABEL']
         available_features = [col for col in numeric_cols if col not in exclude_cols]
 
         X = df[available_features].copy()
-        y = df['attack_detected'] if 'attack_detected' in df.columns else df.iloc[:, -1]
+        y = df[target_column] if target_column in df.columns else df.iloc[:, -1]
 
         # Encode any remaining categorical columns
         for col in X.select_dtypes(include=['object']).columns:
@@ -190,7 +213,7 @@ def show(global_threats, intrusion_data):
         return X_train, X_test, y_train, y_test, available_features
 
     try:
-        X_train, X_test, y_train, y_test, feature_names = prepare_ml_data(intrusion_data)
+        X_train, X_test, y_train, y_test, feature_names = prepare_ml_data(active_data, target_col)
 
         # Display data split
         col1, col2, col3, col4 = st.columns(4)

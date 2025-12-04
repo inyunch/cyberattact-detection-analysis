@@ -50,26 +50,106 @@ def ensure_year_numeric(df):
         df['Year'] = pd.to_numeric(df['Year'].astype(str).str.replace(',', ''), errors='coerce').astype(int)
     return df
 
-def show(global_threats, intrusion_data):
+def show(global_threats, intrusion_data, phishing_data):
     """Display IDA and EDA analysis with clean, organized layout."""
 
-    if global_threats is None or intrusion_data is None:
+    if global_threats is None or intrusion_data is None or phishing_data is None:
         st.error("Unable to load data for analysis.")
         return
 
     # Page header
     st.title("📊 IDA/EDA Analysis")
-    st.markdown("Comprehensive exploratory data analysis of cybersecurity threats and intrusion detection patterns")
+    st.markdown("Comprehensive exploratory data analysis of cybersecurity threats and detection patterns")
+
+    # ==================== KEY FINDINGS AT THE TOP ====================
+    st.markdown("---")
+    st.markdown("## 💡 Key Data Insights")
+
+    # Prepare data for key findings
+    global_threats_clean = ensure_year_numeric(global_threats.drop_duplicates())
+
+    # Calculate key metrics
+    attacks_by_year = global_threats_clean.groupby('Year').size().reset_index(name='Count')
+    growth_rate = ((attacks_by_year['Count'].iloc[-1] / attacks_by_year['Count'].iloc[0]) - 1) * 100 if len(attacks_by_year) > 1 else 0
+    attack_rate = intrusion_data['attack_detected'].mean() * 100
+    imbalance_ratio = (1 - intrusion_data['attack_detected'].mean()) / intrusion_data['attack_detected'].mean() if intrusion_data['attack_detected'].mean() > 0 else 0
+    phishing_rate = phishing_data['CLASS_LABEL'].mean() * 100
+
+    # Display key findings in a grid
+    col1, col2, col3, col4 = st.columns(4)
+
+    with col1:
+        st.markdown(f"""
+        <div style="padding: 20px; background: linear-gradient(135deg, {COLORS['accent_blue']}15 0%, {COLORS['accent_blue']}05 100%);
+             border-left: 4px solid {COLORS['accent_blue']}; border-radius: 8px; height: 160px;">
+            <div style="font-size: 0.85rem; color: {COLORS['text_muted']}; margin-bottom: 8px;">Threat Growth</div>
+            <div style="font-size: 2rem; font-weight: 700; color: {COLORS['accent_blue']}; margin-bottom: 4px;">+{growth_rate:.0f}%</div>
+            <div style="font-size: 0.75rem; color: {COLORS['text_secondary']};">2015-2024</div>
+            <div style="font-size: 0.7rem; color: {COLORS['text_muted']}; margin-top: 12px; line-height: 1.4;">
+                Exponential growth in cyber threats indicates systematic evolution of attack sophistication
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col2:
+        st.markdown(f"""
+        <div style="padding: 20px; background: linear-gradient(135deg, {COLORS['accent_red']}15 0%, {COLORS['accent_red']}05 100%);
+             border-left: 4px solid {COLORS['accent_red']}; border-radius: 8px; height: 160px;">
+            <div style="font-size: 0.85rem; color: {COLORS['text_muted']}; margin-bottom: 8px;">Class Imbalance</div>
+            <div style="font-size: 2rem; font-weight: 700; color: {COLORS['accent_red']}; margin-bottom: 4px;">{imbalance_ratio:.0f}:1</div>
+            <div style="font-size: 0.75rem; color: {COLORS['text_secondary']};">Normal vs Attack</div>
+            <div style="font-size: 0.7rem; color: {COLORS['text_muted']}; margin-top: 12px; line-height: 1.4;">
+                Severe imbalance requires specialized ML techniques (SMOTE, cost-sensitive learning)
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col3:
+        st.markdown(f"""
+        <div style="padding: 20px; background: linear-gradient(135deg, {COLORS['accent_green']}15 0%, {COLORS['accent_green']}05 100%);
+             border-left: 4px solid {COLORS['accent_green']}; border-radius: 8px; height: 160px;">
+            <div style="font-size: 0.85rem; color: {COLORS['text_muted']}; margin-bottom: 8px;">Attack Detection Rate</div>
+            <div style="font-size: 2rem; font-weight: 700; color: {COLORS['accent_green']}; margin-bottom: 4px;">{attack_rate:.1f}%</div>
+            <div style="font-size: 0.75rem; color: {COLORS['text_secondary']};">Intrusion Dataset</div>
+            <div style="font-size: 0.7rem; color: {COLORS['text_muted']}; margin-top: 12px; line-height: 1.4;">
+                Low attack rate highlights need for high-precision detection models
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col4:
+        st.markdown(f"""
+        <div style="padding: 20px; background: linear-gradient(135deg, {COLORS['accent_orange']}15 0%, {COLORS['accent_orange']}05 100%);
+             border-left: 4px solid {COLORS['accent_orange']}; border-radius: 8px; height: 160px;">
+            <div style="font-size: 0.85rem; color: {COLORS['text_muted']}; margin-bottom: 8px;">Phishing Rate</div>
+            <div style="font-size: 2rem; font-weight: 700; color: {COLORS['accent_orange']}; margin-bottom: 4px;">{phishing_rate:.1f}%</div>
+            <div style="font-size: 0.75rem; color: {COLORS['text_secondary']};">URLs Classified</div>
+            <div style="font-size: 0.7rem; color: {COLORS['text_muted']}; margin-top: 12px; line-height: 1.4;">
+                Balanced dataset ideal for binary classification modeling
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
     st.markdown("---")
 
-    # ==================== DATA QUALITY OVERVIEW ====================
-    st.subheader("Data Quality Dashboard")
+    # Dataset selection
+    st.markdown("### 📊 Select Dataset for Analysis")
+    dataset_option = st.radio(
+        "Choose the dataset to analyze:",
+        ["Global Threats Dataset", "Intrusion Detection Dataset", "Phishing Detection Dataset"],
+        horizontal=True,
+        help="Select which dataset to perform IDA/EDA analysis on"
+    )
+
+    st.markdown("---")
+
+    # ==================== DATA QUALITY ASSESSMENT ====================
+    st.markdown("## 🔍 Data Quality Assessment")
 
     # Check if missing data file exists and use it for accurate completeness metrics
     from pathlib import Path
     missing_file = Path('data/global_threat_landscape_with_missing.csv')
     if missing_file.exists():
-        # Use the dataset with missing values for accurate metrics
         try:
             gt_for_metrics = pd.read_csv(missing_file)
         except:
@@ -77,136 +157,158 @@ def show(global_threats, intrusion_data):
     else:
         gt_for_metrics = global_threats
 
-    # Calculate key metrics for both datasets
+    # Calculate comprehensive metrics
     gt_rows, gt_cols = gt_for_metrics.shape
     gt_missing_pct = (gt_for_metrics.isnull().sum().sum() / (gt_rows * gt_cols)) * 100
     gt_completeness = 100 - gt_missing_pct
+    gt_duplicates = gt_for_metrics.duplicated().sum()
 
     id_rows, id_cols = intrusion_data.shape
     id_missing_pct = (intrusion_data.isnull().sum().sum() / (id_rows * id_cols)) * 100
     id_completeness = 100 - id_missing_pct
+    id_duplicates = intrusion_data.duplicated().sum()
 
-    # Top Row: Data Quality Metrics
-    col1, col2, col3, col4 = st.columns(4)
+    ph_rows, ph_cols = phishing_data.shape
+    ph_missing_pct = (phishing_data.isnull().sum().sum() / (ph_rows * ph_cols)) * 100
+    ph_completeness = 100 - ph_missing_pct
+    ph_duplicates = phishing_data.duplicated().sum()
 
-    # Determine quality label based on completeness
-    def get_quality_label(completeness):
-        if completeness >= 95:
-            return "High quality"
-        elif completeness >= 80:
-            return "Good quality"
-        elif completeness >= 60:
-            return "Fair quality"
-        else:
-            return "Needs attention"
+    # Display quality metrics in organized columns
+    col1, col2, col3 = st.columns(3)
 
     with col1:
-        st.metric("Global Threats Records", f"{gt_rows:,}", f"{gt_cols} features")
+        st.markdown(f"""
+        <div style="padding: 16px; background: {COLORS['bg_primary']}; border: 1px solid {COLORS['border_color']}; border-radius: 8px;">
+            <div style="font-size: 0.9rem; font-weight: 600; color: {COLORS['text_primary']}; margin-bottom: 12px;">🌍 Global Threats</div>
+            <div style="font-size: 0.75rem; color: {COLORS['text_muted']};">Records: <span style="color: {COLORS['text_primary']}; font-weight: 600;">{gt_rows:,}</span></div>
+            <div style="font-size: 0.75rem; color: {COLORS['text_muted']};">Features: <span style="color: {COLORS['text_primary']}; font-weight: 600;">{gt_cols}</span></div>
+            <div style="font-size: 0.75rem; color: {COLORS['text_muted']};">Completeness: <span style="color: {COLORS['accent_green']}; font-weight: 600;">{gt_completeness:.1f}%</span></div>
+            <div style="font-size: 0.75rem; color: {COLORS['text_muted']};">Duplicates: <span style="color: {COLORS['text_primary']}; font-weight: 600;">{gt_duplicates:,}</span></div>
+        </div>
+        """, unsafe_allow_html=True)
 
     with col2:
-        st.metric("Data Completeness", f"{gt_completeness:.1f}%", get_quality_label(gt_completeness))
+        st.markdown(f"""
+        <div style="padding: 16px; background: {COLORS['bg_primary']}; border: 1px solid {COLORS['border_color']}; border-radius: 8px;">
+            <div style="font-size: 0.9rem; font-weight: 600; color: {COLORS['text_primary']}; margin-bottom: 12px;">🛡️ Intrusion Detection</div>
+            <div style="font-size: 0.75rem; color: {COLORS['text_muted']};">Records: <span style="color: {COLORS['text_primary']}; font-weight: 600;">{id_rows:,}</span></div>
+            <div style="font-size: 0.75rem; color: {COLORS['text_muted']};">Features: <span style="color: {COLORS['text_primary']}; font-weight: 600;">{id_cols}</span></div>
+            <div style="font-size: 0.75rem; color: {COLORS['text_muted']};">Completeness: <span style="color: {COLORS['accent_green']}; font-weight: 600;">{id_completeness:.1f}%</span></div>
+            <div style="font-size: 0.75rem; color: {COLORS['text_muted']};">Duplicates: <span style="color: {COLORS['text_primary']}; font-weight: 600;">{id_duplicates:,}</span></div>
+        </div>
+        """, unsafe_allow_html=True)
 
     with col3:
-        st.metric("Intrusion Detection Records", f"{id_rows:,}", f"{id_cols} features")
-
-    with col4:
-        st.metric("Data Completeness", f"{id_completeness:.1f}%", get_quality_label(id_completeness))
-
-    st.markdown("---")
-
-    # ==================== EXPLORATORY VISUALIZATIONS ====================
-    st.subheader("Quick Overview")
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-        # Global Threats: Incidents over time
-        yearly_attacks = global_threats.groupby('Year').size().reset_index(name='Count')
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(
-            x=yearly_attacks['Year'],
-            y=yearly_attacks['Count'],
-            mode='lines+markers',
-            line=dict(color=COLORS["accent_blue"], width=3),
-            marker=dict(size=8, color=COLORS["accent_green"]),
-            fill='tozeroy',
-            fillcolor='rgba(0, 217, 255, 0.1)'
-        ))
-        fig = apply_plotly_theme(fig, title="Attack Trends Over Time")
-        fig.update_layout(
-            xaxis_title="Year",
-            yaxis_title="Number of Incidents",
-            height=350
-        )
-        st.plotly_chart(fig, use_container_width=True)
-
-    with col2:
-        # Global Threats: Top attack types
-        top_attacks = global_threats['Attack Type'].value_counts().nlargest(5)
-        fig = go.Figure(go.Bar(
-            x=top_attacks.values,
-            y=top_attacks.index,
-            orientation='h',
-            marker_color=COLORS["accent_green"]
-        ))
-        fig = apply_plotly_theme(fig, title="Most Common Attack Types")
-        fig.update_layout(
-            xaxis_title="Number of Incidents",
-            yaxis=dict(autorange="reversed"),
-            height=350
-        )
-        st.plotly_chart(fig, use_container_width=True)
+        st.markdown(f"""
+        <div style="padding: 16px; background: {COLORS['bg_primary']}; border: 1px solid {COLORS['border_color']}; border-radius: 8px;">
+            <div style="font-size: 0.9rem; font-weight: 600; color: {COLORS['text_primary']}; margin-bottom: 12px;">🎣 Phishing Detection</div>
+            <div style="font-size: 0.75rem; color: {COLORS['text_muted']};">Records: <span style="color: {COLORS['text_primary']}; font-weight: 600;">{ph_rows:,}</span></div>
+            <div style="font-size: 0.75rem; color: {COLORS['text_muted']};">Features: <span style="color: {COLORS['text_primary']}; font-weight: 600;">{ph_cols}</span></div>
+            <div style="font-size: 0.75rem; color: {COLORS['text_muted']};">Completeness: <span style="color: {COLORS['accent_green']}; font-weight: 600;">{ph_completeness:.1f}%</span></div>
+            <div style="font-size: 0.75rem; color: {COLORS['text_muted']};">Duplicates: <span style="color: {COLORS['text_primary']}; font-weight: 600;">{ph_duplicates:,}</span></div>
+        </div>
+        """, unsafe_allow_html=True)
 
     st.markdown("---")
 
-    # ==================== TECHNICAL DETAILS (COLLAPSIBLE) ====================
-    with st.expander("🔧 Technical Details & Raw Data"):
-        st.markdown("### Global Threats Dataset")
-        st.dataframe(global_threats.head(10), use_container_width=True)
-        st.markdown(f"**Shape:** {gt_rows} rows × {gt_cols} columns")
+    # ==================== DATASET-SPECIFIC ANALYSIS ====================
+    if dataset_option == "Global Threats Dataset":
+        st.markdown("## 📋 Global Threats Dataset Analysis")
+        show_ida_global(global_threats)
 
-        st.markdown("---")
+    elif dataset_option == "Intrusion Detection Dataset":
+        st.markdown("## 📋 Intrusion Detection Dataset Analysis")
+        show_ida_intrusion(intrusion_data)
 
-        st.markdown("### Intrusion Detection Dataset")
-        st.dataframe(intrusion_data.head(10), use_container_width=True)
-        st.markdown(f"**Shape:** {id_rows} rows × {id_cols} columns")
+    elif dataset_option == "Phishing Detection Dataset":
+        st.markdown("## 📋 Phishing Detection Dataset Analysis")
+        show_ida_phishing(phishing_data)
 
-    with st.expander("📊 Statistical Summary"):
-        col1, col2 = st.columns(2)
-        with col1:
-            st.markdown("**Global Threats Statistics**")
+    st.markdown("---")
+
+    # ==================== ADVANCED ANALYSIS SECTIONS (COLLAPSIBLE) ====================
+    with st.expander("🔧 View Raw Data & Statistical Summary"):
+        st.markdown("### Dataset Preview")
+        if dataset_option == "Global Threats Dataset":
+            st.dataframe(global_threats.head(20), use_container_width=True)
+            st.markdown("### Statistical Summary")
             st.dataframe(global_threats.describe(), use_container_width=True)
-        with col2:
-            st.markdown("**Intrusion Detection Statistics**")
+        elif dataset_option == "Intrusion Detection Dataset":
+            st.dataframe(intrusion_data.head(20), use_container_width=True)
+            st.markdown("### Statistical Summary")
             st.dataframe(intrusion_data.describe(), use_container_width=True)
+        else:
+            st.dataframe(phishing_data.head(20), use_container_width=True)
+            st.markdown("### Statistical Summary")
+            st.dataframe(phishing_data.describe(), use_container_width=True)
 
-    # ==================== MICE IMPUTATION ANALYSIS ====================
-    with st.expander("🔬 MICE Imputation Analysis"):
+    # ==================== ADVANCED ANALYSIS (OPTIONAL EXPANDERS) ====================
+
+    # MICE Imputation Analysis
+    with st.expander("🔬 MICE Imputation Analysis - Missing Data Handling"):
         show_mice_imputation_section()
 
-    # ==================== TEMPORAL ANALYSIS ====================
-    st.markdown("---")
-    show_temporal_analysis(global_threats)
+    # Temporal Analysis (only for Global Threats)
+    if dataset_option == "Global Threats Dataset":
+        with st.expander("📅 Temporal Trend Analysis - Time-based Patterns"):
+            show_temporal_analysis(global_threats)
 
-    # ==================== GEOGRAPHIC ANALYSIS ====================
-    st.markdown("---")
-    show_geographic_analysis(global_threats)
+        with st.expander("🗺️ Geographic Distribution Analysis - Regional Insights"):
+            show_geographic_analysis(global_threats)
 
-    # ==================== CORRELATION ANALYSIS ====================
-    st.markdown("---")
-    show_correlation_analysis(global_threats, intrusion_data)
+    # Correlation Analysis
+    with st.expander("📊 Correlation Analysis - Feature Relationships"):
+        if dataset_option == "Global Threats Dataset":
+            show_correlation_analysis(global_threats, intrusion_data)
+        elif dataset_option == "Intrusion Detection Dataset":
+            # Show only intrusion correlations
+            st.markdown("### Feature Correlations - Intrusion Detection")
+            numeric_cols = intrusion_data.select_dtypes(include=[np.number]).columns
+            corr_matrix = intrusion_data[numeric_cols].corr()
 
-    # ==================== ATTACK BEHAVIOR ANALYSIS ====================
-    st.markdown("---")
-    show_behavior_analysis(intrusion_data)
+            fig = go.Figure(data=go.Heatmap(
+                z=corr_matrix.values,
+                x=corr_matrix.columns,
+                y=corr_matrix.columns,
+                colorscale='RdBu',
+                zmid=0,
+                text=corr_matrix.values.round(2),
+                texttemplate='%{text}',
+                textfont={"size": 8}
+            ))
 
-    # ==================== ADVANCED ANALYTICS ====================
-    st.markdown("---")
-    show_advanced_analytics(global_threats, intrusion_data)
+            fig = apply_plotly_theme(fig, title="Correlation Heatmap")
+            fig.update_layout(height=600)
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+            # Phishing correlations
+            st.markdown("### Feature Correlations - Phishing Detection")
+            numeric_cols = phishing_data.select_dtypes(include=[np.number]).columns
+            corr_matrix = phishing_data[numeric_cols].corr()
 
-    # ==================== KEY FINDINGS ====================
-    st.markdown("---")
-    show_key_findings(global_threats, intrusion_data)
+            fig = go.Figure(data=go.Heatmap(
+                z=corr_matrix.values,
+                x=corr_matrix.columns,
+                y=corr_matrix.columns,
+                colorscale='RdBu',
+                zmid=0,
+                text=corr_matrix.values.round(2),
+                texttemplate='%{text}',
+                textfont={"size": 8}
+            ))
+
+            fig = apply_plotly_theme(fig, title="Correlation Heatmap")
+            fig.update_layout(height=600)
+            st.plotly_chart(fig, use_container_width=True)
+
+    # Behavioral Analysis (only for Intrusion)
+    if dataset_option == "Intrusion Detection Dataset":
+        with st.expander("🔍 Attack Behavior Analysis - Pattern Detection"):
+            show_behavior_analysis(intrusion_data)
+
+    # Advanced Analytics
+    with st.expander("🎓 Advanced Analytics - PCA & Statistical Tests"):
+        show_advanced_analytics(global_threats, intrusion_data)
 
 
 # ==================== MICE IMPUTATION SECTION ====================
@@ -880,6 +982,118 @@ def show_ida_intrusion(df):
             height=400
         )
         st.plotly_chart(fig, use_container_width=True)
+
+
+def show_ida_phishing(df):
+    """Initial Data Analysis for Phishing Detection Dataset"""
+
+    st.markdown("### 📋 Dataset Overview")
+
+    rows, cols = df.shape
+    phishing_count = df['CLASS_LABEL'].sum()
+    phishing_rate = (phishing_count / len(df)) * 100
+
+    col1, col2, col3, col4 = st.columns(4)
+
+    with col1:
+        st.metric("Total URLs", f"{rows:,}")
+
+    with col2:
+        st.metric("Features", cols)
+
+    with col3:
+        st.metric("Phishing URLs", f"{phishing_count:,}")
+
+    with col4:
+        st.metric("Phishing Rate", f"{phishing_rate:.1f}%")
+
+    # Dataset balance
+    with st.expander("📊 Class Distribution", expanded=True):
+        col1, col2 = st.columns([2, 1])
+
+        with col1:
+            class_counts = df['CLASS_LABEL'].value_counts()
+
+            fig = go.Figure(data=[go.Pie(
+                labels=['Legitimate', 'Phishing'],
+                values=[class_counts[0], class_counts[1]],
+                hole=0.4,
+                marker=dict(colors=[COLORS["accent_green"], COLORS["accent_red"]])
+            )])
+
+            fig = apply_plotly_theme(fig, title="URL Classification Distribution")
+            fig.update_traces(textposition='inside', textinfo='percent+label+value')
+            fig.update_layout(height=300)
+            st.plotly_chart(fig, use_container_width=True)
+
+        with col2:
+            st.markdown("#### Balance Analysis")
+            balance_ratio = class_counts[0] / class_counts[1] if class_counts[1] > 0 else 0
+            st.metric("Balance Ratio", f"{balance_ratio:.2f}:1")
+            st.markdown(f"""
+            **Interpretation:**
+            The dataset shows a {'well-balanced' if 0.5 <= balance_ratio <= 2 else 'slightly imbalanced'}
+            distribution, which is {'ideal' if 0.5 <= balance_ratio <= 2 else 'acceptable'} for binary classification.
+            """)
+
+    # Feature distributions
+    with st.expander("📊 Key Feature Analysis"):
+        st.markdown("#### Top Features by Importance")
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            # HTTPS usage
+            https_stats = df.groupby('NoHttps')['CLASS_LABEL'].agg(['sum', 'count', 'mean']).round(3)
+            https_stats.index = ['Uses HTTPS', 'No HTTPS']
+
+            fig = go.Figure(data=[
+                go.Bar(name='Legitimate', x=https_stats.index,
+                      y=https_stats['count'] - https_stats['sum'],
+                      marker_color=COLORS["accent_green"]),
+                go.Bar(name='Phishing', x=https_stats.index,
+                      y=https_stats['sum'],
+                      marker_color=COLORS["accent_red"])
+            ])
+
+            fig = apply_plotly_theme(fig, title="HTTPS Usage vs Classification")
+            fig.update_layout(barmode='stack', height=300)
+            st.plotly_chart(fig, use_container_width=True)
+
+        with col2:
+            # IP Address presence
+            ip_stats = df.groupby('IpAddress')['CLASS_LABEL'].agg(['sum', 'count', 'mean']).round(3)
+            ip_stats.index = ['No IP', 'Contains IP']
+
+            fig = go.Figure(data=[
+                go.Bar(name='Legitimate', x=ip_stats.index,
+                      y=ip_stats['count'] - ip_stats['sum'],
+                      marker_color=COLORS["accent_green"]),
+                go.Bar(name='Phishing', x=ip_stats.index,
+                      y=ip_stats['sum'],
+                      marker_color=COLORS["accent_red"])
+            ])
+
+            fig = apply_plotly_theme(fig, title="IP Address Presence vs Classification")
+            fig.update_layout(barmode='stack', height=300)
+            st.plotly_chart(fig, use_container_width=True)
+
+    # Data quality
+    st.markdown("### 🔍 Data Quality")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        missing_count = df.isnull().sum().sum()
+        completeness = ((df.size - missing_count) / df.size) * 100
+
+        st.metric("Data Completeness", f"{completeness:.2f}%")
+        st.metric("Missing Values", missing_count)
+
+    with col2:
+        duplicates = df.duplicated().sum()
+        st.metric("Duplicate Rows", duplicates)
+        st.metric("Unique URLs", df.shape[0] - duplicates)
 
 
 # ==================== EDA FUNCTIONS ====================
