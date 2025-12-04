@@ -544,29 +544,27 @@ def show_mice_imputation_section():
     # Documentation
     st.markdown("---")
     st.markdown("#### 📚 About MICE")
+    st.markdown("""
+    **MICE (Multiple Imputation by Chained Equations)** is a robust method for handling missing data.
 
-    with st.expander("ℹ️ Learn More About MICE Imputation"):
-        st.markdown("""
-        **MICE (Multiple Imputation by Chained Equations)** is a robust method for handling missing data.
+    **How it Works:**
+    1. Make initial guesses for missing values
+    2. Iteratively model each variable as a function of others
+    3. Update predictions until convergence
 
-        **How it Works:**
-        1. Make initial guesses for missing values
-        2. Iteratively model each variable as a function of others
-        3. Update predictions until convergence
+    **Features Used:**
+    - Year (temporal context)
+    - Incident Resolution Time (severity indicator)
+    - Financial Loss (target variable)
+    - Number of Affected Users (impact indicator)
 
-        **Features Used:**
-        - Year (temporal context)
-        - Incident Resolution Time (severity indicator)
-        - Financial Loss (target variable)
-        - Number of Affected Users (impact indicator)
-
-        **Quality Metrics:**
-        - **MAE**: Average absolute error
-        - **RMSE**: Root mean squared error (penalizes large errors)
-        - **MAPE**: Percentage error (scale-independent)
-          - < 10%: Excellent
-          - 10-20%: Good
-          - > 20%: Moderate
+    **Quality Metrics:**
+    - **MAE**: Average absolute error
+    - **RMSE**: Root mean squared error (penalizes large errors)
+    - **MAPE**: Percentage error (scale-independent)
+      - < 10%: Excellent
+      - 10-20%: Good
+      - > 20%: Moderate
         """)
 
 
